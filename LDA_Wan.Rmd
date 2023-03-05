@@ -1,0 +1,168 @@
+---
+title: "LongitudinalDataAnalysis"
+author: "Group2: Wanchang Zhang; Hugo Blain; Oscar Cabanelas"
+date: "2023-03-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# 1. Task for week one
+## 1.1 Import data
+```{r}
+#install.packages("readxl")
+library("readxl")
+trenal <- read_excel("Trenal.XLS")
+summary(trenal)
+```
+remove a noninformative column const
+```{r}
+trenal= trenal[,-18]
+summary(trenal)
+```
+```{r}
+dim(trenal)
+``` 
+## 1.2 Table structure analysis and variable understanding
+The table contains observation of HC level on 1160 patients who have gone through kidney transplant. Each patient will have maximum 12 meassurements in the 12 time point $(0,0.5,1,2,\cdots,10)$ years.
+
+
+if we just look at the first 12 columns, they are all Haematocrit level at the corresponding time. Thus our response variable is Haematocrit level. If we just look at first 17 columns from HC0 to reject, then the subtable looks like a wide table;
+If we start from column id to column time, the part of table is a long table.
+From now on we focus on the long table:
+```{r}
+trenal.long = trenal[,13:20]
+summary(trenal.long)
+```
+
+
+```{r}
+dim(trenal.long)
+```
+Besides the time $0,0.5,1,2,3,4,5,\cdots,10$ is one-to-one correspondent to j $1,2,3,\cdots,12$. But we can still leave it in the dataframe.
+Our response variable is the HC level(The percentage of red cells in the blood, normal levels of hermatocrit for men range from $41\%$ to $50\%$, normal level for women is $36\%$ to $48\%$)
+the explanatory variables are age, 
+we can change the structure of the table as we are used to: Identity, time, respons, explanatory variables (time dependent), explanatory variables (time independent).
+The response variables are some continuous integer values? 
+The explanatory variables have binary type: male, cardio, reject,
+and integer type: age
+```{r}
+#install.packages("magrittr") # package installations are only needed the first time you use it
+#install.packages("dplyr")    # alternative installation of the %>%
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)   
+trenal.long %>% 
+  relocate(id) %>%
+  relocate(j,.after=id)%>%
+  relocate(time,.after = j)%>%
+  relocate(respons,.after=time)
+trenal.long$id = as.factor(trenal.long$id)
+trenal.long$j = as.factor(trenal.long$j)
+trenal.long$male = as.factor(trenal.long$male)
+trenal.long$cardio = as.factor(trenal.long$cardio)
+trenal.long$reject = as.factor(trenal.long$reject)
+summary(trenal.long)
+length(unique(trenal.long$id))
+```
+
+```{r}
+# Plot the raw data
+plot(trenal.long$time,trenal.long$respons)
+```
+```{r}
+library(ggplot2)
+library(nlme)
+library(lme4)
+
+data = trenal.long
+#Plot data
+ggplot(data, aes(x=time, y=respons)) + geom_point()
+
+#Plot data with lm line
+ggplot(data, aes(x=time, y=respons)) + geom_point() + geom_smooth(method="lm")
+
+```
+
+
+## 1.3 List of Hypotheses to be tested by the data
+#### Hypothese one
+HC level will change with time differently if the REJECT is different
+```{r}
+#Plot individual data
+ggplot(data, aes(x=time, y=respons, group=reject,color=reject)) + geom_point() 
+```
+
+#### Hypothese two
+HC level will change with time differently if the sex is different, male has generally higher HC level than female
+```{r}
+#Plot individual data
+ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point() 
+```
+
+#### Hypothese three
+HC level will change with time differently if the age when performing the kidney transplant is younger
+```{r}
+#Plot individual data
+ggplot(data, aes(x=time, y=respons, group=age,color=age)) + geom_point() 
+```
+
+#### Hypothese four
+HC level will change with time differently if the patient has experienced cardio-vascular problem during the years preceding the tranplantation
+```{r}
+#Plot individual data
+ggplot(data, aes(x=time, y=respons, group=cardio,color=cardio)) + geom_point() 
+```
+
+```{r}
+#Lm
+lm<-lm(respons~time,data=data)
+summary(lm)
+
+```
+
+```{r}
+#Plot individual data
+ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point() 
+#Spaghetti Plot
+ggplot(data, aes(x=time, y=respons, group=ID,color=ID)) + geom_point() +geom_line()
+#Spaghetti with fitted lines
+ggplot(data, aes(x=time, y=respons, group=ID,color=ID)) + geom_point()+ geom_smooth(method="lm",se=F) +geom_line()
+
+
+```
+## Linear mixed effect model
+Fixed effect could be time, sex, age, reject, cardio 
+Random effect could be 
+
+```{r}
+#lme
+data = trenal.long
+lme<-lme(respons~time+age+male+reject+cardio,data=data)
+#summary(lme)
+
+#newdata<-data.frame(ID=c(1,2,3,4,5),week=c(3,3,3,3,3))
+#newdata$prediction<-predict(lm,newdata=newdata)
+#newdata
+#predict(lme,newdata=newdata,level=0:1)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
