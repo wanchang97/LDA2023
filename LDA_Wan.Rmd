@@ -92,26 +92,30 @@ HC level will change with time differently if the REJECT is different
 #Plot individual data
 ggplot(data, aes(x=time, y=respons, group=reject,color=reject)) + geom_point() 
 ```
+```{r}
+#Plot individual data
 
+ggplot(data[data$id == c('1','2','3','4','5'),], aes(x=time, y=respons, group=id,color=id)) + geom_point()  +geom_line()
+```
 #### Hypothese two
 HC level will change with time differently if the sex is different, male has generally higher HC level than female
 ```{r}
 #Plot individual data
-ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point() 
+ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point()  +geom_line()
 ```
 
 #### Hypothese three
 HC level will change with time differently if the age when performing the kidney transplant is younger
 ```{r}
 #Plot individual data
-ggplot(data, aes(x=time, y=respons, group=age,color=age)) + geom_point() 
+ggplot(data, aes(x=time, y=respons, group=age,color=age)) + geom_point() +geom_line()
 ```
 
 #### Hypothese four
 HC level will change with time differently if the patient has experienced cardio-vascular problem during the years preceding the tranplantation
 ```{r}
 #Plot individual data
-ggplot(data, aes(x=time, y=respons, group=cardio,color=cardio)) + geom_point() 
+ggplot(data, aes(x=time, y=respons, group=cardio,color=cardio)) + geom_point()  +geom_line()
 ```
 
 ```{r}
@@ -125,9 +129,9 @@ summary(lm)
 #Plot individual data
 ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point() 
 #Spaghetti Plot
-ggplot(data, aes(x=time, y=respons, group=ID,color=ID)) + geom_point() +geom_line()
+ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point() +geom_line()
 #Spaghetti with fitted lines
-ggplot(data, aes(x=time, y=respons, group=ID,color=ID)) + geom_point()+ geom_smooth(method="lm",se=F) +geom_line()
+ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point()+ geom_smooth(method="lm",se=F) +geom_line()
 
 
 ```
@@ -137,8 +141,9 @@ Random effect could be
 
 ```{r}
 #lme
-data = trenal.long
-lme<-lme(respons~time+age+male+reject+cardio,data=data)
+#data = trenal.long
+#lme <- lme(repsons ~ time + age ,data=data)
+#lme<-lme(respons~time+age+male+reject+cardio,data=data)
 #summary(lme)
 
 #newdata<-data.frame(ID=c(1,2,3,4,5),week=c(3,3,3,3,3))
