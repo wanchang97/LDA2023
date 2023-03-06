@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # 1. Task for week one
 ## 1.1 Import data
 ```{r}
-#install.packages("readxl")
-library("readxl")
+install.packages("readxl")
+library(readxl)
 trenal <- read_excel("Trenal.XLS")
 summary(trenal)
 ```
@@ -112,7 +112,7 @@ ggplot(data.selected, aes(x=time, y=respons, group=id,color=id)) + geom_point() 
 #ggplot(data.selected, aes(x=time, y=na.pass(respons), group=id,color=id)) + geom_point()  +geom_line()
 ```
 
-##### Bar plot response over time
+##### Bax plot response over time
 ```{r}
 # Box plot
 p <- ggplot(data, aes(x=time, y=respons,group =time, color = time)) +  
@@ -125,11 +125,11 @@ HC level will change with time differently if the REJECT is different
 #Plot individual data
 ggplot(data, aes(x=time, y=respons, group=reject,color=reject)) + geom_point() 
 ```
-##### Bar plot 
+##### Box plot 
 
 ```{r}
 # Box plot
-p <- ggplot(data, aes(x=time, y=respons,group = reject, color = reject)) +  
+p <- ggplot(data, aes(x=reject, y=respons,group = reject, color = reject)) +  
   geom_boxplot()
 p
 ```
@@ -151,7 +151,7 @@ ggplot(data.female.selected, aes(x=time, y= respons, group=id,color=id)) + geom_
 ```
 ##### Box plot
 ```{r}
-p <- ggplot(data, aes(x=male, y=respons,group = male, color = male)) +  
+p <- ggplot(data, aes(x=time, y=respons,fill= male)) +  
   geom_boxplot()
 p
 ```
