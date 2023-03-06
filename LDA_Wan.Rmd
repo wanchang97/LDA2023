@@ -4,6 +4,15 @@ author: "Group2: Wanchang Zhang; Hugo Blain; Oscar Cabanelas"
 date: "2023-03-05"
 output: pdf_document
 ---
+# 0. Introduction 
+The dataset contains information on patients who received renal graft(kidney transplant)
+The patients have been followed for at most 10 years.
+
+Background: People with end-stage kidney disease who receive a kidney transplant generally live longer than people with ESRD who are on dialysis. 
+
+However, kidney transplant recipients must remain on immunosuppressants  (medications to suppress the immune system) for the rest of their life to prevent their body from rejecting the new kidney. The long-term immunosuppression puts them at risk for infections and cancer.
+
+The Haermatocrit level (HC level) usually differs with gender, Also the health condition of a person.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -52,7 +61,7 @@ and integer type: age
 #install.packages("dplyr")    # alternative installation of the %>%
 library(magrittr) # needs to be run every time you start R and want to use %>%
 library(dplyr)   
-trenal.long %>% 
+data <- trenal.long %>% 
   relocate(id) %>%
   relocate(j,.after=id)%>%
   relocate(time,.after = j)%>%
@@ -75,7 +84,6 @@ library(ggplot2)
 library(nlme)
 library(lme4)
 
-data = trenal.long
 #Plot data
 ggplot(data, aes(x=time, y=respons)) + geom_point()
 
@@ -86,37 +94,128 @@ ggplot(data, aes(x=time, y=respons)) + geom_point() + geom_smooth(method="lm")
 
 
 ## 1.3 List of Hypotheses to be tested by the data
+```{r}
+#Select a sample of data to plot
+set.seed(1)
+selected <- sample(1:length(unique(trenal.long$id)),30,replace=T) # random samples and permutations
+#selected.vector = as.vector(selected)
+data.selected = data[(data$id %in% c(selected)), ] 
+```
+
+#### Spaghetti Plot the response over time with the different persons
+```{r}
+
+#data.selected = data[data$id == selected.vector,]# why the dim(data.selected) = 12 x 8
+# Plot the respons over time for different id
+# If some responses are not available, NA
+ggplot(data.selected, aes(x=time, y=respons, group=id,color=id)) + geom_point()  +geom_line()
+#ggplot(data.selected, aes(x=time, y=na.pass(respons), group=id,color=id)) + geom_point()  +geom_line()
+```
+
+##### Bar plot response over time
+```{r}
+# Box plot
+p <- ggplot(data, aes(x=time, y=respons,group =time, color = time)) +  
+  geom_boxplot()
+p
+```
 #### Hypothese one
 HC level will change with time differently if the REJECT is different
 ```{r}
 #Plot individual data
 ggplot(data, aes(x=time, y=respons, group=reject,color=reject)) + geom_point() 
 ```
-```{r}
-#Plot individual data
+##### Bar plot 
 
-ggplot(data[data$id == c('1','2','3','4','5'),], aes(x=time, y=respons, group=id,color=id)) + geom_point()  +geom_line()
-```
-#### Hypothese two
-HC level will change with time differently if the sex is different, male has generally higher HC level than female
 ```{r}
-#Plot individual data
-ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point()  +geom_line()
+# Box plot
+p <- ggplot(data, aes(x=time, y=respons,group = reject, color = reject)) +  
+  geom_boxplot()
+p
 ```
+
+
+#### Hypothese two
+HC level will change with time differently if the gender is different, male (1) has generally higher HC level than female (0)
+```{r}
+data.male =  data[(data$male == "1" ), ] 
+data.female =  data[(data$male == "0" ), ] 
+data.male.selected =  data[(data$male == "1" & data$id %in% c(selected)), ] 
+data.female.selected =  data[(data$male == "0" & data$id %in% c(selected)), ]
+```
+
+#####  Spaghetti plots stratified by variables gender male
+```{r}
+ggplot(data.male.selected, aes(x=time, y =respons, group=id,color=id)) + geom_point()  +geom_line()+ggtitle("Spaghetti plot for male")+ geom_smooth(method="lm")
+ggplot(data.female.selected, aes(x=time, y= respons, group=id,color=id)) + geom_point()  +geom_line()+ggtitle("Spaghetti plot for female")+ geom_smooth(method="lm")
+```
+##### Box plot
+```{r}
+p <- ggplot(data, aes(x=male, y=respons,group = male, color = male)) +  
+  geom_boxplot()
+p
+```
+
+##### Box plot for male and female
+COULD I PLOT THEM IN THE SAME FIGURE?
+```{r}
+
+p.box.male <- ggplot(data.male, aes(x=time, y=respons,group = time, color = time)) +  
+  geom_boxplot()
+p.box.male
+
+p.box.female <- ggplot(data.female, aes(x=time, y=respons,group = time, color = time)) +  
+  geom_boxplot()
+p.box.female
+```
+
+
 
 #### Hypothese three
 HC level will change with time differently if the age when performing the kidney transplant is younger
 ```{r}
 #Plot individual data
-ggplot(data, aes(x=time, y=respons, group=age,color=age)) + geom_point() +geom_line()
+ggplot(data.selected, aes(x=time, y=respons, group=age,color=age)) + geom_point() +geom_line()
 ```
 
+##### Box plot
+```{r}
+p <- ggplot(data, aes(x=age, y=respons,group = age, color = age)) +  
+  geom_boxplot()
+p
+```
 #### Hypothese four
 HC level will change with time differently if the patient has experienced cardio-vascular problem during the years preceding the tranplantation
+##### Spathetti plot ?
 ```{r}
 #Plot individual data
-ggplot(data, aes(x=time, y=respons, group=cardio,color=cardio)) + geom_point()  +geom_line()
+ggplot(data.selected, aes(x=time, y=respons, group=cardio,color=cardio)) + geom_point()  +geom_line()
 ```
+##### Bar plot
+```{r}
+p <- ggplot(data, aes(x=cardio, y=respons,group = cardio, color = cardio)) +  
+  geom_boxplot()
+p
+```
+
+## Correlation analysis for different HC levels along time
+For this purpose we need the wide table
+
+```{r}
+trenal.wide = trenal[,1:17]
+summary(trenal.wide)
+```
+```{r}
+cor(trenal.wide$HC0,trenal.wide$HC06)
+```
+```{r}
+# scatter plot matrix
+
+pairs(~HC0+HC06+HC1+HC2+HC3+HC4+HC5+HC6+HC7+HC8+HC9+HC10,data=trenal.wide,
+   main="Simple Scatterplot Matrix")
+```
+
+
 
 ```{r}
 #Lm
@@ -136,7 +235,7 @@ ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point()+ geom
 
 ```
 ## Linear mixed effect model
-Fixed effect could be time, sex, age, reject, cardio 
+Fixed effect could be time, gender, age, reject, cardio 
 Random effect could be 
 
 ```{r}
