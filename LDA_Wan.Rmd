@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # 1. Task for week one
 ## 1.1 Import data
 ```{r}
-install.packages("readxl")
+#install.packages("readxl")
 library(readxl)
 trenal <- read_excel("Trenal.XLS")
 summary(trenal)
@@ -77,6 +77,8 @@ length(unique(trenal.long$id))
 
 ```{r}
 # Plot the raw data
+#install.packages("tigerstats") 
+require(tigerstats)
 xyplot(respons ~ time, groups = id, data=data, type="l",xlab="Time (year)",ylab="HC level " )
 ```
 
