@@ -77,8 +77,10 @@ length(unique(trenal.long$id))
 
 ```{r}
 # Plot the raw data
-plot(trenal.long$time,trenal.long$respons)
+xyplot(respons ~ time, groups = id, data=data, type="l",xlab="Time (year)",ylab="HC level " )
 ```
+
+
 ```{r}
 library(ggplot2)
 library(nlme)
@@ -102,6 +104,80 @@ selected <- sample(1:length(unique(trenal.long$id)),30,replace=T) # random sampl
 data.selected = data[(data$id %in% c(selected)), ] 
 ```
 
+```{r}
+# Individual plots
+plot(data.selected) # WHAT I WILL GET FROM THE PLOT(DATA), HOW to plot a scatter plot of HC level changes with time for each id instead of a scatter plot
+```
+```{r}
+# spaghettic plot
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=id))+geom_point()+ geom_line()
+
+```
+
+```{r}
+# Plot individual data by sex
+ggplot(data.selected,aes(x=time,y= respons,group=id, color=male))+geom_point()+geom_line()
+```
+
+```{r}
+# Plot mean of male and mean of female
+library(dplyr)
+MEAN <- data.selected %>%
+  group_by(male,age,cardio,reject) %>%
+  summarise(respons = mean(respons))
+MEAN
+```
+```{r}
+ggplot(data.selected,aes(x=age,y=respons,color=male)) + geom_line(data=MEAN)
+```
+
+```{r}
+# Spaghetti Ggplot separated by male =1
+p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~male)
+
+```
+```{r}
+# Spaghetti Ggplot separated by cardio
+p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~cardio)
+
+```
+```{r}
+# Spaghetti Ggplot separated by reject =1
+p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~reject)
+
+```
+
+```{r}
+# BoxPlot
+ggplot(data.selected,aes(x=as.factor(age),y=respons))+ geom_boxplot(position=position_dodge(1))
+```
+```{r}
+# BoxPlot
+ggplot(data.selected,aes(x=as.factor(time),y=respons))+ geom_boxplot(position=position_dodge(1))
+```
+
+```{r}
+# Box plot by sex
+ggplot(data.selected,aes(x=as.factor(time),y=respons,fill=as.factor(male)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+```{r}
+# Box plot by cardio
+ggplot(data.selected,aes(x=as.factor(time),y=respons,fill=as.factor(cardio)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+```{r}
+# Box plot by reject
+ggplot(data.selected,aes(x=as.factor(time),y=respons,fill=as.factor(reject)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
 #### Spaghetti Plot the response over time with the different persons
 ```{r}
 
@@ -205,6 +281,12 @@ For this purpose we need the wide table
 trenal.wide = trenal[,1:17]
 summary(trenal.wide)
 ```
+
+```{r}
+
+```
+
+
 ```{r}
 cor(trenal.wide$HC0,trenal.wide$HC06)
 ```
