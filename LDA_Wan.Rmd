@@ -137,21 +137,24 @@ ggplot(data.selected,aes(x=age,y=respons,color=male)) + geom_line(data=MEAN)
 # Spaghetti Ggplot separated by male =1
 p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
-p + facet_grid(~male)
+p + facet_grid(~male,labeller=label_both)
 
 ```
 ```{r}
 # Spaghetti Ggplot separated by cardio
 p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
-p + facet_grid(~cardio)
+cardio.labs <- c("Cardio = 0","Cardio = 1")
+p + facet_grid(~cardio,labeller = label_both) 
+#p + facet_grid(~cardio,labeller = labeller (cardio = cardio.labs)) 
+
 
 ```
 ```{r}
 # Spaghetti Ggplot separated by reject =1
 p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
-p + facet_grid(~reject)
+p + facet_grid(~reject,labeller=label_both)
 
 ```
 
@@ -301,12 +304,7 @@ pairs(~HC0+HC06+HC1+HC2+HC3+HC4+HC5+HC6+HC7+HC8+HC9+HC10,data=trenal.wide,
 
 
 
-```{r}
-#Lm
-lm<-lm(respons~time,data=data)
-summary(lm)
 
-```
 
 ```{r}
 #Plot individual data
@@ -318,7 +316,91 @@ ggplot(data, aes(x=time, y=respons, group=male,color=male)) + geom_point()+ geom
 
 
 ```
+\newpage
 ## Linear mixed effect model
+```{r}
+library(nlme)
+library(lme4)
+library(lattice)
+library(ggplot2)
+```
+
+First model only consider fixed effects, no random effects, use linear model and linear mixed model
+
+```{r}
+# First model, no random effects
+model.noRandomEffects <- lm(respons ~ time,data=data)
+summary(model.noRandomEffects)
+                      
+```
+Read from the table, we have a same model for each subject $i$
+$$\textsf{Respons_i} = 37.33685 + 0.26322 \times \textsf{time} + \epsilon_i $$
+where $\epsilon$ has a large variance
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-23.3368  -3.8633   0.0393   3.8206  27.1367 
+```{r}
+# second model random intercept
+model.inter <- lmer(respons~time+(1|id),data=data)
+summary(model.inter)
+```
+Read from the table, we have a different model for each subject $i$
+$$\textsf{Respons_i} = 37.295 + b_{i0} + (0.2913+b_{i1}) \times \textsf{time}+ \epsilon_i$$
+Now the residual $\epsilon_i$ has smaller variance
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-5.5197 -0.4741  0.0847  0.5683  6.4131 
+
+Is the random intercept giving information?
+```{r}
+value1 <- as.numeric(2*(logLik(model.inter)-(logLik(model.noRandomEffects))))
+value1
+p1 = 0.5 * (1-pchisq(value1,1))
+p1
+```
+```{r}
+library(nadiv)
+?LRTest
+library(nadiv)
+LRTest(logLik(model.inter),logLik(model.noRandomEffects))
+```
+Thus the model.inter outperforms the linear model
+
+## Third model Random Slope
+```{r}
+model.slope = lmer(respons ~ time + (time-1|id),data=data)
+summary(model.slope)
+```
+Read from the table, we have a different model for each subject $i$:
+
+$$\textsf{Respons_i} = 37.23239  + (0.35231+b_{i1}) \times \textsf{time}+ \epsilon_i$$
+
+Is this random slope giving information?
+
+```{r}
+value2 <- as.numeric(2*(logLik(model.slope)-(logLik(model.noRandomEffects))))
+value2
+p2 = 0.5*(1-pchisq(value2,1))
+p2
+LRTest(logLik(model.slope),logLik(model.noRandomEffects))
+```
+```{r}
+value12 <- as.numeric(2*(logLik(model.slope)-(logLik(model.inter))))
+value12
+p12 = 0.5*(1-pchisq(value12,1))
+p12
+LRTest(logLik(model.slope),logLik(model.inter))
+```
+
+```{r}
+value12 <- as.numeric(2*(logLik(model.slope)-(logLik(model.inter))))
+value12
+p12 = 0.5*(1-pchisq(value12,1))
+p12
+LRTest(logLik(model.inter),logLik(model.slope))
+```
+model.inter outperforms than the model.slope. 
+
 Fixed effect could be time, gender, age, reject, cardio 
 Random effect could be 
 
