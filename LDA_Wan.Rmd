@@ -1,9 +1,19 @@
 ---
-title: "LongitudinalDataAnalysis"
+title: "Longitudinal Data Analysis "
+subtitle: "Case study of Trenal.XLS using Linear Mixed Effect Model"
 author: "Group2: Wanchang Zhang; Hugo Blain; Oscar Cabanelas"
-date: "2023-03-05"
-output: pdf_document
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+  fig_caption: true
+  number_sections: true
 ---
+\newpage 
+\tableofcontents 
+\listoffigures
+\listoftables
+\newpage
+
 # 0. Introduction 
 The dataset contains information on patients who received renal graft(kidney transplant)
 The patients have been followed for at most 10 years.
@@ -61,18 +71,22 @@ and integer type: age
 #install.packages("dplyr")    # alternative installation of the %>%
 library(magrittr) # needs to be run every time you start R and want to use %>%
 library(dplyr)   
-data <- trenal.long %>% 
-  relocate(id) %>%
-  relocate(j,.after=id)%>%
-  relocate(time,.after = j)%>%
-  relocate(respons,.after=time)
 trenal.long$id = as.factor(trenal.long$id)
 trenal.long$j = as.factor(trenal.long$j)
 trenal.long$male = as.factor(trenal.long$male)
 trenal.long$cardio = as.factor(trenal.long$cardio)
 trenal.long$reject = as.factor(trenal.long$reject)
-summary(trenal.long)
-length(unique(trenal.long$id))
+
+data <- trenal.long %>% 
+  relocate(id) %>%
+  relocate(j,.after=id)%>%
+  relocate(time,.after = j)%>%
+  relocate(respons,.after=time)
+
+summary(data)
+sum(!is.na(data$respons))
+
+length(unique(data$id))
 ```
 
 ```{r}
@@ -288,7 +302,10 @@ summary(trenal.wide)
 ```
 
 ```{r}
-
+HcCorr = trenal.wide[,c(1:12)]
+cor(HcCorr,use="complete.obs" ) # also COV for covariance
+library("PerformanceAnalytics")
+chart.Correlation(HcCorr,historgram=TRUE)
 ```
 
 
@@ -333,8 +350,8 @@ model.noRandomEffects <- lm(respons ~ time,data=data)
 summary(model.noRandomEffects)
                       
 ```
-Read from the table, we have a same model for each subject $i$
-$$\textsf{Respons_i} = 37.33685 + 0.26322 \times \textsf{time} + \epsilon_i $$
+Read from the table, we have a same model for each subject $i$:
+$$\textsf{Respons}_i = 37.33685 + 0.26322 \times \textsf{time} + \epsilon_i $$
 where $\epsilon$ has a large variance
 Residuals:
      Min       1Q   Median       3Q      Max 
@@ -345,7 +362,7 @@ model.inter <- lmer(respons~time+(1|id),data=data)
 summary(model.inter)
 ```
 Read from the table, we have a different model for each subject $i$
-$$\textsf{Respons_i} = 37.295 + b_{i0} + (0.2913+b_{i1}) \times \textsf{time}+ \epsilon_i$$
+$$\textsf{Respons}_i = 37.295 + b_{i0} + (0.2913+b_{i1}) \times \textsf{time}+ \epsilon_i$$
 Now the residual $\epsilon_i$ has smaller variance
 Scaled residuals: 
     Min      1Q  Median      3Q     Max 
@@ -360,8 +377,7 @@ p1
 ```
 ```{r}
 library(nadiv)
-?LRTest
-library(nadiv)
+#?LRTest
 LRTest(logLik(model.inter),logLik(model.noRandomEffects))
 ```
 Thus the model.inter outperforms the linear model
@@ -373,7 +389,7 @@ summary(model.slope)
 ```
 Read from the table, we have a different model for each subject $i$:
 
-$$\textsf{Respons_i} = 37.23239  + (0.35231+b_{i1}) \times \textsf{time}+ \epsilon_i$$
+$$\textsf{Respons}_i = 37.23239  + (0.35231+b_{i1}) \times \textsf{time}+ \epsilon_i$$
 
 Is this random slope giving information?
 
@@ -399,10 +415,40 @@ p12 = 0.5*(1-pchisq(value12,1))
 p12
 LRTest(logLik(model.inter),logLik(model.slope))
 ```
-model.inter outperforms than the model.slope. 
+model.inter outperforms than the model.slope
 
-Fixed effect could be time, gender, age, reject, cardio 
-Random effect could be 
+Fourth Model
+
+Fixed effect(changes the same for all subjects) could be time, male, age, reject, cardio
+Random effect will start from only intercept, to the slope of gender, age, reject, cardio
+
+## Only fixed effects
+```{r}
+model.noRandomEffects.full = lm(respons ~ time+age+male+cardio+reject, data=data)
+summary(model.noRandomEffects.full)
+```
+
+```{r}
+data.noNA <- na.omit(data)
+summary(data.noNA)
+
+```
+## Take the intercept as random effects
+```{r}
+library(lme4)
+model.inter = lmer(respons ~ time+age+male+cardio+reject + (1|id), data=data)
+summary(model.inter)
+```
+
+```{r}
+library(nlme)
+model.inter.full = lme(respons ~ time+age+male+cardio+reject, random = ~1|id, data=data.noNA)
+summary(model.inter.full)
+```
+## Take 
+
+Besides we can think which term to consider the fixed effect and random effect
+Intercept + slope 1st order term + slope 2nd order term
 
 ```{r}
 #lme
