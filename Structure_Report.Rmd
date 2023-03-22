@@ -1,0 +1,220 @@
+---
+title: "Longitudinal Data Analysis "
+subtitle: "Case study of Trenal.XLS using Linear Mixed Effect Model"
+author: "Group2: Wanchang Zhang; Hugo Blain; Oscar Cabanelas"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+  fig_caption: true
+  number_sections: true
+  extra_dependencies:
+    graphicx: null
+    bm: null 
+    multirow: null
+    multicolumn: null
+    hyperref: null
+    amsmath : null
+          
+---
+\newpage 
+\tableofcontents 
+\listoffigures
+\listoftables
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Theory of Linear Mixed Effects Model(LMM)
+## Index description
+Let us assume that a given input data set $X$ has a dimension $N \times p$, with $N$ observations and $p$ predictors.
+
+For each subject indexed with $i, i = 1,\cdots,I$, we can build a linear mixed effect model 
+
+$$\bf{Y}_i = \bf{X}_i \bf{\beta} + \bf{Z}_i \bf{b}_i + \bf{\epsilon}_i$$
+
+## The application of LMM 
+Linear Mixed Effects Model is used to analyse a data set, where the observations are not fully independent, while the top level clusters are assumed independent. Inside each cluster, the observations are correlated 
+
+# Data set `Trenal.XLS` pre-analysis
+## The summary of the data set
+
+### Import data
+```{r}
+library(readxl)
+trenal <- read_excel("Trenal.XLS") # summary(trenal)
+```
+
+
+### Data Preprocessing
+
+
+```{r}
+trenal= trenal[,-18] #remove a noninformative column const
+# Continuous or discrete variables
+trenal$id = as.factor(trenal$id)
+trenal$j = as.factor(trenal$j)
+trenal$male = as.factor(trenal$male)
+trenal$cardio = as.factor(trenal$cardio)
+trenal$reject = as.factor(trenal$reject)
+
+trenal.long = trenal[,13:20] # long table form 
+trenal.wide = trenal[,1:17] # wide table form
+
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)   
+
+data.long <- trenal.long %>% # reordered long table 
+  relocate(id) %>%
+  relocate(j,.after=id)%>%
+  relocate(time,.after = j)%>%
+  relocate(respons,.after=time)
+#summary(data.long)
+sum(!is.na(data.long$respons))
+
+data.long.noNA <- na.omit(data.long)# reordered long table without NAs
+summary(data.long.noNA)
+data.long.noNA$id[length(data.long.noNA$id)]
+```
+
+### Response variable and predictors
+#### Response variable
+From the `summary(data.long.noNA)`, we can read that the response variable is a continuous variable `respons` HC level from $(15,76)$ with Mean $38.24$.
+
+We have totally $I = 1160$ ids for subjects. Ideally each id would have $12$ (start from $HC_0,HC_{0.5},HC_1,HC_2,\cdots,HC_{10}$) HC level measurement, but in really not all subjects have all of the $12$ measurements. We have totally $N = 9558 = \sum_{i=1}^{I} n_i$ missing values. 
+
+#### Predictors
+The explaining variables are 
+
+1. $X_1=time$ in year as discrete values, only changes with $j$,$j = 1,\cdots,n_i$
+2. $X_2=age$ in year with 12 NAs; will only change with subject id $i$
+3. $X_3 = male$ 0 = female, 1= male;will only change with subject id $i$
+4. $X_4 = cardio$ 0 = no, 1= yes;will only change with subject id $i$
+5. $X_5 = reject$ 0 = accept, 1= reject;will only change with subject id $i$
+6. fixed intercept, continuous
+
+In the data analysis part, we need to try out different variables accounting for fixed effects and random effects.
+<!-- [Formal Data Analysis](#data-set-`trenal.xls`-analysis-with-the-linear-mixed-effects-model) -->
+
+
+### Data visualization and the information from the data
+```{r}
+library(ggplot2)
+dim(data.long.noNA)
+```
+
+
+```{r}
+# since the data dimension is large 9551 x 8, we can select random 30 data to have a look 
+set.seed(1)
+selected <- sample(1:length(unique(data.long.noNA$id)),30,replace=T) # random samples and permutations
+#selected.vector = as.vector(selected)
+data.selected = data.long.noNA[(data.long.noNA$id %in% c(selected)), ] 
+```
+
+#### Spaghettic plot
+```{r,fig.axis = 1}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=id))+geom_point()+ geom_line()+theme_light()
+```
+Plot Info:
+The intercept may vary according to each individual
+The slope is not very easy to see
+
+```{r,fig.axis=1}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=male)) +geom_point()+ geom_line()+theme_light()
+```
+```{r,fig.axis=1}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=cardio)) +geom_point()+ geom_line()+theme_light()
+```
+
+```{r,fig.axis=1}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=reject)) +geom_point()+ geom_line()+theme_light()
+```
+
+```{r}
+# Spaghetti Ggplot separated by male =1
+p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~male,labeller=label_both)
+
+```
+
+
+```{r}
+# Spaghetti Ggplot separated by cardio
+p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+cardio.labs <- c("Cardio = 0","Cardio = 1")
+p + facet_grid(~cardio,labeller = label_both) 
+```
+```{r}
+# Spaghetti Ggplot separated by reject =1
+p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~reject,labeller=label_both)
+
+```
+
+#### Boxplot
+```{r}
+# Box plot by sex
+ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(male)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+```{r}
+# Box plot by cardio
+ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(cardio)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+```{r}
+# Box plot by reject
+ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(reject)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+#### Correlation plot of Hc levels in different time
+
+```{r}
+HcCorr = trenal.wide[,c(1:12)]
+cor(HcCorr,use="complete.obs" ) # also COV for covariance
+library("PerformanceAnalytics")
+chart.Correlation(HcCorr,historgram=TRUE)
+```
+
+
+Hypothesis based on the plot
+1.Age
+2.Male
+3.Cardio
+4.Reject
+
+
+
+# Data set `Trenal.XLS` analysis with the linear mixed effects model 
+<!-- #[Formal Data Analysis](#Data set `Trenal.XLS` analysis with the linear mixed effects model) -->
+
+## The chosen of fixed effects variable
+We can choose all the predictors as the fixed effect variables, plus an intercept
+## The chosen of random effects variable
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
