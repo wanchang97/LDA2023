@@ -160,9 +160,6 @@ p <- ggplot(data=data.selected,aes(x=time,y=respons,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 cardio.labs <- c("Cardio = 0","Cardio = 1")
 p + facet_grid(~cardio,labeller = label_both) 
-#p + facet_grid(~cardio,labeller = labeller (cardio = cardio.labs)) 
-
-
 ```
 ```{r}
 # Spaghetti Ggplot separated by reject =1

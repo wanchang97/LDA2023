@@ -6,7 +6,7 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
   fig_caption: true
-  number_sections: true
+  number_sections: yes
   extra_dependencies:
     graphicx: null
     bm: null 
@@ -25,6 +25,15 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+1. Describe the data, and use graphical techniques to explore the mean structure, the variance structure and the correlation structure. Summarize your conclusions. What are the implications with respect to statistical modeling? 
+2. What summary statistics are appropriate for the analysis of these data? Why? Do they yield the same results? Summarize your conclusions. 
+3. Fit a multivariate model and find the most parsimonious mean structure which can be used to describe the average evolutions in the data. What covariance structures are applicable in this case? What is the most parsimonious structure you can find? 
+4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
+5. Formulate a plausible random-effects model. Fit your model and compare the results with those from the multivariate model. Check the appropriateness of your random-effects model. Calculate the subject-specific intercepts/slopes and compare them with the ones you obtained from a two-stages analysis. What do you conclude? 
+6. Pay attention to the missing, especially the ones presented by the outcome variable. Do your results still hold despite the missingness?
+
 
 # Theory of Linear Mixed Effects Model(LMM)
 ## Index description
