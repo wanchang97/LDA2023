@@ -23,13 +23,31 @@ output:
 \newpage
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE)
 ```
 
 
 1. Describe the data, and use graphical techniques to explore the mean structure, the variance structure and the correlation structure. Summarize your conclusions. What are the implications with respect to statistical modeling? 
+
+Conclusion:
+
+Implication:
+
 2. What summary statistics are appropriate for the analysis of these data? Why? Do they yield the same results? Summarize your conclusions. 
+Summary statistics: summarize and provide information about the sample data. It tells you about the values in your data set. This includes where the mean lies and whether your data is skewed. Summary statistics have three main categories from <https://www.statisticshowto.com/summary-statistics/>
+1). Measures of location(central tendency)
+
+2). Measures of spread(range, interquartile range, quartiles, skewed, Kurtosis)
+
+this two can be answered from the `data_summary`
+
+3). Graphs/charts(Histogram, Frequency Distribution Table, Box plot, Bar chart, Scatter plot, Pie char.t)
+
+
+
 3. Fit a multivariate model and find the most parsimonious mean structure which can be used to describe the average evolutions in the data. What covariance structures are applicable in this case? What is the most parsimonious structure you can find? 
+
+
 4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
 5. Formulate a plausible random-effects model. Fit your model and compare the results with those from the multivariate model. Check the appropriateness of your random-effects model. Calculate the subject-specific intercepts/slopes and compare them with the ones you obtained from a two-stages analysis. What do you conclude? 
 6. Pay attention to the missing, especially the ones presented by the outcome variable. Do your results still hold despite the missingness?
@@ -61,18 +79,59 @@ trenal <- read_excel("Trenal.XLS") # summary(trenal)
 
 ```{r}
 trenal= trenal[,-18] #remove a noninformative column const
+
 # Continuous or discrete variables
 trenal$id = as.factor(trenal$id)
 trenal$j = as.factor(trenal$j)
+trenal$time = as.factor(trenal$time)
 trenal$male = as.factor(trenal$male)
 trenal$cardio = as.factor(trenal$cardio)
 trenal$reject = as.factor(trenal$reject)
 # Change the name of respons
 colnames(trenal)[19] <- "HC"
 
-trenal.long = trenal[,13:20] # long table form 
-trenal.wide = trenal[,1:17] # wide table form
+trenal.long = trenal[,13:20] # long table form
+# Remove j
+trenal.long = trenal.long[,-6]
+trenal.long.noNA <- na.omit(trenal.long)# reordered
+```
 
+
+```{r}
+trenal.wide4 = reshape(trenal.long,
+                       direction="wide",
+                       timevar="time",
+                       idvar="id",
+                       v.names="HC",
+                       sep="_")
+trenal.wide1 = trenal[,1:17] # wide table form
+
+trenal.wide2.noNA = reshape(data=trenal.long,
+                      direction="wide",
+                      v.names=c("HC"),
+                      timevar="time",
+                      idvar="id")
+trenal.wide3.noNA = reshape(data=trenal.long,
+                      direction="wide",
+                      v.names=c("HC"),
+                      timevar="j",
+                      idvar="id")
+
+trenal.wide2.noNA = reshape(data=trenal.long.noNA,
+                      direction="wide",
+                      v.names=c("HC"),
+                      timevar="time",
+                      idvar="id")
+trenal.wide3.noNA = reshape(data=trenal.long.noNA,
+                      direction="wide",
+                      v.names=c("HC"),
+                      timevar="j",
+                      idvar="id")
+
+```
+
+
+```{r}
 library(magrittr) # needs to be run every time you start R and want to use %>%
 library(dplyr)   
 
@@ -86,6 +145,7 @@ sum(!is.na(data.long$HC))
 
 data.long.noNA <- na.omit(data.long)# reordered long table without NAs
 summary(data.long.noNA)
+data_summary = data.frame(unclass(summary(data.long.noNA,maxsum=1160)),check.names=FALSE)
 data.long.noNA$id[length(data.long.noNA$id)]
 ```
 
@@ -93,14 +153,7 @@ data.long.noNA$id[length(data.long.noNA$id)]
 #### Response variable
 From the `summary(data.long.noNA)`, we can read that the response variable is a continuous variable `HC` HC level from $(15,76)$ with Mean $38.24$.
 
-We have totally $I = 1160$ ids for subjects. Ideally each id would have $12$ (start from $HC_0,HC_{0.5},HC_1,HC_2,\cdots,HC_{10}$) HC level measurement, but in really not all subjects have all of the $12$ measurements. We have totally $N = 9558 = \sum_{i=1}^{I} n_i$ missing values. 
-
-```{r}
-library(ggplot2)
-# To view the mean structure of the respons for all individuals
-ggplot(data.long.noNA,aes(x=time,y=HC,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
-```
-
+We have totally $I = 1160$ ids for subjects. Ideally each id would have $12$ (start from $HC_0,HC_{0.5},HC_1,HC_2,\cdots,HC_{10}$) HC level measurement, but in really not all subjects have all of the $12$ measurements (Actually only $348$ patients all $12$ measurements). We have totally $N = 9558 = \sum_{i=1}^{I} n_i$ missing values. 
 
 #### Predictors
 The explaining variables are 
@@ -116,7 +169,38 @@ In the data analysis part, we need to try out different variables accounting for
 <!-- [Formal Data Analysis](#data-set-`trenal.xls`-analysis-with-the-linear-mixed-effects-model) -->
 
 
-### Data visualization and the information from the data
+## Data visualization and the information from the data
+
+### Mean Structure
+
+```{r,fig.axis=1}
+library(ggplot2)
+# To view the mean structure of the HC for all individuals
+ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)+
+  labs(title="Line plot of HC level for all individuals overtime and the mean structure")
+```
+
+### Variance Structure
+
+```{r,fig.axis=1}
+# To view to variance structure
+ggplot(data.long.noNA,aes(x=as.factor(time),y=HC))+ 
+  geom_boxplot(position=position_dodge(1))+
+  labs(title="Box Plot of HC level for all indivuduals over time and the variance structure")
+```
+
+### Covariance Structure
+
+
+```{r,fig.axis=1}
+HcCorr = trenal.wide[,c(1:12)]
+cor(HcCorr,use="complete.obs" ) # also COV for covariance
+library("PerformanceAnalytics")
+chart.Correlation(HcCorr,historgram=TRUE)
+```
+
+
+
 ```{r}
 dim(data.long.noNA)
 ```
@@ -190,14 +274,6 @@ ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(cardio)))+
 # Box plot by reject
 ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(reject)))+ 
   geom_boxplot(position=position_dodge(1))
-```
-#### Correlation plot of Hc levels in different time
-
-```{r}
-HcCorr = trenal.wide[,c(1:12)]
-cor(HcCorr,use="complete.obs" ) # also COV for covariance
-library("PerformanceAnalytics")
-chart.Correlation(HcCorr,historgram=TRUE)
 ```
 
 
