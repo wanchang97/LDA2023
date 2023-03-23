@@ -67,6 +67,8 @@ trenal$j = as.factor(trenal$j)
 trenal$male = as.factor(trenal$male)
 trenal$cardio = as.factor(trenal$cardio)
 trenal$reject = as.factor(trenal$reject)
+# Change the name of respons
+colnames(trenal)[19] <- "HC"
 
 trenal.long = trenal[,13:20] # long table form 
 trenal.wide = trenal[,1:17] # wide table form
@@ -78,9 +80,9 @@ data.long <- trenal.long %>% # reordered long table
   relocate(id) %>%
   relocate(j,.after=id)%>%
   relocate(time,.after = j)%>%
-  relocate(respons,.after=time)
+  relocate(HC,.after=time)
 #summary(data.long)
-sum(!is.na(data.long$respons))
+sum(!is.na(data.long$HC))
 
 data.long.noNA <- na.omit(data.long)# reordered long table without NAs
 summary(data.long.noNA)
@@ -89,9 +91,16 @@ data.long.noNA$id[length(data.long.noNA$id)]
 
 ### Response variable and predictors
 #### Response variable
-From the `summary(data.long.noNA)`, we can read that the response variable is a continuous variable `respons` HC level from $(15,76)$ with Mean $38.24$.
+From the `summary(data.long.noNA)`, we can read that the response variable is a continuous variable `HC` HC level from $(15,76)$ with Mean $38.24$.
 
 We have totally $I = 1160$ ids for subjects. Ideally each id would have $12$ (start from $HC_0,HC_{0.5},HC_1,HC_2,\cdots,HC_{10}$) HC level measurement, but in really not all subjects have all of the $12$ measurements. We have totally $N = 9558 = \sum_{i=1}^{I} n_i$ missing values. 
+
+```{r}
+library(ggplot2)
+# To view the mean structure of the respons for all individuals
+ggplot(data.long.noNA,aes(x=time,y=HC,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+```
+
 
 #### Predictors
 The explaining variables are 
@@ -109,7 +118,6 @@ In the data analysis part, we need to try out different variables accounting for
 
 ### Data visualization and the information from the data
 ```{r}
-library(ggplot2)
 dim(data.long.noNA)
 ```
 
@@ -124,26 +132,26 @@ data.selected = data.long.noNA[(data.long.noNA$id %in% c(selected)), ]
 
 #### Spaghettic plot
 ```{r,fig.axis = 1}
-ggplot(data.selected,aes(x=time,y=respons,group=id,color=id))+geom_point()+ geom_line()+theme_light()
+ggplot(data.selected,aes(x=time,y=HC,group=id,color=id))+geom_point()+ geom_line()+theme_light()
 ```
 Plot Info:
 The intercept may vary according to each individual
 The slope is not very easy to see
 
 ```{r,fig.axis=1}
-ggplot(data.selected,aes(x=time,y=respons,group=id,color=male)) +geom_point()+ geom_line()+theme_light()
+ggplot(data.selected,aes(x=time,y=HC,group=id,color=male)) +geom_point()+ geom_line()+theme_light()
 ```
 ```{r,fig.axis=1}
-ggplot(data.selected,aes(x=time,y=respons,group=id,color=cardio)) +geom_point()+ geom_line()+theme_light()
+ggplot(data.selected,aes(x=time,y=HC,group=id,color=cardio)) +geom_point()+ geom_line()+theme_light()
 ```
 
 ```{r,fig.axis=1}
-ggplot(data.selected,aes(x=time,y=respons,group=id,color=reject)) +geom_point()+ geom_line()+theme_light()
+ggplot(data.selected,aes(x=time,y=HC,group=id,color=reject)) +geom_point()+ geom_line()+theme_light()
 ```
 
 ```{r}
 # Spaghetti Ggplot separated by male =1
-p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 p + facet_grid(~male,labeller=label_both)
 
@@ -152,14 +160,14 @@ p + facet_grid(~male,labeller=label_both)
 
 ```{r}
 # Spaghetti Ggplot separated by cardio
-p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 cardio.labs <- c("Cardio = 0","Cardio = 1")
 p + facet_grid(~cardio,labeller = label_both) 
 ```
 ```{r}
 # Spaghetti Ggplot separated by reject =1
-p <- ggplot(data=data.long.noNA,aes(x=time,y=respons,group=id))
+p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 p + facet_grid(~reject,labeller=label_both)
 
@@ -168,19 +176,19 @@ p + facet_grid(~reject,labeller=label_both)
 #### Boxplot
 ```{r}
 # Box plot by sex
-ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(male)))+ 
+ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(male)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 
 ```{r}
 # Box plot by cardio
-ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(cardio)))+ 
+ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(cardio)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 
 ```{r}
 # Box plot by reject
-ggplot(data.long.noNA,aes(x=as.factor(time),y=respons,fill=as.factor(reject)))+ 
+ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(reject)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 #### Correlation plot of Hc levels in different time
