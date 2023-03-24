@@ -94,40 +94,8 @@ trenal.long = trenal[,13:20] # long table form
 # Remove j
 trenal.long = trenal.long[,-6]
 trenal.long.noNA <- na.omit(trenal.long)# reordered
-```
-
-
-```{r}
-trenal.wide4 = reshape(trenal.long,
-                       direction="wide",
-                       timevar="time",
-                       idvar="id",
-                       v.names="HC",
-                       sep="_")
-trenal.wide1 = trenal[,1:17] # wide table form
-
-trenal.wide2.noNA = reshape(data=trenal.long,
-                      direction="wide",
-                      v.names=c("HC"),
-                      timevar="time",
-                      idvar="id")
-trenal.wide3.noNA = reshape(data=trenal.long,
-                      direction="wide",
-                      v.names=c("HC"),
-                      timevar="j",
-                      idvar="id")
-
-trenal.wide2.noNA = reshape(data=trenal.long.noNA,
-                      direction="wide",
-                      v.names=c("HC"),
-                      timevar="time",
-                      idvar="id")
-trenal.wide3.noNA = reshape(data=trenal.long.noNA,
-                      direction="wide",
-                      v.names=c("HC"),
-                      timevar="j",
-                      idvar="id")
-
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18]
+summary(trenal.wide)
 ```
 
 

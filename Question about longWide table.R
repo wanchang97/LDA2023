@@ -21,7 +21,11 @@ trenal.long = trenal.long[,-6]
 trenal.long.noNA <- na.omit(trenal.long)# reordered
 
 # Wide table form?
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18]
+
 trenal.wide0 = trenal[,1:17] # directly taken from the raw data, where the id, age,cardio,reject are all not correct.
+
+summary(trenal.wide)
 
 trenal.wide1 <- reshape(trenal.long,
                        direction="wide",
@@ -36,4 +40,3 @@ trenal.wide2 <- reshape(trenal.long.noNA,
                         idvar = "id",
                         v.names="HC",
                         sep="_")# It gives me error
-
