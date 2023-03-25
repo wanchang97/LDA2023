@@ -20,10 +20,25 @@ trenal.long.noNA <- na.omit(trenal.long)
 # Wide table form
 trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
 
-# Linear Mixed Effect Model Analysis
-library(nlme)
-library(lme4)
+# Multivariate Linear Model analysis
+lm1 <- lm(HC ~ time, trenal.long)
+summary(lm1)
 
-# First model, no random effects
-model.noRandomEffects <- lm(respons ~ time,data=data)
-summary(model.noRandomEffects)
+lm2 <- lm(HC ~ time + male,trenal.long)
+summary(lm2)
+
+lm3 <- lm(HC ~ time + male + reject,trenal.long)
+summary(lm3)
+
+lm4 <- lm(HC ~ time + male + reject + cardio,trenal.long)
+summary(lm4)
+
+anova(lm1,lm2,lm3,lm4)
+
+lm5 <- lm(HC ~ time + male + cardio,trenal.long)
+summary(lm5)
+
+# Cardio not really important
+# lm3 wins
+
+

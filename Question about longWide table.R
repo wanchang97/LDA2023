@@ -83,6 +83,10 @@ dev.off()
 
 
 
+
+
+
+
 trenal.wide0 = trenal[,1:17] # directly taken from the raw data, where the id, age,cardio,reject are all not correct.
 
 summary(trenal.wide)
