@@ -245,7 +245,7 @@ ggplot(data.female.selected, aes(x=time, y= respons, group=id,color=id)) + geom_
 ```{r}
 p <- ggplot(data, aes(x=time, y=respons,fill= male)) +  
   geom_boxplot()
-p
+p a 
 ```
 
 ##### Box plot for male and female
