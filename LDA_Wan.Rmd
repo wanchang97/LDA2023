@@ -204,7 +204,7 @@ ggplot(data.selected, aes(x=time, y=respons, group=id,color=id)) + geom_point() 
 #ggplot(data.selected, aes(x=time, y=na.pass(respons), group=id,color=id)) + geom_point()  +geom_line()
 ```
 
-##### Bax plot response over time
+##### Box plot response over time
 ```{r}
 # Box plot
 p <- ggplot(data, aes(x=time, y=respons,group =time, color = time)) +  

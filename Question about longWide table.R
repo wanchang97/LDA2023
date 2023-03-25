@@ -40,3 +40,26 @@ trenal.wide2 <- reshape(trenal.long.noNA,
                         idvar = "id",
                         v.names="HC",
                         sep="_")# It gives me error
+
+# trenal.long.three columns
+trenal.long.threecolumns = trenal.long[,c(1,6,7)]
+summary(trenal.long.threecolumns)
+trenal.wide4 <- reshape(trenal.long.threecolumns,
+                        direction = "wide",
+                        timevar = "time",
+                        idvar = "id",
+                        v.names="HC")
+summary(trenal.wide4)
+dim(trenal.wide4)
+
+
+x = rnorm(100)
+y = rnorm(100,2,1)
+z = x+ 2*y+rnorm(100)
+
+fit1 <- lm(z~x+y)
+fit2 <- lm(z~y+x)
+fit3 <- lm(z~x+y+x:y)
+library(dyn) 
+
+anova.lmlist(fit1,fit3)
