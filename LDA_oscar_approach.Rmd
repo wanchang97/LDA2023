@@ -1,0 +1,313 @@
+---
+title: "LDA - Delivery"
+author: "Oscar Cabanelas"
+date: '2023-03-23'
+output: pdf_document
+---
+- Data description (using plots and so on)
+- Summary statistics (summary and so on)
+- Fit multivariate model
+- Two stage analysis
+- random effect model (from wang)
+
+```{r}
+#install.packages("pacman")
+library(pacman)
+p_load(readxl, magrittr, dplyr, lattice, ggplot2, nlme)
+```
+
+
+
+# Theory of Linear Mixed Effects Model(LMM)
+## Index description
+Let us assume that a given input data set $X$ has a dimension $N \times p$, with $N$ observations and $p$ predictors.
+
+For each subject indexed with $i, i = 1,\cdots,I$, we can build a linear mixed effect model 
+
+$$\bf{Y}_i = \bf{X}_i \bf{\beta} + \bf{Z}_i \bf{b}_i + \bf{\epsilon}_i$$
+
+## The application of LMM 
+Linear Mixed Effects Model is used to analyse a data set, where the observations are not fully independent, while the top level clusters are assumed independent. Inside each cluster, the observations are correlated 
+
+## Introduction
+
+The dataset contains information on patients who received a renal graft (kidney transplant).
+
+The patients have been followed for at most 10 years.
+
+The variables included in the analysis are: 
+ID: identification number
+MALE: 0=female, 1=male
+AGE: Age at transplantation
+CARDIO: has the patient experienced a cardio-vascular problem during the years preceding the transplantation? 0=no, 1=yes
+REJECT: has the patient shown symptoms of graft rejection during the first three months after the transplantation? 0=no, 1=yes
+Hc0: Haematocrit level at the moment of transplantation
+Hc06: Haematocrit level 6 months after transplantation
+Hc1, Hc2, ..., HC10: Haematocrit level 1 year, 2 years, ..., 10 years after transplantation
+
+## Data description
+
+First of all, we load the data that will be used for the analysis. 
+
+```{r message=FALSE, warning=FALSE}
+library(readxl)
+trenal <- read_excel("Trenal.XLS")
+head(trenal)
+```
+
+```{r message=FALSE, warning=FALSE}
+dim(Trenal)
+```
+As we can see, the dataset is composed of 13920 rows and 20 columns. 
+
+```{r message=FALSE, warning=FALSE}
+head(Trenal)
+```
+
+```{r message=FALSE, warning=FALSE}
+trenal= Trenal[,-18]
+summary(trenal)
+```
+
+From the 1st column to the 12th, the values appear to be the levels of Haematocrit at each period, information that appears also with the combination of variables time and response. So, we decide to use only the information from the 13th column on in order not to overlap information and use the **long format** of it. 
+
+```{r message=FALSE, warning=FALSE}
+trenal.long = trenal[,13:20]
+summary(trenal.long)
+```
+Now, it is interesting to rellocate the variables in order to have a claear format of the data. Moreover, some of the variables are transformed to factor since they are not numerical ones. 
+
+```{r message=FALSE, warning=FALSE}
+trenal.long$id = as.factor(trenal.long$id)
+trenal.long$j = as.factor(trenal.long$j)
+trenal.long$male = as.factor(trenal.long$male)
+trenal.long$cardio = as.factor(trenal.long$cardio)
+trenal.long$reject = as.factor(trenal.long$reject)
+
+data <- trenal.long %>%
+relocate(id) %>%
+relocate(j,.after=id)%>%
+relocate(time,.after = j)%>%
+relocate(respons,.after=time)
+summary(data)
+```
+
+#Check NA's from wanchang
+
+Now, we can plot the data. To do that, we are going to create a spaguetti plot. 
+
+```{r}
+Plot1<-xyplot(respons ~ time, groups = id,
+              data = trenal.long,
+              type = "l" ,xlab="Years after transplation",ylab="Levels of Haematocrit after transplation")
+#add title
+```
+
+
+
+**Comment**:
+
+As we can see, there is a lot of variability in the origin, since the values go from 20 until 50 approximatelly. Furthermore, in this plot we can not see a clear difference in the slopes. Since that, we are going to pick up a random sample for trying to understand that aspect. 
+
+To do that, we are going to use the ggplot function to make it beauty.
+
+```{r}
+set.seed(1)
+selected <- sample(1:length(unique(trenal.long$id)),100,replace=T)
+data.selected = trenal.long[(trenal.long$id %in% c(selected)), ]
+```
+
+Plot again
+
+```{r}
+(Plot2<-xyplot(respons ~ time, groups = id,
+              data = data.selected,
+              type = "l" ,xlab="Years after transplation",ylab="Levels of Haematocrit after transplation"))
+```
+
+```{r}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=id))+geom_point()+ geom_line()+theme_light()+ theme(legend.position = "none")
+```
+
+After choosing a random sample, we can see that the first year after the treatment there is a peak in the level of Haematocrtit and, afterwards, it seems to stabilize in each of the sample individuals regardless their initial level. 
+
+Now, it is interesting to check if we can find differences between genders:
+
+
+```{r}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=male))+geom_point()+ geom_line()+theme_light()
+```
+**Comment**
+
+Furthermore, we can check it depending on the level of cardio
+
+```{r}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=cardio))+geom_point()+ geom_line()+theme_light()
+```
+**Comment**
+
+```{r}
+ggplot(data.selected,aes(x=time,y=respons,group=id,color=reject))+geom_point()+ geom_line()+theme_light()
+```
+**Comment**
+
+Add here things about the mean that Wanchang did by group.
+
+2. Summary statistics ...
+
+Analysis of endpoints: the response at the last mesure
+
+To check this, we need to extract the last measurement for each individual. To do that, we just need to select the row in which the time is equal to 10.0. 
+
+```{r}
+last_measurement <- subset(trenal.long, trenal.long$time == 10)
+summary(last_measurement)
+#Check the mean and everything about last point response
+```
+
+
+
+Analysis of increments: Difference between the response at the first available and the last one.
+
+Increment
+
+Increment per unit of time
+
+3. Fit a multivariate model and find the most parsimonious mean structure which can be used to describe the average evolutions in the data. What covariance structures are applicable in this case? What is the most parsimonious structure you can find? 
+
+To do that, we are going to use the lm function.
+
+```{r}
+trenal.lm<-lm(respons ~ time, data = trenal.long)
+summary(trenal.lm)
+```
+
+**Comment**
+
+```{r}
+trenal.lm2 <- lm(respons ~ time + male, data = trenal.long)
+summary(trenal.lm2)
+```
+**Comment**
+
+```{r}
+trenal.lm3.1 <- lm(respons ~ reject + male + time, data = trenal.long)
+summary(trenal.lm3.1)
+```
+
+```{r}
+trenal.lm3.2 <- lm(respons ~ time + male + reject, data = trenal.long)
+summary(trenal.lm3.2)
+```
+
+
+```{r}
+trenal.lm4 <- lm(respons ~ time + male + reject + cardio, data = trenal.long)
+summary(trenal.lm4)
+```
+
+```{r}
+trenal.lm5 <- lm(respons ~ time + male + cardio, data = trenal.long)
+summary(trenal.lm5)
+```
+
+```{r}
+trenal.lm7 <- lm(respons ~ time + male + reject + reject:time, data = trenal.long)
+summary(trenal.lm7)
+```
+**Comment**
+
+```{r}
+anova( trenal.lm5, trenal.lm3)
+```
+
+4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
+
+Two stage analysis:
+
+Firstly, group data
+
+```{r}
+trenal_grouped<-groupedData(respons~time|id,trenal.long, inner = ~male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+#here, we do not declare any group, but I should group by male, reject or cardio
+#outer: time dependent
+#inner: not time dependent (male, )
+
+```
+
+
+first step: A model for each individual estimating the intercept and time was adjusted
+
+```{r}
+modlist1 <- lmList (respons~time , trenal_grouped , na.action = na.pass)
+
+modlist1
+
+#plot(intervals(modlist1))
+plot(trenal_grouped)
+```
+**Comment** In here, he have the model with a beta for each individual. 
+
+2nd step
+
+```{r}
+attributes(modlist1)
+
+
+beta0<- coef(modlist1)[,1]
+
+beta1<- coef(modlist1)[,2]
+
+```
+
+```{r}
+coef(modlist1)
+bbdd<-data.frame(Id=as.numeric(attributes(modlist1)$names),
+                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
+bbdd <- bbdd[order(bbdd[,1]),]
+bbdd <- cbind(bbdd,group=GrowthGVWide$group)
+```
+
+```{r}
+
+#Boxplot
+meanbeta0bygroup<-tapply(bbdd$beta0,as.factor(bbdd$group),mean,na.rm=T)
+meanbeta1bygroup<-tapply(bbdd$beta1,as.factor(bbdd$group),mean,na.rm=T)
+
+
+#Let's check if they are quite related ?inverse correlation?
+
+with(bbdd,cor(beta0,beta1))
+
+
+library(ggplot2)
+ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point()
+ggplot(bbdd, aes(x=beta0, y=beta1, color=group)) + geom_point()
+
+
+install.packages('dplyr', repos = 'https://cloud.r-project.org')
+
+library(dplyr)
+bbdd %>%
+  group_by(group) %>%
+  summarize(cor=cor(beta0, beta1))
+
+
+# Fit a model for the intercept
+modbeta0<-lm(beta0~group,bbdd)
+summary(modbeta0)
+confint(modbeta0)
+
+### Fit a model for the slope
+# All the variables should be included
+modbeta1<-lm(beta1~group,bbdd)
+summary(modbeta1)
+confint(modbeta1)
+
+
+#### END OF  EXERCISE
+
+
+```
+
