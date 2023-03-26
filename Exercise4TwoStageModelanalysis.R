@@ -4,7 +4,7 @@ trenal= trenal[,-18] #remove a noninformative column const
 # Continuous or discrete variables
 trenal$id = as.factor(trenal$id)
 trenal$j = as.factor(trenal$j)
-trenal$time = as.factor(trenal$time)
+#trenal$time = as.factor(trenal$time)
 trenal$male = as.factor(trenal$male)
 trenal$cardio = as.factor(trenal$cardio)
 trenal$reject = as.factor(trenal$reject)
@@ -30,10 +30,14 @@ trenal.group.male<-groupedData(HC~time|id,trenal.long,outer=~male,labels=list(y=
 trenal.group.reject<-groupedData(HC~time|id,trenal.long,outer=~reject,labels=list(y="HC level"),units=list(y="(%)"))
 trenal.group.cardio<-groupedData(HC~time|id,trenal.long,outer=~cardio,labels=list(y="HC level"),units=list(y="(%)"))
 
-modlist1<-lmList(HC~time|id, 
-                 trenal.long, na.action=na.pass)
+list.male<-lmList(HC~time|id, 
+                 trenal.group.male, na.action=na.pass)
 #View(modlist1)
-attributes(modlist1)
+attributes(list.male)
+
+pdf("intervals.pdf")
+plot(intervals(list.male))
+dev.off()
 
 beta0<- coef(modlist1)[,1]
 beta1<- coef(modlist1)[,2]
