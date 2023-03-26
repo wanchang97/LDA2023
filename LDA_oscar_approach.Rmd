@@ -75,7 +75,7 @@ From the 1st column to the 12th, the values appear to be the levels of Haematocr
 trenal.long = trenal[,13:20]
 summary(trenal.long)
 ```
-Now, it is interesting to rellocate the variables in order to have a claear format of the data. Moreover, some of the variables are transformed to factor since they are not numerical ones. 
+Now, it is interesting to rellocate the variables in order to have a clear format . Moreover, some of the variables are transformed to factor since they are not numerical ones. 
 
 ```{r message=FALSE, warning=FALSE}
 trenal.long$id = as.factor(trenal.long$id)
@@ -183,6 +183,8 @@ summary(trenal.lm)
 ```
 
 **Comment**
+
+This first model has all the 
 
 ```{r}
 trenal.lm2 <- lm(respons ~ time + male, data = trenal.long)
