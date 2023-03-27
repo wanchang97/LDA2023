@@ -191,15 +191,9 @@ summary(trenal.lm2)
 **Comment**
 
 ```{r}
-trenal.lm3 <- lm(respons ~ reject + male + time, data = trenal.long)
+trenal.lm3 <- lm(respons ~ time + male + reject, data = trenal.long)
 summary(trenal.lm3)
 ```
-
-```{r}
-trenal.lm3.2 <- lm(respons ~ time + male + reject, data = trenal.long)
-summary(trenal.lm3.2)
-```
-
 
 ```{r}
 trenal.lm4 <- lm(respons ~ time + male + reject + cardio, data = trenal.long)
@@ -214,14 +208,14 @@ summary(trenal.lm5)
 On top of that, we want to test if the level of rejection affection in the response variable can depend on the time. Since that, we also apply one interaction between the time and the rejection level. 
 
 ```{r}
-trenal.lm7 <- lm(respons ~ time + male + reject + reject:time, data = trenal.long)
-summary(trenal.lm7)
+trenal.lm6 <- lm(respons ~ time + male + reject + reject:time, data = trenal.long)
+summary(trenal.lm6)
 ```
 
 **Comment**
 
 ```{r}
-anova( trenal.lm5, trenal.lm3)
+anova(trenal.lm, trenal.lm2,  trenal.lm4, trenal.lm5, trenal.lm6)
 ```
 
 4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
@@ -231,7 +225,7 @@ As a first step, we need to create a *groupedData* object in order to apply it t
 
 
 ```{r}
-trenal_grouped<-groupedData(respons~time|id,trenal.long, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped<-groupedData(respons~time|id,trenal.long, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
 #here, we do not declare any group, but I should group by male, reject or cardio
 #outer: time dependent
@@ -247,19 +241,18 @@ plot(trenal_grouped, inner = T)
 first step: A model for each individual estimating the intercept and time was adjusted
 
 ```{r}
-modlist1 <- lmList (respons~time , trenal_grouped , na.action = na.pass)
+modlist1 <- lmList (respons~ time , trenal_grouped , na.action = na.pass)
 
 modlist1
 
-plot(intervals(modlist1))
+#plot(intervals(modlist1))
 #plot(trenal_grouped)
 ```
 **Comment** In here, he have the model with a beta for each individual. 
 
-2nd step
 
 ```{r}
-attributes(modlist1)
+#attributes(modlist1)
 
 
 beta0<- coef(modlist1)[,1]
@@ -279,7 +272,7 @@ bbdd<-data.frame(Id=as.numeric(attributes(modlist1)$names),
 bbdd <- bbdd[order(bbdd[,1]),]
 bbdd <- cbind(bbdd,male=trenal.wide$male)
 ```
-
+2nd step: 
 ```{r}
 
 #Boxplot
