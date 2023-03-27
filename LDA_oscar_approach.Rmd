@@ -56,16 +56,16 @@ head(trenal)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-dim(Trenal)
+dim(trenal)
 ```
 As we can see, the dataset is composed of 13920 rows and 20 columns. 
 
 ```{r message=FALSE, warning=FALSE}
-head(Trenal)
+head(trenal)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-trenal= Trenal[,-18]
+trenal= trenal[,-18]
 summary(trenal)
 ```
 
@@ -175,7 +175,7 @@ Increment per unit of time
 
 3. Fit a multivariate model and find the most parsimonious mean structure which can be used to describe the average evolutions in the data. What covariance structures are applicable in this case? What is the most parsimonious structure you can find? 
 
-To do that, we are going to use the lm function.
+To do that, we are going to use the lm function. We will try to create different linear models using all the available variables in the data set. 
 
 ```{r}
 trenal.lm<-lm(respons ~ time, data = trenal.long)
@@ -184,8 +184,6 @@ summary(trenal.lm)
 
 **Comment**
 
-This first model has all the 
-
 ```{r}
 trenal.lm2 <- lm(respons ~ time + male, data = trenal.long)
 summary(trenal.lm2)
@@ -193,8 +191,8 @@ summary(trenal.lm2)
 **Comment**
 
 ```{r}
-trenal.lm3.1 <- lm(respons ~ reject + male + time, data = trenal.long)
-summary(trenal.lm3.1)
+trenal.lm3 <- lm(respons ~ reject + male + time, data = trenal.long)
+summary(trenal.lm3)
 ```
 
 ```{r}
@@ -213,10 +211,13 @@ trenal.lm5 <- lm(respons ~ time + male + cardio, data = trenal.long)
 summary(trenal.lm5)
 ```
 
+On top of that, we want to test if the level of rejection affection in the response variable can depend on the time. Since that, we also apply one interaction between the time and the rejection level. 
+
 ```{r}
 trenal.lm7 <- lm(respons ~ time + male + reject + reject:time, data = trenal.long)
 summary(trenal.lm7)
 ```
+
 **Comment**
 
 ```{r}
@@ -225,17 +226,21 @@ anova( trenal.lm5, trenal.lm3)
 
 4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
 
-Two stage analysis:
 
-Firstly, group data
+As a first step, we need to create a *groupedData* object in order to apply it to the following process. 
+
 
 ```{r}
-trenal_grouped<-groupedData(respons~time|id,trenal.long, inner = ~male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped<-groupedData(respons~time|id,trenal.long, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
 #here, we do not declare any group, but I should group by male, reject or cardio
 #outer: time dependent
 #inner: not time dependent (male, )
 
+```
+
+```{r}
+plot(trenal_grouped, inner = T)
 ```
 
 
@@ -246,8 +251,8 @@ modlist1 <- lmList (respons~time , trenal_grouped , na.action = na.pass)
 
 modlist1
 
-#plot(intervals(modlist1))
-plot(trenal_grouped)
+plot(intervals(modlist1))
+#plot(trenal_grouped)
 ```
 **Comment** In here, he have the model with a beta for each individual. 
 
@@ -264,18 +269,22 @@ beta1<- coef(modlist1)[,2]
 ```
 
 ```{r}
+trenal.wide = trenal[,1:17]
+```
+
+```{r}
 coef(modlist1)
 bbdd<-data.frame(Id=as.numeric(attributes(modlist1)$names),
                  beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
 bbdd <- bbdd[order(bbdd[,1]),]
-bbdd <- cbind(bbdd,group=GrowthGVWide$group)
+bbdd <- cbind(bbdd,male=trenal.wide$male)
 ```
 
 ```{r}
 
 #Boxplot
-meanbeta0bygroup<-tapply(bbdd$beta0,as.factor(bbdd$group),mean,na.rm=T)
-meanbeta1bygroup<-tapply(bbdd$beta1,as.factor(bbdd$group),mean,na.rm=T)
+meanbeta0bygroup<-tapply(bbdd$beta0,as.factor(bbdd$male),mean,na.rm=T)
+meanbeta1bygroup<-tapply(bbdd$beta1,as.factor(bbdd$male),mean,na.rm=T)
 
 
 #Let's check if they are quite related ?inverse correlation?
@@ -285,25 +294,25 @@ with(bbdd,cor(beta0,beta1))
 
 library(ggplot2)
 ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point()
-ggplot(bbdd, aes(x=beta0, y=beta1, color=group)) + geom_point()
+ggplot(bbdd, aes(x=beta0, y=beta1, color=male)) + geom_point()
 
 
-install.packages('dplyr', repos = 'https://cloud.r-project.org')
+#install.packages('dplyr', repos = 'https://cloud.r-project.org')
 
 library(dplyr)
 bbdd %>%
-  group_by(group) %>%
+  group_by(male) %>%
   summarize(cor=cor(beta0, beta1))
 
 
 # Fit a model for the intercept
-modbeta0<-lm(beta0~group,bbdd)
+modbeta0<-lm(beta0~male,bbdd)
 summary(modbeta0)
 confint(modbeta0)
 
 ### Fit a model for the slope
 # All the variables should be included
-modbeta1<-lm(beta1~group,bbdd)
+modbeta1<-lm(beta1~male,bbdd)
 summary(modbeta1)
 confint(modbeta1)
 
