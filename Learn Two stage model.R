@@ -29,17 +29,17 @@ summary(lm.M16)
 ## Two-stage Approach
 # Now let us use a two-stage approach to analyse these data.
 # First the linear regression model is fitted to the data for each person separately (i.e., based on the four observations per individual):
-fm1 <- lmList(distance ~ age | Subject, Orthodont)
-# standardized residuals versus fitted values by gender
-plot(fm1, resid(., type = "pool") ~ fitted(.) | Sex, abline = 0, id = 0.05)
-# box-plots of residuals by Subject
-plot(fm1, Subject ~ resid(.))
-# observed versus fitted values by Subject
-plot(fm1, distance ~ fitted(.) | Subject, abline = c(0,1))
+# fm1 <- lmList(distance ~ age | Subject, Orthodont)
+# # standardized residuals versus fitted values by gender
+# plot(fm1, resid(., type = "pool") ~ fitted(.) | Sex, abline = 0, id = 0.05)
+# # box-plots of residuals by Subject
+# plot(fm1, Subject ~ resid(.))
+# # observed versus fitted values by Subject
+# plot(fm1, distance ~ fitted(.) | Subject, abline = c(0,1))
+fm1 <- lme(Orthodont)
+plot(augPred(fm1, level = 0:1, length.out = 2))
 
 res.list <- lmList(distance ~ age|Subject,data=Orthodont)
-# standardized residuals vs fitted values by gender
-plot(res.list,resid(.,type="pool")~fitted(.)|male,abline=0,id=0.05)
 # We can examine the individual profiles and fitted regression lines for each individual with
 plot(augPred(res.list),grid=TRUE)
 
@@ -64,5 +64,5 @@ V <- bldiag(V) # construct block diagonal matrix
 res2 = rma.mv(b ~ estm - 1,V,random = ~estm|subj,struct = "UN") # meta-analysis via multivariate linear mixed effects models
 res2
 
-res2.1 = rma.mv(b ~ estm,V,random = ~estm|subj,struct = "UN") # meta-analysis via multivariate linear mixed effects models
-res2.1
+#res2.1 = rma.mv(b ~ estm,V,random = ~estm|subj,struct = "UN") # meta-analysis via multivariate linear mixed effects models
+#res2.1

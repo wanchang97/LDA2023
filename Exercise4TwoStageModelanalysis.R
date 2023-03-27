@@ -16,7 +16,9 @@ trenal.long = trenal[,13:20] # long table form
 trenal.long = trenal.long[,-6]
 trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
 trenal.long.noNA <- na.omit(trenal.long)
-
+set.seed(1)
+selected <- sample(1:length(unique(trenal.long.noNA$id)),30,replace=T)
+trenal.long.noNA.selected = trenal.long.noNA[(trenal.long.noNA$id %in% c(selected)),]
 # Wide table form
 trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
 
@@ -25,6 +27,75 @@ trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
 lm.firststage = lm(HC ~ time+age+male+reject+cardio ,trenal.long)
 summary(lm.firststage)
 library(nlme)
+
+trenal.long.noNA.groupbyage <- groupedData(HC ~ time|id,trenal.long.noNA,outer=~age,labels=list(x = "time",y="HC level",units=list(y="(cm)")))
+trenal.long.noNA.groupbymale <- groupedData(HC ~ time|id,trenal.long.noNA,outer=~male,labels=list(x = "time",y="HC level",units=list(y="(cm)")))
+trenal.long.noNA.groupbyreject <- groupedData(HC ~ time|id,trenal.long.noNA,outer=~reject,labels=list(x = "time",y="HC level",units=list(y="(cm)")))
+trenal.long.noNA.groupbycardio <- groupedData(HC ~ time|id,trenal.long.noNA,outer=~cardio,labels=list(x = "time",y="HC level",units=list(y="(cm)")))
+
+res.list.groupbyage <- lmList(HC ~ time |id, data=trenal.long.noNA.groupbyage)
+b = lapply(res.list.groupbyage,coef)
+V = lapply(res.list.groupbyage,vcov)
+#trenal.long.noNA.select.groupbyagemalereject <- groupedData(HC ~time|id,trenal.long.noNA.selected,outer=~age+male+reject,labels=list("HC level", units = list(y="(%)")))
+#plot(trenal.long.noNA.select.groupbyagemalereject) 
+#formula(trenal.long.noNA.select.groupbyagemalereject)
+#gsummary(trenal.long.noNA.select.groupbyagemalereject)
+#fm1 <- lme(trenal.long.noNA.select.groupbyagemalereject)
+
+trenal.long.noNA.select.groupbymale <- groupedData(HC ~time|id,trenal.long.noNA.selected,outer=~male,labels=list("HC level", units = list(y="(%)")))
+pdf("GroupedPlot/GroupbyMale.pdf")
+plot(trenal.long.noNA.select.groupbymale)                                                                                                                                  
+dev.off()
+
+trenal.long.noNA.select.groupbycardio <- groupedData(HC ~time|id,trenal.long.noNA.selected,outer=~cardio,labels=list("HC level", units = list(y="(%)")))
+pdf("GroupedPlot/GroupbyCardio.pdf")
+plot(trenal.long.noNA.select.groupbycardio)                                                                                                                                  
+dev.off()
+
+
+trenal.long.noNA.select.groupbyreject <- groupedData(HC ~time|id,trenal.long.noNA.selected,outer=~reject,labels=list("HC level", units = list(y="(%)")))
+pdf("GroupedPlot/GroupbyReject.pdf")
+plot(trenal.long.noNA.select.groupbyreject)                                                                                                                                  
+dev.off()
+
+
+trenal.long.noNA.select.groupbyage <- groupedData(HC ~time|id,trenal.long.noNA.selected,outer=~age,labels=list("HC level", units = list(y="(%)")))
+pdf("GroupedPlot/GroupbyAge.pdf")
+plot(trenal.long.noNA.select.groupbyage)                                                                                                                                  
+dev.off()
+
+
+res.male <- lme(HC~time,random=~1|id,data=trenal.long.noNA)
+plot(augPred(res.male, level = 0:1, length.out = 2))
+
+res.age <- lme(HC ~ time,random = ~age|id,data=trenal.long.noNA)
+plot(augPred(res.age, level = 0:1, length.out = 2))
+
+
+res.list.age.selected <- lmList(HC ~ age | id, data=trenal.long.noNA.selected)
+plot(augPred(res.list.age.selected),grid=TRUE)
+
+
+res.list.age <- lmList(HC ~ age | id, data=trenal.long.noNA)
+plot(augPred(res.list.age),grid=TRUE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 trenal.group.age<-groupedData(HC~time|id,trenal.long,outer=~age,labels=list(y="HC level"),units=list(y="(%)"))
 trenal.group.male<-groupedData(HC~time|id,trenal.long,outer=~male,labels=list(y="HC level"),units=list(y="(%)"))
 trenal.group.reject<-groupedData(HC~time|id,trenal.long,outer=~reject,labels=list(y="HC level"),units=list(y="(%)"))
@@ -32,19 +103,20 @@ trenal.group.cardio<-groupedData(HC~time|id,trenal.long,outer=~cardio,labels=lis
 
 list.male<-lmList(HC~time|id, 
                  trenal.group.male, na.action=na.pass)
-#View(modlist1)
+
+#View(list.male)
 attributes(list.male)
 
 pdf("intervals.pdf")
 plot(intervals(list.male))
 dev.off()
 
-beta0<- coef(modlist1)[,1]
-beta1<- coef(modlist1)[,2]
+beta0<- coef(list.male)[,1]
+beta1<- coef(list.male)[,2]
 
-coef(modlist1)
-bbdd<-data.frame(Id=as.numeric(attributes(modlist1)$id),
-                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
+coef(list.male)
+bbdd<-data.frame(Id=as.numeric(attributes(list.male)$id),
+                 beta0=coef(list.male)[,1],beta1=coef(list.male)[,2])
 bbdd <- bbdd[order(bbdd[,1]),]
 bbdd <- cbind(bbdd,group=trenal.long$id)
 

@@ -22,8 +22,9 @@ trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
 
 # Linear Mixed Effect Model Analysis
 library(nlme)
-library(lme4)
+#library(lme4)
 
 # First model, no random effects
-model.noRandomEffects <- lm(respons ~ time,data=data)
+fit.noRandomEffects <- lm(HC ~ time+age+male+reject+cardio,data=trenal.long.noNA)
+fit.intercept <- lme(HC~time+age+male+reject+cardio,random=1,data=trenal.long.noNA)
 summary(model.noRandomEffects)
