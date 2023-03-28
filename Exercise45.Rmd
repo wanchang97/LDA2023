@@ -1,0 +1,273 @@
+---
+title: "Untitled"
+author: "Wanchang Zhang"
+date: "2023-03-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Read Data
+
+```{r}
+library(readxl)
+trenal <- read_excel("Trenal.XLS") # summary(trenal)
+trenal= trenal[,-18] #remove a noninformative column const
+# Continuous or discrete variables
+trenal$id = as.factor(trenal$id)
+trenal$j = as.factor(trenal$j)
+#trenal$time = as.factor(trenal$time)
+trenal$male = as.factor(trenal$male)
+trenal$cardio = as.factor(trenal$cardio)
+trenal$reject = as.factor(trenal$reject)
+# Change the name of respons
+colnames(trenal)[19] <- "HC"
+trenal.long = trenal[,13:20] # long table form
+
+# Remove j
+trenal.long = trenal.long[,-6]
+trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
+trenal.long.noNA <- na.omit(trenal.long)
+
+# Wide table form
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
+```
+
+# Data set `Trenal.XLS` analysis with the Linear mixed effect method and two stage method 
+
+This is inspired from the chapter of <https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html>
+Longitudinal data is a special example of multilevel data, where
+
+  * Level One is : time and the response variable e.g. HC level 
+  * Level Two is : covariates related to each subject, e.g. age, male, reject, cardio
+
+## Unconditional Means Model to discover variance distribution
+We can first try the unconditional Means Model to explore the variance( within subject and between-subject), Define $Y_{ij}$ as the HC level from subject $i$ and measured time $j$
+
+  * Level One: 
+  $$Y_{ij} = a_i + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  * Level Two: 
+  $$a_i = \alpha_0 + u_i,$$ where $u_i \sim N(0,\sigma_{u}^2)$
+  
+Written in linear mixed effect model is:
+ $$Y_{ij} = \alpha_0 + u_i + \epsilon_{ij},$$ where $u_i \sim N(0,\sigma_u^2)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+ 
+```{r}
+# Model A
+library(lme4)
+model.a <- lmer(HC ~ 1 + (1|id),REML=T,data=trenal.long)
+summary(model.a)
+cat("AIC = ",AIC(model.a),";BIC = ", BIC(model.a))
+```
+From the output of `model.a`, we obtain estimates of three model parameters:
+
+  * $\hat{\alpha}_0 = 38.16$: the mean of HC level $\mu_{HC}$ across all subjects and all years
+  * $\hat{\sigma}^2 = 23.07$: the variance in within-subjects deviation, between years of measurements $HC_j$ and the mean $\mu_{HC}$ across all subjects and all years
+  * $\hat{\sigma_u}^2 = 13.60$: the variance in between-subjects deviation, between subject mean $\mu_{HC_i}$ and the overall mean $\mu_{HC}$ across all subjects and all years.
+  
+The intraclass correlation coefficient:
+$$\hat{\rho}= \frac{\hat{\sigma_u}^2}{\hat{\sigma_u}^2+\hat{\sigma}^2} = \frac{13.60}{13.60+ 23.07}=0.371$$
+$37.1\%$ of the total variation in HC levels is attributable to differences among subjects rather than changes over time within each subject.
+
+## Unconditional Growth Model, introducing time in Level One
+
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + u_i, \\
+  b_i &= \beta_0 + v_i
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+```{r}
+# model b
+model.b <- lmer(HC ~ time + (time|id),REML=T,data= trenal.long)
+summary(model.b)
+cat("AIC = ",AIC(model.b),";BIC = ", BIC(model.b))
+```
+From the `model.b`, we obtain estimates of our six model parameters:
+ 
+* $\hat{\alpha}_0 = 37.2678$: the mean HC level for the subjects at time 0, $HC_0$
+* $\hat{\beta}_0 = 0.31583$: the mean change in successively measurements during totally $12$ measurements
+* $\hat{\sigma}^2 = 20.8883$: the variance in within-subject deviations
+* $\hat{\sigma}_u^2 = 13.5731$: the variance between subjects at time 0, $HC_0$
+* $\hat{\sigma}_v^2 = 0.1856$: the variance between subjects in rate of changes in HC level
+* $\rho_{uv} = -0.15$: the correlation in subject's $HC_0$ and the rate of change in HC level
+
+The estimated within-subject variance $\hat{\sigma}^2$ decreased by about $9\%$ from the unconditional means model implying that $9\%$ of within-subject variability in HC level can be explained by a linear increase over time:
+$$Pseudo R^2_{L1} = \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond. growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} = 0.0948$$ 
+
+### Unconditional growth but only random intercepts
+```{r}
+model.b1 <- lmer(HC ~ time + (1|id),REML=T,data= trenal.long)
+summary(model.b1)
+cat("AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1))
+```
+
+
+## Modeling other trends over time
+From the spaghetti plots we notice that our HC level usually increases first very quickly then stays stable. (piecewise linear? )
+To reduce the correlation between the linear and quadratic components of time effect, we need to center the time varibale first:
+```{r}
+library(dplyr)
+trenal.long.center <- trenal.long%>%
+  mutate(timec = time - 5,timec2 = timec^2)
+```
+
+
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + u_i, \\
+  b_i &= \beta_0 + v_i, \\
+  c_i &= \gamma_0 + w_i,
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \gamma_0 \times time_{ij}^2] + [ u_i + v_i \times time_{ij} + w_i \times time_{ij}^2 +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+
+
+```{r}
+model.c <- lmer(HC ~ timec + timec2 + (timec + timec2|id),REML=T, data=trenal.long.center)
+summary(model.c)
+cat("AIC = ",AIC(model.c),";BIC = ", BIC(model.c))
+```
+
+```{r}
+model.c1 <- lmer(HC ~ timec + timec2 + (1|id),REML=T, data=trenal.long.center)
+summary(model.c1)
+cat("AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1))
+```
+Then add more variables in Level Two
+Here we fix the linear model on time model.b
+### Add age to uncontidional growth `model.b.age`
+
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + \alpha_1 \times Age_i + u_i, \\
+  b_i &= \beta_0 + \beta_1 \times Age_i +  v_i
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \alpha_1\times Age_i + \beta_1 \times Age_i \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+```{r}
+# model.b.age
+model.b.age <- lmer(HC ~ time + age + time:age +  (time|id),REML=T,data= trenal.long)
+summary(model.b.age)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age))
+```
+```{r}
+# model.b.age1
+model.b.age1 <- lmer(HC ~ time + age  +  (time|id),REML=T,data= trenal.long)
+summary(model.b.age1)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1))
+```
+### Add male to unconditional growth model  `model.b.male`
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + \alpha_1 \times Male_i + u_i, \\
+  b_i &= \beta_0 + \beta_1 \times Male_i +  v_i
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \alpha_1\times Male_i + \beta_1 \times Male_i \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+```{r}
+# model.b.male
+model.b.male <- lmer(HC ~ time + male + time:male +  (time|id),REML=T,data= trenal.long)
+summary(model.b.male)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1),"\n")
+cat("model.b.male: AIC = ",AIC(model.b.male),";BIC = ", BIC(model.b.male), "\n")
+
+```
+```{r}
+# model.b.male
+model.b.male1 <- lmer(HC ~ time + male  +  (time|id),REML=T,data= trenal.long)
+summary(model.b.male1)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1),"\n")
+cat("model.b.male: AIC = ",AIC(model.b.male),";BIC = ", BIC(model.b.male), "\n")
+cat("model.b.male1: AIC = ",AIC(model.b.male1),";BIC = ", BIC(model.b.male1), "\n")
+```
+### Add age and male to unconditional growth model  `model.b.agemale`
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + \alpha_1 \times Age_i + \alpha_2 \times Male_i + u_i, \\
+  b_i &= \beta_0 + \beta_1 \times Age_i + \beta_2 \times Male_i +  v_i
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+  
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \alpha_1\times Age_i + \alpha_2\times Male_i + \beta_1 \times Age_i \times time_{ij}+\beta_2 \times Male_i \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+```{r}
+# model.b.agemale
+model.b.agemale <- lmer(HC ~ time + age + age:time + male + male:time +  (time|id),REML=T,data= trenal.long)
+summary(model.b.agemale)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1),"\n")
+cat("model.b.male: AIC = ",AIC(model.b.male),";BIC = ", BIC(model.b.male), "\n")
+cat("model.b.male1: AIC = ",AIC(model.b.male1),";BIC = ", BIC(model.b.male1), "\n")
+cat("model.b.agemale: AIC = ",AIC(model.b.agemale),";BIC = ", BIC(model.b.agemale), "\n")
+```
+```{r}
+# model.b.agemale1
+model.b.agemale1 <- lmer(HC ~ time + age + male +  (time|id),REML=T,data= trenal.long)
+summary(model.b.agemale1)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1),"\n")
+cat("model.b.male: AIC = ",AIC(model.b.male),";BIC = ", BIC(model.b.male), "\n")
+cat("model.b.male1: AIC = ",AIC(model.b.male1),";BIC = ", BIC(model.b.male1), "\n")
+cat("model.b.agemale: AIC = ",AIC(model.b.agemale),";BIC = ", BIC(model.b.agemale), "\n")
+cat("model.b.agemale1: AIC = ",AIC(model.b.agemale1),";BIC = ", BIC(model.b.agemale1), "\n")
+```
+```{r}
+# model.b.agemale1
+model.b.agemalereject1 <- lmer(HC ~ time + age + male + reject+ (time|id),REML=T,data= trenal.long)
+summary(model.b.agemalereject1)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.age: AIC = ",AIC(model.b.age),";BIC = ", BIC(model.b.age),"\n")
+cat("model.b.age1: AIC = ",AIC(model.b.age1),";BIC = ", BIC(model.b.age1),"\n")
+cat("model.b.male: AIC = ",AIC(model.b.male),";BIC = ", BIC(model.b.male), "\n")
+cat("model.b.male1: AIC = ",AIC(model.b.male1),";BIC = ", BIC(model.b.male1), "\n")
+cat("model.b.agemale: AIC = ",AIC(model.b.agemale),";BIC = ", BIC(model.b.agemale), "\n")
+cat("model.b.agemale1: AIC = ",AIC(model.b.agemale1),";BIC = ", BIC(model.b.agemale1), "\n")
+cat("model.b.agemalereject1: AIC = ",AIC(model.b.agemalereject1),";BIC = ", BIC(model.b.agemalereject1), "\n")
+```

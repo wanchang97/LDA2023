@@ -339,41 +339,53 @@ ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(reject)))+
 ```
 
 ## Data set analysis to see the age effect
+```{r}
+library(ggplot2)
+ggplot(data=data.long.noNA,aes(y=HC,x=age))+geom_point()
+```
+
+
+```{r}
+data.groupbyage <- data.long.noNA %>%   group_by(age) %>% summarise(avgHC=mean(HC))
+
+ggplot(data=data.groupbyage,aes(y=avgHC,x=age))+geom_point()
+```
+
 
 ```{r}
 library(jtools)
-fit.age = lm(HC ~ time +age,data=data.long.noNA)
-summ(fit.age)
 
-fit.age = lm(HC ~ time +age,data=data.long.noNA)
-summ(fit.age)
+plot(data.groupbyage,xlab="age",ylab="average HC")
+#fit.age = lm(HC ~ time +age,data=data.long.noNA)
+#summ(fit.age)
+
+#fit.age = lm(HC ~ time +age,data=data.long.noNA)
+#summ(fit.age)
 ```
 
 
 
-# Data set `Trenal.XLS` analysis with the linear mixed effects model 
+# Data set `Trenal.XLS` analysis with the Multilevel models 
 <!-- #[Formal Data Analysis](#Data set `Trenal.XLS` analysis with the linear mixed effects model) -->
 
-## The chosen of fixed effects variable
-We can choose all the predictors as the fixed effect variables, plus an intercept
-## The chosen of random effects variable
+This is inspired from the chapter of <https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html>
+Longitudinal data is a special example of two-level model, where
 
+  * Level One is : time and HC level 
+  * Level Two is : covariates related to each subject, e.g. age, male, reject, cardio
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+We can first try the unconditional Means Model to explore the variance( within subject and between-subject), Define $Y_{ij}$ as the HC level from subject $i$ and measured time $j$
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+  * Level One: $$Y_{ij} = a_i + \epsilon_{ij}$$, where $\epsilon_{ij} ~ N(0,\sigma^2)$
+  * Level Two: $$a_i = \alpha_0 + u_i$$, where $u_i ~ N(0,\sigma_{u}^2)$
+  
+Written in linear mixed effect model is:
+ $$Y_{ij} = \alpha_0 + u_i + \epsilon_{ij}$$, where $u_i ~ N(0,\sigma_u^2)$ and $\epsilon_{ij} ~ N(0,\sigma^2)$
+ 
+ 
+```{r}
+# Model A
+model.a <- lmer(HC ~ 1 + (1|id),)
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
