@@ -1,7 +1,7 @@
 ---
 title: "Longitudinal Data Analysis "
 subtitle: "Case study of Trenal.XLS using Linear Mixed Effect Model"
-author: "Group2: Wanchang Zhang; Hugo Blain; Oscar Cabanelas"
+author: "Group2:Hugo Blain; Oscar Cabanelas;Wanchang Zhang"
 date: "`r Sys.Date()`"
 output: 
   pdf_document:
@@ -14,7 +14,7 @@ output:
     multicolumn: null
     hyperref: null
     amsmath : null
-          
+bibliography: scholar.bib          
 ---
 \newpage 
 \tableofcontents 

@@ -1,0 +1,117 @@
+---
+title: "Longitudinal Data Analysis "
+subtitle: "Case study of Trenal.XLS using Linear Mixed Effect Model"
+author: "Group2:Hugo Blain; Oscar Cabanelas;Wanchang Zhang"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+  fig_caption: true
+  number_sections: yes
+  extra_dependencies:
+    graphicx: null
+    bm: null 
+    multirow: null
+    multicolumn: null
+    hyperref: null
+    amsmath : null
+bibliography: scholar.bib          
+---
+\newpage 
+\tableofcontents 
+\listoffigures
+\listoftables
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE)
+```
+# Data description
+## Backgrounds of the data
+The dataset `Trenal.XLS` contains information on patients who received renal graft(kidney transplant). The patients have been followed for at most 10 years.
+
+People with end-stage kidney disease who receive a kidney transplant generally live longer than people with ESRD who are on dialysis. 
+However, kidney transplant recipients must remain on immunosuppressants  (medications to suppress the immune system) for the rest of their life to prevent their body from rejecting the new kidney. The long-term immunosuppression puts them at risk for infections and cancer.
+Haematocrit level 
+## Initial Exploratory Analysis
+### Import data `Trenal.XLS`
+```{r}
+library(readxl)
+library(knitr)
+trenal <- read_excel("Trenal.XLS") # summary(trenal)
+
+trenal= trenal[,-18] #remove a noninformative column const
+
+# Continuous or discrete variables
+trenal$id = as.factor(trenal$id)
+trenal$j = as.factor(trenal$j)
+#trenal$time = as.factor(trenal$time)
+trenal$male = as.factor(trenal$male)
+trenal$cardio = as.factor(trenal$cardio)
+trenal$reject = as.factor(trenal$reject)
+
+# Change the name of respons
+colnames(trenal)[19] <- "Hc"
+trenal.long = trenal[,13:20] # long table form
+
+# Remove j
+trenal.long = trenal.long[,-6]
+trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
+trenal.long.noNA <- na.omit(trenal.long)
+
+# Wide table form
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
+```
+
+### Data Organization
+* The input data:
+  * id: total `r dim(trenal.long.unique)[1]` persons
+  * age to perform the operation: from $15$ to $76$ years old, average is $46.43$ years old
+  * male: we observe 494 females and 666 males
+  * cardio: 953 persons has experienced a cardio-vascular problem during
+the years preceding the transplant, 207 did not.
+  * reject: 793 patients shown symptoms of graft rejection during the first
+three months after the transportation, 367 has not.
+
+* The response variable Hc level: continous from min $14\%$ to max $65\%$.The Hc level is dependent on the meassured time, individual's age to perform the              operation,  gender, cardio history and reject history
+
+
+
+
+### Missing Data
+```{r,echo=FALSE}
+# Analyse the NA values descriptively
+## First to collect how many NAs are in Hc0, Hc0.5, Hc1, ..., Hc 10
+Hc.NA = numeric(12)
+for (i in c(1:12)) {
+  Hc.NA[i] = sum(is.na(trenal.wide[,i]))
+}
+# 1   0   1  87 205 314 418 508 595 672 749 812
+# The number of missing data / the ideal case have all meassurements for everyone
+Hc.NA.percentage = Hc.NA/dim(trenal.long.unique)[1]
+missing <- data.frame(rbind(Hc.NA,Hc.NA.percentage))
+kable(missing, caption= "Missing data for each measurement",
+      col.names =colnames(trenal.wide[c(1:12)]),digits = 3)
+```
+
+
+```{r}
+plot(Hc.NA.percentage,xaxt="n",xlab ="j",ylab="Missing data%")
+axis(side=1,at=c(1,2,3,4,5,6,7,8,9,10,11,12),labels=colnames(trenal.wide)[1:12])
+# Conclusion could be at the first three measurements, there are almost full data
+# More people tends to miss the measurements when time increases
+
+##Second  We can extract all NA data from the long table to analyse their construction
+trenal.long.NA = trenal.long[is.na(trenal.long$Hc),]
+#t = unique(trenal.long.NA$id) # 821 individuals
+trenal.long.NA.unique <- trenal.long.NA[match( unique(trenal.long.NA$id), trenal.long.NA$id),]
+summary(trenal.long.NA.unique)
+```
+
+## Exploratory Data Analysis for longitudinal data 
+
+# Multilevel Data Analysis
+
+## Two stage model
+
+## Linear Mixed effects model
+
