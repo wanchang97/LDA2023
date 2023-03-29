@@ -26,6 +26,12 @@ bibliography: scholar.bib
 knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE)
 ```
 
+```{r,echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+```
+
 
 1. Describe the data, and use graphical techniques to explore the mean structure, the variance structure and the correlation structure. Summarize your conclusions. What are the implications with respect to statistical modeling? 
 
@@ -189,25 +195,25 @@ summary(trenal.wide)
 
 
 ```{r}
-library(magrittr) # needs to be run every time you start R and want to use %>%
+#library(magrittr) # needs to be run every time you start R and want to use %>%
 library(dplyr)   
 
-data.long <- trenal.long %>% # reordered long table 
+trenal.long <- trenal.long %>% # reordered long table 
   relocate(id) %>%
   relocate(time,.after = id)%>%
   relocate(HC,.after=time)
-#summary(data.long)
-sum(!is.na(data.long$HC))
+#summary(trenal.long)
+sum(!is.na(trenal.long$HC))
 
-data.long.noNA <- na.omit(data.long)# reordered long table without NAs
-summary(data.long.noNA)
-data_summary_long = data.frame(unclass(summary(data.long.noNA,maxsum=1160)),check.names=FALSE)
-data.long.noNA$id[length(data.long.noNA$id)]
+trenal.long.noNA <- na.omit(trenal.long)# reordered long table without NAs
+summary(trenal.long.noNA)
+data_summary_long = data.frame(unclass(summary(trenal.long.noNA,maxsum=1160)),check.names=FALSE)
+trenal.long.noNA$id[length(trenal.long.noNA$id)]
 ```
 
 ### Response variable and predictors
 #### Response variable
-From the `summary(data.long.noNA)`, we can read that the response variable is a continuous variable `HC`level from $(15,76)$ with Mean $38.24$. (Hematocrit is the percentage of red cells in your blood %)
+From the `summary(trenal.long.noNA)`, we can read that the response variable is a continuous variable `HC`level from $(15,76)$ with Mean $38.24$. (Hematocrit is the percentage of red cells in your blood %)
 
 We have totally $I = 1160$ ids for subjects. Ideally each id would have $12$ (start from $HC_0,HC_{0.5},HC_1,HC_2,\cdots,HC_{10}$) HC level measurement, but in really not all subjects have all of the $12$ measurements (Actually only $348$ patients all $12$ measurements). We have totally $N = 9558 = \sum_{i=1}^{I} n_i$ missing values. 
 
@@ -230,9 +236,8 @@ In the data analysis part, we need to try out different variables accounting for
 ### Mean Structure
 
 ```{r,fig.axis=1}
-library(ggplot2)
 # To view the mean structure of the HC for all individuals
-ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)+
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=HC,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)+
   labs(title="Line plot of HC level for all individuals overtime and the mean structure")
 ```
 
@@ -240,7 +245,7 @@ ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,group=id))  + geom_line(col="gr
 
 ```{r,fig.axis=1}
 # To view to variance structure
-ggplot(data.long.noNA,aes(x=as.factor(time),y=HC))+ 
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=HC))+ 
   geom_boxplot(position=position_dodge(1))+
   labs(title="Box Plot of HC level for all indivuduals over time and the variance structure")
 ```
@@ -258,16 +263,16 @@ chart.Correlation(HcCorr,historgram=TRUE)
 
 
 ```{r}
-dim(data.long.noNA)
+dim(trenal.long.noNA)
 ```
 
 
 ```{r}
 # since the data dimension is large 9551 x 8, we can select random 30 data to have a look 
 set.seed(1)
-selected <- sample(1:length(unique(data.long.noNA$id)),30,replace=T) # random samples and permutations
+selected <- sample(1:length(unique(trenal.long.noNA$id)),30,replace=T) # random samples and permutations
 #selected.vector = as.vector(selected)
-data.selected = data.long.noNA[(data.long.noNA$id %in% c(selected)), ] 
+data.selected = trenal.long.noNA[(trenal.long.noNA$id %in% c(selected)), ] 
 ```
 
 #### Spaghettic plot
@@ -278,7 +283,7 @@ ggplot(data.selected,aes(x=time,y=HC,group=id,color=id))+geom_point()+ geom_line
 ggplot(data.selected,aes(x=time,y=HC,group=id,color=age))+geom_point()+ geom_line()+theme_light()
 ```
 ```{r,fig.axis = 1}
-ggplot(data.long.noNA,aes(x=time,y=HC,group=id,color=age))+geom_point()+ geom_line()+theme_light()
+ggplot(trenal.long.noNA,aes(x=time,y=HC,group=id,color=age))+geom_point()+ geom_line()+theme_light()
 ```
 Plot Info:
 The intercept may vary according to each individual
@@ -297,7 +302,7 @@ ggplot(data.selected,aes(x=time,y=HC,group=id,color=reject)) +geom_point()+ geom
 
 ```{r}
 # Spaghetti Ggplot separated by male =1
-p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 p + facet_grid(~male,labeller=label_both)
 
@@ -306,14 +311,14 @@ p + facet_grid(~male,labeller=label_both)
 
 ```{r}
 # Spaghetti Ggplot separated by cardio
-p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 cardio.labs <- c("Cardio = 0","Cardio = 1")
 p + facet_grid(~cardio,labeller = label_both) 
 ```
 ```{r}
 # Spaghetti Ggplot separated by reject =1
-p <- ggplot(data=data.long.noNA,aes(x=time,y=HC,group=id))
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=HC,group=id))
 p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
 p + facet_grid(~reject,labeller=label_both)
 
@@ -322,31 +327,31 @@ p + facet_grid(~reject,labeller=label_both)
 #### Boxplot
 ```{r}
 # Box plot by sex
-ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(male)))+ 
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(male)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 
 ```{r}
 # Box plot by cardio
-ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(cardio)))+ 
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(cardio)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 
 ```{r}
 # Box plot by reject
-ggplot(data.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(reject)))+ 
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=HC,fill=as.factor(reject)))+ 
   geom_boxplot(position=position_dodge(1))
 ```
 
 ## Data set analysis to see the age effect
 ```{r}
 library(ggplot2)
-ggplot(data=data.long.noNA,aes(y=HC,x=age))+geom_point()
+ggplot(data=trenal.long.noNA,aes(y=HC,x=age))+geom_point()
 ```
 
 
 ```{r}
-data.groupbyage <- data.long.noNA %>%   group_by(age) %>% summarise(avgHC=mean(HC))
+data.groupbyage <- trenal.long.noNA %>%   group_by(age) %>% summarise(avgHC=mean(HC))
 
 ggplot(data=data.groupbyage,aes(y=avgHC,x=age))+geom_point()
 ```
@@ -356,10 +361,10 @@ ggplot(data=data.groupbyage,aes(y=avgHC,x=age))+geom_point()
 library(jtools)
 
 plot(data.groupbyage,xlab="age",ylab="average HC")
-#fit.age = lm(HC ~ time +age,data=data.long.noNA)
+#fit.age = lm(HC ~ time +age,data=trenal.long.noNA)
 #summ(fit.age)
 
-#fit.age = lm(HC ~ time +age,data=data.long.noNA)
+#fit.age = lm(HC ~ time +age,data=trenal.long.noNA)
 #summ(fit.age)
 ```
 

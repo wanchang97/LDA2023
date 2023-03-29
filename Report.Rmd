@@ -26,17 +26,28 @@ bibliography: scholar.bib
 knitr::opts_chunk$set(echo = TRUE,warning=FALSE,message=FALSE)
 ```
 # Data description
+
 ## Backgrounds of the data
 The dataset `Trenal.XLS` contains information on patients who received renal graft(kidney transplant). The patients have been followed for at most 10 years.
 
 People with end-stage kidney disease who receive a kidney transplant generally live longer than people with ESRD who are on dialysis. 
 However, kidney transplant recipients must remain on immunosuppressants  (medications to suppress the immune system) for the rest of their life to prevent their body from rejecting the new kidney. The long-term immunosuppression puts them at risk for infections and cancer.
-Haematocrit level 
-## Initial Exploratory Analysis
-### Import data `Trenal.XLS`
-```{r}
+Haematocrit level is meassured for each patient who has received renal graft to see if gender, the age to go through the operation, reject or not, cardio history or not will influence the healthy state of a patient after operation.
+
+```{r,echo=FALSE}
 library(readxl)
 library(knitr)
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(GGally)
+library("PerformanceAnalytics")
+```
+## Data preprocess
+
+### Import and clean up data `Trenal.XLS`
+
+```{r}
 trenal <- read_excel("Trenal.XLS") # summary(trenal)
 
 trenal= trenal[,-18] #remove a noninformative column const
@@ -55,7 +66,7 @@ trenal.long = trenal[,13:20] # long table form
 
 # Remove j
 trenal.long = trenal.long[,-6]
-trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
+trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]# meanHc should replace trenal.long.unique$Hc
 trenal.long.noNA <- na.omit(trenal.long)
 
 # Wide table form
@@ -72,13 +83,10 @@ the years preceding the transplant, 207 did not.
   * reject: 793 patients shown symptoms of graft rejection during the first
 three months after the transportation, 367 has not.
 
-* The response variable Hc level: continous from min $14\%$ to max $65\%$.The Hc level is dependent on the meassured time, individual's age to perform the              operation,  gender, cardio history and reject history
-
-
-
+* The response variable Hc level: continous from min $14\%$ to max $65\%$.The Hc level is dependent on the meassured time, individual's age to perform the              operation,  gender, cardio history and reject history.
 
 ### Missing Data
-```{r,echo=FALSE}
+```{r,fig.axis=1,fig.align='center'}
 # Analyse the NA values descriptively
 ## First to collect how many NAs are in Hc0, Hc0.5, Hc1, ..., Hc 10
 Hc.NA = numeric(12)
@@ -91,27 +99,549 @@ Hc.NA.percentage = Hc.NA/dim(trenal.long.unique)[1]
 missing <- data.frame(rbind(Hc.NA,Hc.NA.percentage))
 kable(missing, caption= "Missing data for each measurement",
       col.names =colnames(trenal.wide[c(1:12)]),digits = 3)
-```
-
-
-```{r}
 plot(Hc.NA.percentage,xaxt="n",xlab ="j",ylab="Missing data%")
 axis(side=1,at=c(1,2,3,4,5,6,7,8,9,10,11,12),labels=colnames(trenal.wide)[1:12])
-# Conclusion could be at the first three measurements, there are almost full data
-# More people tends to miss the measurements when time increases
 
-##Second  We can extract all NA data from the long table to analyse their construction
+```
+
+Conclusion could be at the first three measurements, there are almost full data
+More people tends to miss the measurements when time increases. 
+And then we can extract all NA data from the long table to analyse their construction
+```{r,fig.align='center'}
 trenal.long.NA = trenal.long[is.na(trenal.long$Hc),]
 #t = unique(trenal.long.NA$id) # 821 individuals
 trenal.long.NA.unique <- trenal.long.NA[match( unique(trenal.long.NA$id), trenal.long.NA$id),]
 summary(trenal.long.NA.unique)
 ```
+```{r}
+## Conclusion, For the missing data, we can see that 
+png(file="MissingValueAnalysis.png",
+    width=600, height=1200)
+plot.new()
+par(mfrow=c(4,2))
+## age 
+hist(trenal.long.unique$age,title="Age distribution in original data")
+hist(trenal.long.NA.unique$age,col="red",title="Age distribution in missing data")
 
-## Exploratory Data Analysis for longitudinal data 
+## male
+plot(trenal.long.unique$male)
+title(main="Gender distribution in original data")
+plot(trenal.long.NA.unique$male,col="red")
+title(main="Gender distribution in missing data")
+
+## cardio
+plot(trenal.long.unique$cardio)
+title(main="Cardio distribution in original data")
+plot(trenal.long.NA.unique$cardio,col="red")
+title(main="Cardio distribution in missing data")
+
+## reject
+plot(trenal.long.unique$reject)
+title(main="Reject distribution in original data")
+plot(trenal.long.NA.unique$reject,col="red") 
+title(main="Reject distribution in missing data")
+dev.off()
+```
+
+The missing data has a similar distribution as the ideal full data set, in age, male, cardio and reject plot. So we may conclude that the missing data are random and not depend on any observed predictors or the response.
+# Exploratory Data Analysis
+
+## Univariate summaries
+
+### Plot histogram of continuous variables
+
+```{r,fig.axis=1,fig.align='center'}
+hist(trenal.long$Hc,title="Hc distribution in original data")
+```
+
+```{r,fig.align='center'}
+hist(trenal.long.unique$age,title="age distribution in original data")
+```
+
+## Bivariate summaries
+
+### Plot relationship between pairs of variables
+
+```{r,fig.align='center'}
+# Bivariate summaries
+gg <- ggpairs(data=trenal.long.unique[,2:6])# Here Hc is only one value per individual
+gg
+```
+
+### Plot the time trend of response 
+
+#### Mean Structure
+
+```{r,fig.axis=1,fig.align='center'}
+# To view the mean structure of the Hc for all individuals
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=Hc,group=id))  + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)+
+  labs(title="Line plot of Hc level for all individuals overtime and the mean structure")
+```
+
+#### Variance Structure
+
+```{r,fig.axis=1,fig.align='center'}
+# To view to variance structure
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=Hc))+ 
+  geom_boxplot(position=position_dodge(1))+
+  labs(title="Box Plot of Hc level for all indivuduals over time and the variance structure")
+```
+
+#### Covariance Structure
+
+```{r,fig.axis=1,fig.align='center'}
+HcCorr = trenal.wide[,c(1:12)]
+#cor(HcCorr,use="complete.obs" ) # also COV for covariance
+chart.Correlation(HcCorr,historgram=TRUE)
+```
+
+### Find out a covariate increasing or decreasing the responses time trend#
+
+#### Spaghetti Plot
+
+```{r}
+# since the data dimension is large 9551 x 8, we can select random 30 data to have a look 
+set.seed(1)
+selected <- sample(1:length(unique(trenal.long.noNA$id)),30,replace=T) # random samples and permutations
+#selected.vector = as.vector(selected)
+data.selected = trenal.long.noNA[(trenal.long.noNA$id %in% c(selected)), ] 
+```
+
+* Spaghetti plot group by id
+
+```{r,fig.axis = 1,echo=FALSE}
+ggplot(data.selected,aes(x=time,y=Hc,group=id,color=id))+geom_point()+ geom_line()+theme_light()
+```
+
+* Spaghetti plot group by male
+
+```{r,fig.axis=1,echo=FALSE}
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=Hc,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~male,labeller=label_both)
+
+```
+
+* Spaghetti plot group by cardio
+
+```{r,echo=FALSE}
+# Spaghetti Ggplot separated by cardio
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=Hc,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+cardio.labs <- c("Cardio = 0","Cardio = 1")
+p + facet_grid(~cardio,labeller = label_both) 
+```
+
+*Spaghetti plot group by reject
+
+```{r, echo=FALSE}
+# Spaghetti Ggplot separated by reject =1
+p <- ggplot(data=trenal.long.noNA,aes(x=time,y=Hc,group=id))
+p <- p + geom_line(col="grey")+stat_summary(aes(group=1),geom="line",fun=mean,linewidth=2)
+p + facet_grid(~reject,labeller=label_both)
+
+```
+
+
+#### Boxplot
+
+* Box plot by male
+
+```{r, echo=FALSE}
+ggplot(trenal.long.noNA,aes(x=time,y=Hc,fill=as.factor(male)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+* Box plot by cardio
+
+```{r,fig.align = "center",echo=FALSE}
+# Box plot by cardio
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=Hc,fill=as.factor(cardio)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+* Box plot by reject
+
+```{r,echo=FALSE}
+ggplot(trenal.long.noNA,aes(x=as.factor(time),y=Hc,fill=as.factor(reject)))+ 
+  geom_boxplot(position=position_dodge(1))
+```
+
+### Data set analysis to see the age effect
+
+```{r}
+ggplot(data=trenal.long.noNA,aes(y=Hc,x=age))+geom_point()
+```
+
+
+```{r}
+data.groupbyage <- trenal.long.noNA %>%   group_by(age) %>% summarise(avgHc=mean(Hc))
+ggplot(data=data.groupbyage,aes(y=avgHc,x=age))+geom_point()
+```
+
+## Conclusions after exploring data analysis
+
+* The Hc time trend tends to increase first from 0 to 0.5 year then keep variated during the rest of the meassurements
+* The subject related variables age may increase the mean Hc level of a subject
+* Male has relative higher Hc level than female
+* Cardio or reject play no big difference in the Hc level measurements.
+
 
 # Multilevel Data Analysis
 
-## Two stage model
+## Multivariate Linear Model Analysis
 
-## Linear Mixed effects model
+```{r}
+lm1 <- lm(Hc ~ time, trenal.long)
+summary(lm1)
+
+lm2 <- lm(Hc ~ time + age, trenal.long)
+summary(lm2)
+
+lm3 <- lm(Hc ~ time + age + male,trenal.long)
+summary(lm3)
+
+lm4 <- lm(Hc ~ time + age + male + reject,trenal.long)
+summary(lm4)
+
+lm5 <- lm(Hc ~ time + age + male + reject + cardio,trenal.long)
+summary(lm5)
+
+anova(lm2,lm3,lm4,lm5)
+```
+
+Conclustions:
+Variables must keep are: intercept, time, age, male
+if p value is 0.01, it is better to add reject
+if p value is 0.05, it is better to add cardio 
+
+## Two Stage Model Analysis
+
+
+
+## Linear Mixed effects Model Analysis
+
+This is inspired from the chapter of <https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html>
+Longitudinal data is a special example of multilevel data, where
+
+  * Level One is : time and the response variable e.g. Hc level 
+  * Level Two is : covariates related to each subject, e.g. age, male, reject, cardio
+
+### Unconditional Means Model to discover variance distribution
+We can first try the unconditional Means Model to explore the variance( within subject and between-subject), Define $Y_{ij}$ as the Hc level from subject $i$ and measured time $j$
+
+  * Level One: 
+  $$Y_{ij} = a_i + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  * Level Two: 
+  $$a_i = \alpha_0 + u_i,$$ where $u_i \sim N(0,\sigma_{u}^2)$
+  
+Written in linear mixed effect model is:
+ $$Y_{ij} = \alpha_0 + u_i + \epsilon_{ij},$$ where $u_i \sim N(0,\sigma_u^2)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+```{r}
+# Model A
+library(lme4)
+model.a <- lmer(Hc ~ 1 + (1|id),REML=T,data=trenal.long)
+summary(model.a)
+```
+
+
+```{r,echo=FALSE}
+cat("AIC = ",AIC(model.a),";BIC = ", BIC(model.a))
+```
+
+From the output of `model.a`, we obtain estimates of three model parameters:
+
+  * $\hat{\alpha}_0 = 38.16$: the mean of Hc level $\mu_{Hc}$ across all subjects and all years
+  * $\hat{\sigma}^2 = 23.07$: the variance in within-subjects deviation, between years of measurements $Hc_j$ and the mean $\mu_{Hc}$ across all subjects and all years
+  * $\hat{\sigma_u}^2 = 13.60$: the variance in between-subjects deviation, between subject mean $\mu_{Hc_i}$ and the overall mean $\mu_{Hc}$ across all subjects and all years.
+  
+The intraclass correlation coefficient:
+$$\hat{\rho}= \frac{\hat{\sigma_u}^2}{\hat{\sigma_u}^2+\hat{\sigma}^2} = \frac{13.60}{13.60+ 23.07}=0.371$$
+
+$37.1\%$ of the total variation in Hc levels is attributable to differences among subjects rather than changes over time within each subject.
+
+### Unconditional Growth Model, introducing time in Level One
+
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + u_i, \\
+  b_i &= \beta_0 + v_i
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+```{r}
+# model b
+model.b <- lmer(Hc ~ time + (time|id),REML=T,data= trenal.long)
+summary(model.b)
+```
+
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+```
+From the `model.b`, we obtain estimates of our six model parameters:
+ 
+* $\hat{\alpha}_0 = 37.2678$: the mean Hc level for the subjects at time 0, $Hc_0$
+* $\hat{\beta}_0 = 0.31583$: the mean change in successively measurements during totally $12$ measurements
+* $\hat{\sigma}^2 = 20.8883$: the variance in within-subject deviations
+* $\hat{\sigma}_u^2 = 13.5731$: the variance between subjects at time 0, $Hc_0$
+* $\hat{\sigma}_v^2 = 0.1856$: the variance between subjects in rate of changes in Hc level
+* $\rho_{uv} = -0.15$: the correlation in subject's $Hc_0$ and the rate of change in Hc level
+
+The estimated within-subject variance $\hat{\sigma}^2$ decreased by about $9\%$ from the unconditional means model implying that $9\%$ of within-subject variability in Hc level can be explained by a linear increase over time:
+$$Pseudo R^2_{L1} = \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond. growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} = 0.0948$$ 
+
+#### Unconditional growth but only random intercepts
+
+```{r}
+model.b1 <- lmer(Hc ~ time + (1|id),REML=T,data= trenal.long)
+summary(model.b1)
+```
+
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+```
+
+### Modeling other trends over time quadratic
+
+From the spaghetti plots we notice that our Hc level usually increases first very quickly then stays stable. (piecewise linear? )
+To reduce the correlation between the linear and quadratic components of time effect, we need to center the time variable first:
+
+```{r}
+trenal.long.center <- trenal.long%>%
+  mutate(timec = time - 5,timec2 = timec^2)
+```
+
+
+  * Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + u_i, \\
+  b_i &= \beta_0 + v_i, \\
+  c_i &= \gamma_0 + w_i,
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \gamma_0 \times time_{ij}^2] + [ u_i + v_i \times time_{ij} + w_i \times time_{ij}^2 +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+
+
+```{r}
+model.c <- lmer(Hc ~ timec + timec2 + (timec + timec2|id),REML=T, data=trenal.long.center)
+summary(model.c)
+```
+
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+```
+
+```{r}
+model.c1 <- lmer(Hc ~ timec + timec2 + (1|id),REML=T, data=trenal.long.center)
+summary(model.c1)
+```
+
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+```
+
+
+
+### Piecewise linear time trend
+In the **piecewise linear model**, the complete time span of the study is divided into two segments, with a separate slope relating time to the response in each segment.
+
+* Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + u_i, \\
+  b_i &= \beta_0 + v_i, \\
+  c_i &= \gamma_0 + w_i,
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+
+Written in linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+In our case study, we can fit separate slope in time $0-0.5$ and $0.5-10$
+```{r}
+# Modeling piecewise linear time trend with two intervals
+time1 = trenal.long$time
+time1[time1>0.5] = 0
+time2 = trenal.long$time
+time2[time2<1] = 0
+  
+trenal.long.piecewise = trenal.long
+trenal.long.piecewise['time1'] <- time1
+trenal.long.piecewise['time2'] <- time2
+
+model.b.piecewise <- lmer(Hc ~ time1 + time2 + (1|id),REML=T,data=trenal.long.piecewise)
+
+summary(model.b.piecewise)
+```
+
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+```
+
+
+```{r}
+model.b.piecewise1 <- lmer(Hc ~ time1 + time2 + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise1)
+```
+
+```{r,echo=FALSE}
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+```
+
+From the AIC and BIC value, we can see the quadratic model `model.c` outperforms the piecewise linear model `model.b.piecewise1`. However, we believe that in reality the $Hc$ level of a person will not change quadratically. It makes more sense that the Hc level of a patient will increases faster the first half year of his or her operation, and then keep stable with probably some random effects to change over the following years.
+
+With the level one model fixed, we can consider adding level two variables sequentially.
+
+### Adding subject related variable in level two
+```{r}
+model.b.piecewise.age <- lmer(Hc ~ time1 + time2 + age + (time2|id),REML=T,data=trenal.long.piecewise)
+```
+
+
+```{r,echo=FALSE}
+summary(model.b.piecewise.age)
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+```
+
+
+```{r}
+model.b.piecewise.male <- lmer(Hc ~ time1 + time2 + male + (time2|id),REML=T,data=trenal.long.piecewise)
+```
+
+```{r,echo=FALSE}
+summary(model.b.piecewise.male)
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
+```
+
+
+```{r}
+model.b.piecewise.maleage <- lmer(Hc ~ time1 + time2 + male +age +(time2|id),REML=T,data=trenal.long.piecewise)
+```
+
+
+```{r,echo=FALSE}
+summary(model.b.piecewise.maleage)
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
+cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
+```
+
+```{r}
+model.b.piecewise.maleagereject <- lmer(Hc ~ time1 + time2 + male +age + reject +(time2|id),REML=T,data=trenal.long.piecewise)
+```
+
+```{r,echo=FALSE}
+summary(model.b.piecewise.maleage)
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
+cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
+cat("model.b.piecewise,maleagereject: AIC = ",AIC(model.b.piecewise.maleagereject),";BIC = ", BIC(model.b.piecewise.maleagereject), "\n")
+```
+
+
+#### Comparing nested model using anova
+
+```{r}
+drop_in_dev <- anova(model.b.piecewise1,model.b.piecewise.male,test="Chisq")
+drop_in_dev
+```
+
+```{r}
+drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,model.b.piecewise.maleagereject,test="Chisq")
+drop_in_dev
+```
+
+Finally, our optimal model would be the piecewise linear model with age gender as the levle two variables `model.b.piecewise.maleage`.
+
+* Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+  * Level Two: 
+  
+  \begin{align}
+  a_i &= \alpha_0 + \alpha_1 \times male_i + \alpha_2 \times age_i + u_i, \\
+  b_i &= \beta_0 + \beta_1 \times male_i + \beta_2 \times age_i + v_i, \\
+  c_i &= \gamma_0 + \gamma_1 \times male_i + \gamma_2 \times age_i + w_i,
+  \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+
+The simplified linear mixed effect model is:
+$$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}} + \epsilon_{ij} $$
+ $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and $\epsilon_{ij} \sim N(0,20.5)$
+ 
+
 
