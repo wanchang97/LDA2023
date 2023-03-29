@@ -1,0 +1,107 @@
+---
+title: "TwoStageModelling"
+author: "Wanchang Zhang"
+date: "2023-03-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(GGally)
+library(data.table)
+#library(Hmisc)
+#library(mice)
+library(lattice)
+library(nlme)
+library(reshape2)
+library(MASS)
+#library(mnormt)
+library(lme4)
+library(gridExtra)
+library(knitr)
+#library(kableExtra)
+library(broom)
+library(tidyverse)
+```
+```{r}
+library(readxl)
+trenal <- read_excel("Trenal.XLS") # summary(trenal)
+trenal= trenal[,-18] #remove a noninformative column const
+# Continuous or discrete variables
+trenal$id = as.factor(trenal$id)
+trenal$j = as.factor(trenal$j)
+#trenal$time = as.factor(trenal$time)
+trenal$male = as.factor(trenal$male)
+trenal$cardio = as.factor(trenal$cardio)
+trenal$reject = as.factor(trenal$reject)
+# Change the name of respons
+colnames(trenal)[19] <- "HC"
+trenal.long = trenal[,13:20] # long table form
+
+# Remove j
+trenal.long = trenal.long[,-6]
+trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
+trenal.long.noNA <- na.omit(trenal.long)
+
+# Wide table form
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
+```
+
+```{r}
+set.seed(1)
+selected <- sample(1:length(unique(trenal.long.noNA$id)),30,replace=T) # random samples and permutations
+#selected.vector = as.vector(selected)
+data.selected = trenal.long.noNA[(trenal.long.noNA$id %in% c(selected)), ] 
+```
+
+```{r}
+regressions <- data.selected %>%
+  group_by(id) %>%
+  do(fit = lm(HC ~ time,data=.))
+sd_filter <- data.selected %>%
+  group_by(id) %>%
+  summarise(sds = sd(HC))
+
+regressions <- regressions %>% 
+  right_join(sd_filter,by="id")%>%
+  filter(!is.na(sds))
+
+lm_info2 <- regressions %>%
+  tidy(fit) %>%
+  ungroup() %>%
+  dplyr::select(id,terms,std.error) %>%
+  spread(key = term, value = std.error)
+
+regressions[[2]][[1]]$coefficients
+
+lm_info1 <- regressions %>%
+  tidy(fit)%>%
+  ungroup() %>%
+  dplyr::select(id,terms,estimate) %>%
+  spread(key = term, value = estimate) %>%
+  rename(rate = time,int = `(Intercept)`)
+
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
