@@ -1,0 +1,2528 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={LDA - Delivery},
+  pdfauthor={Oscar Cabanelas},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{LDA - Delivery}
+\author{Oscar Cabanelas}
+\date{2023-03-23}
+
+\begin{document}
+\maketitle
+
+\begin{itemize}
+\tightlist
+\item
+  Data description (using plots and so on)
+\item
+  Summary statistics (summary and so on)
+\item
+  Fit multivariate model
+\item
+  Two stage analysis
+\item
+  random effect model (from wang)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#install.packages("pacman")}
+\FunctionTok{library}\NormalTok{(pacman)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'pacman' was built under R version 4.2.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{p\_load}\NormalTok{(readxl, magrittr, dplyr, lattice, ggplot2, nlme)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{theory-of-linear-mixed-effects-modellmm}{%
+\section{Theory of Linear Mixed Effects
+Model(LMM)}\label{theory-of-linear-mixed-effects-modellmm}}
+
+\hypertarget{index-description}{%
+\subsection{Index description}\label{index-description}}
+
+Let us assume that a given input data set \(X\) has a dimension
+\(N \times p\), with \(N\) observations and \(p\) predictors.
+
+For each subject indexed with \(i, i = 1,\cdots,I\), we can build a
+linear mixed effect model
+
+\[\bf{Y}_i = \bf{X}_i \bf{\beta} + \bf{Z}_i \bf{b}_i + \bf{\epsilon}_i\]
+
+\hypertarget{the-application-of-lmm}{%
+\subsection{The application of LMM}\label{the-application-of-lmm}}
+
+Linear Mixed Effects Model is used to analyse a data set, where the
+observations are not fully independent, while the top level clusters are
+assumed independent. Inside each cluster, the observations are
+correlated
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+The dataset contains information on patients who received a renal graft
+(kidney transplant).
+
+The patients have been followed for at most 10 years.
+
+The variables included in the analysis are: ID: identification number
+MALE: 0=female, 1=male AGE: Age at transplantation CARDIO: has the
+patient experienced a cardio-vascular problem during the years preceding
+the transplantation? 0=no, 1=yes REJECT: has the patient shown symptoms
+of graft rejection during the first three months after the
+transplantation? 0=no, 1=yes Hc0: Haematocrit level at the moment of
+transplantation Hc06: Haematocrit level 6 months after transplantation
+Hc1, Hc2, \ldots, HC10: Haematocrit level 1 year, 2 years, \ldots, 10
+years after transplantation
+
+\hypertarget{data-description}{%
+\subsection{Data description}\label{data-description}}
+
+First of all, we load the data that will be used for the analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\NormalTok{trenal }\OtherTok{\textless{}{-}} \FunctionTok{read\_excel}\NormalTok{(}\StringTok{"Trenal.XLS"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(trenal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 21
+##     HC0  HC06   HC1   HC2   HC3   HC4   HC5   HC6   HC7   HC8   HC9  HC10    id
+##   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+## 1    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 2    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 3    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 4    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 5    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 6    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## # i 8 more variables: age <dbl>, male <dbl>, cardio <dbl>, reject <dbl>,
+## #   const <dbl>, j <dbl>, respons <dbl>, time <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dim}\NormalTok{(trenal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 13920    21
+\end{verbatim}
+
+As we can see, the dataset is composed of 13920 rows and 20 columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(trenal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 21
+##     HC0  HC06   HC1   HC2   HC3   HC4   HC5   HC6   HC7   HC8   HC9  HC10    id
+##   <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+## 1    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 2    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 3    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 4    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 5    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## 6    26    41    42    44    44    45    43    42    39    NA    NA    NA     1
+## # i 8 more variables: age <dbl>, male <dbl>, cardio <dbl>, reject <dbl>,
+## #   const <dbl>, j <dbl>, respons <dbl>, time <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal}\OtherTok{=}\NormalTok{ trenal[,}\SpecialCharTok{{-}}\DecValTok{18}\NormalTok{]}
+\FunctionTok{summary}\NormalTok{(trenal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       HC0             HC06            HC1             HC2            HC3       
+##  Min.   :14.00   Min.   :22.00   Min.   :20.00   Min.   :17.0   Min.   :20.00  
+##  1st Qu.:28.00   1st Qu.:35.00   1st Qu.:36.00   1st Qu.:36.0   1st Qu.:36.00  
+##  Median :32.00   Median :38.55   Median :39.00   Median :40.0   Median :39.00  
+##  Mean   :31.86   Mean   :38.83   Mean   :39.71   Mean   :39.7   Mean   :39.17  
+##  3rd Qu.:36.00   3rd Qu.:42.00   3rd Qu.:43.00   3rd Qu.:43.0   3rd Qu.:43.00  
+##  Max.   :60.00   Max.   :61.70   Max.   :63.00   Max.   :65.0   Max.   :60.00  
+##  NA's   :12                      NA's   :12      NA's   :1044   NA's   :2460   
+##       HC4             HC5             HC6             HC7       
+##  Min.   :23.00   Min.   :17.00   Min.   :20.00   Min.   :17.00  
+##  1st Qu.:35.00   1st Qu.:35.00   1st Qu.:36.00   1st Qu.:35.00  
+##  Median :39.00   Median :39.00   Median :39.00   Median :39.00  
+##  Mean   :39.16   Mean   :39.02   Mean   :39.11   Mean   :38.85  
+##  3rd Qu.:43.00   3rd Qu.:43.00   3rd Qu.:43.00   3rd Qu.:42.00  
+##  Max.   :55.00   Max.   :56.00   Max.   :55.00   Max.   :60.00  
+##  NA's   :3768    NA's   :5016    NA's   :6096    NA's   :7140   
+##       HC8             HC9             HC10             id        
+##  Min.   :23.00   Min.   :17.00   Min.   :24.10   Min.   :   1.0  
+##  1st Qu.:35.00   1st Qu.:35.00   1st Qu.:35.00   1st Qu.: 290.8  
+##  Median :38.05   Median :38.50   Median :38.00   Median : 580.5  
+##  Mean   :38.35   Mean   :38.57   Mean   :38.49   Mean   : 580.5  
+##  3rd Qu.:42.00   3rd Qu.:42.00   3rd Qu.:42.00   3rd Qu.: 870.2  
+##  Max.   :55.00   Max.   :55.00   Max.   :54.00   Max.   :1160.0  
+##  NA's   :8064    NA's   :8988    NA's   :9744                    
+##       age             male            cardio           reject      
+##  Min.   :15.00   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.:36.00   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median :48.00   Median :1.0000   Median :0.0000   Median :0.0000  
+##  Mean   :46.43   Mean   :0.5741   Mean   :0.1784   Mean   :0.3164  
+##  3rd Qu.:57.00   3rd Qu.:1.0000   3rd Qu.:0.0000   3rd Qu.:1.0000  
+##  Max.   :76.00   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
+##  NA's   :12                                                        
+##        j            respons           time       
+##  Min.   : 1.00   Min.   :14.00   Min.   : 0.000  
+##  1st Qu.: 3.75   1st Qu.:34.00   1st Qu.: 1.750  
+##  Median : 6.50   Median :38.00   Median : 4.500  
+##  Mean   : 6.50   Mean   :38.24   Mean   : 4.625  
+##  3rd Qu.: 9.25   3rd Qu.:42.00   3rd Qu.: 7.250  
+##  Max.   :12.00   Max.   :65.00   Max.   :10.000  
+##                  NA's   :4362
+\end{verbatim}
+
+From the 1st column to the 12th, the values appear to be the levels of
+Haematocrit at each period, information that appears also with the
+combination of variables time and response. So, we decide to use only
+the information from the 13th column on in order not to overlap
+information and use the \textbf{long format} of it.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.long }\OtherTok{=}\NormalTok{ trenal[,}\DecValTok{13}\SpecialCharTok{:}\DecValTok{20}\NormalTok{]}
+\FunctionTok{summary}\NormalTok{(trenal.long)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        id              age             male            cardio      
+##  Min.   :   1.0   Min.   :15.00   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.: 290.8   1st Qu.:36.00   1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median : 580.5   Median :48.00   Median :1.0000   Median :0.0000  
+##  Mean   : 580.5   Mean   :46.43   Mean   :0.5741   Mean   :0.1784  
+##  3rd Qu.: 870.2   3rd Qu.:57.00   3rd Qu.:1.0000   3rd Qu.:0.0000  
+##  Max.   :1160.0   Max.   :76.00   Max.   :1.0000   Max.   :1.0000  
+##                   NA's   :12                                       
+##      reject             j            respons           time       
+##  Min.   :0.0000   Min.   : 1.00   Min.   :14.00   Min.   : 0.000  
+##  1st Qu.:0.0000   1st Qu.: 3.75   1st Qu.:34.00   1st Qu.: 1.750  
+##  Median :0.0000   Median : 6.50   Median :38.00   Median : 4.500  
+##  Mean   :0.3164   Mean   : 6.50   Mean   :38.24   Mean   : 4.625  
+##  3rd Qu.:1.0000   3rd Qu.: 9.25   3rd Qu.:42.00   3rd Qu.: 7.250  
+##  Max.   :1.0000   Max.   :12.00   Max.   :65.00   Max.   :10.000  
+##                                   NA's   :4362
+\end{verbatim}
+
+Now, it is interesting to rellocate the variables in order to have a
+clear format . Moreover, some of the variables are transformed to factor
+since they are not numerical ones.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.long}\SpecialCharTok{$}\NormalTok{id }\OtherTok{=} \FunctionTok{as.factor}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{id)}
+\NormalTok{trenal.long}\SpecialCharTok{$}\NormalTok{j }\OtherTok{=} \FunctionTok{as.factor}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{j)}
+\NormalTok{trenal.long}\SpecialCharTok{$}\NormalTok{male }\OtherTok{=} \FunctionTok{as.factor}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{male)}
+\NormalTok{trenal.long}\SpecialCharTok{$}\NormalTok{cardio }\OtherTok{=} \FunctionTok{as.factor}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{cardio)}
+\NormalTok{trenal.long}\SpecialCharTok{$}\NormalTok{reject }\OtherTok{=} \FunctionTok{as.factor}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{reject)}
+
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ trenal.long }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{relocate}\NormalTok{(id) }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{relocate}\NormalTok{(j,}\AttributeTok{.after=}\NormalTok{id)}\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{relocate}\NormalTok{(time,}\AttributeTok{.after =}\NormalTok{ j)}\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{relocate}\NormalTok{(respons,}\AttributeTok{.after=}\NormalTok{time)}
+\FunctionTok{summary}\NormalTok{(data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        id              j             time           respons     
+##  1      :   12   1      :1160   Min.   : 0.000   Min.   :14.00  
+##  2      :   12   2      :1160   1st Qu.: 1.750   1st Qu.:34.00  
+##  3      :   12   3      :1160   Median : 4.500   Median :38.00  
+##  4      :   12   4      :1160   Mean   : 4.625   Mean   :38.24  
+##  5      :   12   5      :1160   3rd Qu.: 7.250   3rd Qu.:42.00  
+##  6      :   12   6      :1160   Max.   :10.000   Max.   :65.00  
+##  (Other):13848   (Other):6960                    NA's   :4362   
+##       age        male     cardio    reject  
+##  Min.   :15.00   0:5928   0:11436   0:9516  
+##  1st Qu.:36.00   1:7992   1: 2484   1:4404  
+##  Median :48.00                              
+##  Mean   :46.43                              
+##  3rd Qu.:57.00                              
+##  Max.   :76.00                              
+##  NA's   :12
+\end{verbatim}
+
+\#Check NA's from wanchang
+
+Now, we can plot the data. To do that, we are going to create a
+spaguetti plot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Plot1}\OtherTok{\textless{}{-}}\FunctionTok{xyplot}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time, }\AttributeTok{groups =}\NormalTok{ id,}
+              \AttributeTok{data =}\NormalTok{ trenal.long,}
+              \AttributeTok{type =} \StringTok{"l"}\NormalTok{ ,}\AttributeTok{xlab=}\StringTok{"Years after transplation"}\NormalTok{,}\AttributeTok{ylab=}\StringTok{"Levels of Haematocrit after transplation"}\NormalTok{)}
+\CommentTok{\#add title}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Comment}:
+
+As we can see, there is a lot of variability in the origin, since the
+values go from 20 until 50 approximately. Furthermore, in this plot we
+can not see a clear difference in the slopes. Since that, we are going
+to pick up a random sample for trying to understand that aspect.
+
+To do that, we are going to use the ggplot function to make it beauty.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{selected }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(}\FunctionTok{unique}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{id)),}\DecValTok{100}\NormalTok{,}\AttributeTok{replace=}\NormalTok{T)}
+\NormalTok{data.selected }\OtherTok{=}\NormalTok{ trenal.long[(trenal.long}\SpecialCharTok{$}\NormalTok{id }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(selected)), ]}
+\end{Highlighting}
+\end{Shaded}
+
+Plot again
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(Plot2}\OtherTok{\textless{}{-}}\FunctionTok{xyplot}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time, }\AttributeTok{groups =}\NormalTok{ id,}
+              \AttributeTok{data =}\NormalTok{ data.selected,}
+              \AttributeTok{type =} \StringTok{"l"}\NormalTok{ ,}\AttributeTok{xlab=}\StringTok{"Years after transplation"}\NormalTok{,}\AttributeTok{ylab=}\StringTok{"Levels of Haematocrit after transplation"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data.selected,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time,}\AttributeTok{y=}\NormalTok{respons,}\AttributeTok{group=}\NormalTok{id,}\AttributeTok{color=}\NormalTok{id))}\SpecialCharTok{+}\FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}\FunctionTok{theme\_light}\NormalTok{()}\SpecialCharTok{+} \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 358 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 356 rows containing missing values (`geom_line()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+After choosing a random sample, we can see that the first year after the
+treatment there is a peak in the level of Haematocrtit and, afterwards,
+it seems to stabilize in each of the sample individuals regardless their
+initial level.
+
+Now, it is interesting to check if we can find differences between
+genders:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data.selected,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time,}\AttributeTok{y=}\NormalTok{respons,}\AttributeTok{group=}\NormalTok{id,}\AttributeTok{color=}\NormalTok{male))}\SpecialCharTok{+}\FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}\FunctionTok{theme\_light}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 358 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 356 rows containing missing values (`geom_line()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-12-1.pdf}
+\textbf{Comment}
+
+Furthermore, we can check it depending on the level of cardio
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data.selected,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time,}\AttributeTok{y=}\NormalTok{respons,}\AttributeTok{group=}\NormalTok{id,}\AttributeTok{color=}\NormalTok{cardio))}\SpecialCharTok{+}\FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}\FunctionTok{theme\_light}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 358 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 356 rows containing missing values (`geom_line()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-13-1.pdf}
+\textbf{Comment}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(data.selected,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time,}\AttributeTok{y=}\NormalTok{respons,}\AttributeTok{group=}\NormalTok{id,}\AttributeTok{color=}\NormalTok{reject))}\SpecialCharTok{+}\FunctionTok{geom\_point}\NormalTok{()}\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}\SpecialCharTok{+}\FunctionTok{theme\_light}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 358 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 356 rows containing missing values (`geom_line()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-14-1.pdf}
+\textbf{Comment}
+
+Add here things about the mean that Wanchang did by group.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Summary statistics \ldots{}
+\end{enumerate}
+
+Analysis of endpoints: the response at the last mesure
+
+To check this, we need to extract the last measurement for each
+individual. To do that, we just need to select the row in which the time
+is equal to 10.0.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{last\_measurement }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(trenal.long, trenal.long}\SpecialCharTok{$}\NormalTok{time }\SpecialCharTok{==} \DecValTok{10}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(last\_measurement)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        id            age        male    cardio  reject        j       
+##  1      :   1   Min.   :15.00   0:494   0:953   0:793   12     :1160  
+##  2      :   1   1st Qu.:36.00   1:666   1:207   1:367   1      :   0  
+##  3      :   1   Median :48.00                           2      :   0  
+##  4      :   1   Mean   :46.43                           3      :   0  
+##  5      :   1   3rd Qu.:57.00                           4      :   0  
+##  6      :   1   Max.   :76.00                           5      :   0  
+##  (Other):1154   NA's   :1                               (Other):   0  
+##     respons           time   
+##  Min.   :24.10   Min.   :10  
+##  1st Qu.:35.00   1st Qu.:10  
+##  Median :38.00   Median :10  
+##  Mean   :38.49   Mean   :10  
+##  3rd Qu.:42.00   3rd Qu.:10  
+##  Max.   :54.00   Max.   :10  
+##  NA's   :812
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Check the mean and everything about last point response}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Comment}
+
+The last point of the \emph{respons} has 812 NAs from the 1154
+measurements.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{last\_measurement}\SpecialCharTok{$}\NormalTok{resp\_na}\OtherTok{\textless{}{-}}\FunctionTok{ifelse}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(last\_measurement}\SpecialCharTok{$}\NormalTok{respons) }\SpecialCharTok{==}\NormalTok{ T, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+
+\NormalTok{last\_measurement}\SpecialCharTok{$}\NormalTok{resp\_na}\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(last\_measurement}\SpecialCharTok{$}\NormalTok{resp\_na)}
+\FunctionTok{summary}\NormalTok{(last\_measurement}\SpecialCharTok{$}\NormalTok{resp\_na)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   0   1 
+## 348 812
+\end{verbatim}
+
+How it is composed for male/female?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{last\_measurement\_male }\OtherTok{\textless{}{-}}\NormalTok{ last\_measurement }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(male) }\SpecialCharTok{\%\textgreater{}\%} 
+\FunctionTok{count}\NormalTok{(respons)}
+\end{Highlighting}
+\end{Shaded}
+
+Analysis of increments: Difference between the response at the first
+available and the last one.
+
+We will use just the non NA values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.long\_no\_na }\OtherTok{\textless{}{-}} \FunctionTok{na.omit}\NormalTok{(trenal.long)}
+\NormalTok{trenal.long.incr}\OtherTok{\textless{}{-}}\NormalTok{trenal.long\_no\_na }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(time }\SpecialCharTok{==} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(id) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{incr =} \FunctionTok{max}\NormalTok{(respons) }\SpecialCharTok{{-}} \FunctionTok{min}\NormalTok{ (respons), }\AttributeTok{one =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\NormalTok{incr }\SpecialCharTok{\%in\%} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: There was 1 warning in `filter()`.
+## i In argument: `time == c(0, 10)`.
+## Caused by warning in `time == c(0, 10)`:
+## ! longer object length is not a multiple of shorter object length
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{boxplot}\NormalTok{(trenal.long.incr}\SpecialCharTok{$}\NormalTok{incr)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+Increment
+
+Increment per unit of time
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Fit a multivariate model and find the most parsimonious mean structure
+  which can be used to describe the average evolutions in the data. What
+  covariance structures are applicable in this case? What is the most
+  parsimonious structure you can find?
+\end{enumerate}
+
+To do that, we are going to use the lm function. We will try to create
+different linear models using all the available variables in the data
+set.
+
+On top of that, we want to test if the level of rejection affection in
+the response variable can depend on the time. Since that, we also apply
+one interaction between the time and the rejection level.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.lm}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+\NormalTok{trenal.lm2 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time }\SpecialCharTok{+}\NormalTok{ male, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+\NormalTok{trenal.lm3 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ reject, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+\NormalTok{trenal.lm4 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ cardio, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+\NormalTok{trenal.lm5 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ reject }\SpecialCharTok{+}\NormalTok{ cardio, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+\NormalTok{trenal.lm6 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time }\SpecialCharTok{+}\NormalTok{ male }\SpecialCharTok{+}\NormalTok{ reject }\SpecialCharTok{+}\NormalTok{ reject}\SpecialCharTok{:}\NormalTok{time, }\AttributeTok{data =}\NormalTok{ trenal.long)}
+
+\FunctionTok{anova}\NormalTok{(trenal.lm, trenal.lm2, trenal.lm3, trenal.lm4, trenal.lm5, trenal.lm6)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: respons ~ time
+## Model 2: respons ~ time + male
+## Model 3: respons ~ time + male + reject
+## Model 4: respons ~ time + male + cardio
+## Model 5: respons ~ time + male + reject + cardio
+## Model 6: respons ~ time + male + reject + reject:time
+##   Res.Df    RSS Df Sum of Sq       F    Pr(>F)    
+## 1   9556 346639                                   
+## 2   9555 332478  1   14161.5 407.995 < 2.2e-16 ***
+## 3   9554 331631  1     846.7  24.394 7.985e-07 ***
+## 4   9554 332426  0    -794.7                      
+## 5   9553 331584  1     841.9  24.255 8.580e-07 ***
+## 6   9553 331630  0     -46.6                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(trenal.lm3, trenal.lm5)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: respons ~ time + male + reject
+## Model 2: respons ~ time + male + reject + cardio
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1   9554 331631                           
+## 2   9553 331584  1    47.183 1.3594 0.2437
+\end{verbatim}
+
+CORR AND COVARIANCE STRUCTURE
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.wide }\OtherTok{=}\NormalTok{ trenal[,}\DecValTok{1}\SpecialCharTok{:}\DecValTok{17}\NormalTok{]}
+
+\NormalTok{dataCorr}\OtherTok{\textless{}{-}}\NormalTok{ trenal.wide[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{12}\NormalTok{)]}
+\FunctionTok{cor}\NormalTok{(dataCorr,}\AttributeTok{use=}\StringTok{"complete.obs"}\NormalTok{) }\CommentTok{\#Also COV for covarianza}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             HC0      HC06       HC1       HC2       HC3       HC4       HC5
+## HC0  1.00000000 0.2264123 0.1587116 0.1724777 0.2139805 0.1732267 0.1557624
+## HC06 0.22641235 1.0000000 0.7562367 0.6233688 0.5520591 0.5278499 0.5143061
+## HC1  0.15871158 0.7562367 1.0000000 0.7315995 0.6656006 0.6119867 0.5873331
+## HC2  0.17247771 0.6233688 0.7315995 1.0000000 0.7284046 0.6382434 0.5996189
+## HC3  0.21398049 0.5520591 0.6656006 0.7284046 1.0000000 0.7733522 0.7016965
+## HC4  0.17322666 0.5278499 0.6119867 0.6382434 0.7733522 1.0000000 0.7888249
+## HC5  0.15576243 0.5143061 0.5873331 0.5996189 0.7016965 0.7888249 1.0000000
+## HC6  0.13620085 0.4569881 0.5004036 0.4869519 0.5786122 0.6814132 0.7592203
+## HC7  0.10156045 0.3936597 0.4541699 0.4724703 0.5402798 0.6466212 0.7067887
+## HC8  0.08419757 0.3687935 0.4454882 0.4244221 0.5030428 0.6040136 0.6080051
+## HC9  0.08859254 0.3711560 0.4254622 0.3971477 0.4303661 0.5461579 0.5713338
+## HC10 0.09718506 0.4210917 0.4301937 0.4647890 0.4972001 0.5629570 0.5800544
+##            HC6       HC7        HC8        HC9       HC10
+## HC0  0.1362008 0.1015604 0.08419757 0.08859254 0.09718506
+## HC06 0.4569881 0.3936597 0.36879347 0.37115604 0.42109175
+## HC1  0.5004036 0.4541699 0.44548815 0.42546216 0.43019368
+## HC2  0.4869519 0.4724703 0.42442213 0.39714773 0.46478897
+## HC3  0.5786122 0.5402798 0.50304282 0.43036614 0.49720006
+## HC4  0.6814132 0.6466212 0.60401365 0.54615793 0.56295695
+## HC5  0.7592203 0.7067887 0.60800514 0.57133378 0.58005440
+## HC6  1.0000000 0.7414970 0.67347761 0.62938253 0.60329422
+## HC7  0.7414970 1.0000000 0.71838142 0.63933448 0.65646214
+## HC8  0.6734776 0.7183814 1.00000000 0.70316750 0.68501304
+## HC9  0.6293825 0.6393345 0.70316750 1.00000000 0.74259683
+## HC10 0.6032942 0.6564621 0.68501304 0.74259683 1.00000000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cov}\NormalTok{(dataCorr,}\AttributeTok{use=}\StringTok{"complete.obs"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            HC0      HC06       HC1       HC2      HC3       HC4       HC5
+## HC0  39.066556  7.665218  5.774002  6.234614  7.07784  5.763345  4.971864
+## HC06  7.665218 29.338892 23.842148 19.527246 15.82455 15.219122 14.226481
+## HC1   5.774002 23.842148 33.879074 24.627098 20.50234 18.961168 17.458390
+## HC2   6.234614 19.527246 24.627098 33.446305 22.29312 19.647973 17.709378
+## HC3   7.077840 15.824553 20.502342 22.293116 28.00580 21.785056 18.963882
+## HC4   5.763345 15.219122 18.961168 19.647973 21.78506 28.334444 21.443314
+## HC5   4.971864 14.226481 17.458390 17.709378 18.96388 21.443314 26.080017
+## HC6   4.301388 12.506996 14.716768 14.229393 15.47169 18.327116 19.590611
+## HC7   3.308261 11.112594 13.777065 14.240366 14.90100 17.938242 18.811183
+## HC8   2.627503  9.973469 12.946223 12.254999 13.29138 16.052596 15.502522
+## HC9   2.877108 10.445636 12.867175 11.933907 11.83365 15.105395 15.160039
+## HC10  3.182038 11.948183 13.116956 14.080989 13.78347 15.697692 15.517650
+##            HC6       HC7       HC8       HC9      HC10
+## HC0   4.301388  3.308261  2.627503  2.877108  3.182038
+## HC06 12.506996 11.112594  9.973469 10.445636 11.948183
+## HC1  14.716768 13.777065 12.946223 12.867175 13.116956
+## HC2  14.229393 14.240366 12.254999 11.933907 14.080989
+## HC3  15.471694 14.900997 13.291382 11.833646 13.783466
+## HC4  18.327116 17.938242 16.052596 15.105395 15.697692
+## HC5  19.590611 18.811183 15.502522 15.160039 15.517650
+## HC6  25.530100 19.525773 16.989891 16.523324 15.968301
+## HC7  19.525773 27.160964 18.692563 17.312397 17.921962
+## HC8  16.989891 18.692563 24.927707 18.241328 17.916092
+## HC9  16.523324 17.312397 18.241328 26.996843 20.212166
+## HC10 15.968301 17.921962 17.916092 20.212166 27.441419
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(}\StringTok{"PerformanceAnalytics"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'PerformanceAnalytics' was built under R version 4.2.3
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: xts
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: zoo
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'zoo'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## ################################### WARNING ###################################
+## # We noticed you have dplyr installed. The dplyr lag() function breaks how    #
+## # base R's lag() function is supposed to work, which breaks lag(my_xts).      #
+## #                                                                             #
+## # Calls to lag(my_xts) that you enter or source() into this session won't     #
+## # work correctly.                                                             #
+## #                                                                             #
+## # All package code is unaffected because it is protected by the R namespace   #
+## # mechanism.                                                                  #
+## #                                                                             #
+## # Set `options(xts.warn_dplyr_breaks_lag = FALSE)` to suppress this warning.  #
+## #                                                                             #
+## # You can use stats::lag() to make sure you're not using dplyr::lag(), or you #
+## # can add conflictRules('dplyr', exclude = 'lag') to your .Rprofile to stop   #
+## # dplyr from breaking base R's lag() function.                                #
+## ################################### WARNING ###################################
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'xts'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:dplyr':
+## 
+##     first, last
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'PerformanceAnalytics'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:graphics':
+## 
+##     legend
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{chart.Correlation}\NormalTok{(dataCorr , }\AttributeTok{histogram=}\NormalTok{T)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in par(usr): argument 1 does not name a graphical parameter
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+
+## Warning in par(usr): argument 1 does not name a graphical parameter
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Use an explicit two-stage analysis to get an initial impression about
+  trends and effects of covariates.
+\end{enumerate}
+
+As a first step, we need to create a \emph{groupedData} object in order
+to apply it to the following process.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal\_grouped1}\OtherTok{\textless{}{-}}\FunctionTok{groupedData}\NormalTok{(respons}\SpecialCharTok{\textasciitilde{}}\NormalTok{time}\SpecialCharTok{|}\NormalTok{id,trenal.long\_no\_na, }\AttributeTok{inner =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ male, }\AttributeTok{labels=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit"}\NormalTok{),}\AttributeTok{units=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit "}\NormalTok{))}
+
+
+\NormalTok{trenal\_grouped2}\OtherTok{\textless{}{-}}\FunctionTok{groupedData}\NormalTok{(respons}\SpecialCharTok{\textasciitilde{}}\NormalTok{time}\SpecialCharTok{|}\NormalTok{id,trenal.long\_no\_na, }\AttributeTok{inner =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ reject, }\AttributeTok{labels=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit"}\NormalTok{),}\AttributeTok{units=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit "}\NormalTok{))}
+
+\NormalTok{trenal\_grouped3}\OtherTok{\textless{}{-}}\FunctionTok{groupedData}\NormalTok{(respons}\SpecialCharTok{\textasciitilde{}}\NormalTok{time}\SpecialCharTok{|}\NormalTok{id,trenal.long\_no\_na, }\AttributeTok{inner =} \SpecialCharTok{\textasciitilde{}}\NormalTok{ cardio, }\AttributeTok{labels=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit"}\NormalTok{),}\AttributeTok{units=}\FunctionTok{list}\NormalTok{(}\AttributeTok{y=}\StringTok{"level of Haematocrit "}\NormalTok{))}
+
+\CommentTok{\#plot(trenal\_grouped1, inner =  T, key = F)}
+\CommentTok{\#plot(trenal\_grouped2, inner = T, key = F)}
+\CommentTok{\#plot(trenal\_grouped3, inner = T, key = F)}
+\CommentTok{\#here, we do not declare any group, but I should group by male, reject or cardio}
+\CommentTok{\#outer: time dependent}
+\CommentTok{\#inner: not time dependent (male, )}
+\end{Highlighting}
+\end{Shaded}
+
+first step: A model for each individual estimating the intercept and
+time was adjusted. It is not significant which of the three previous
+models we will use, since the info is the same.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#REMOVE MISSINGS HERE}
+
+\NormalTok{modlist1 }\OtherTok{\textless{}{-}} \FunctionTok{lmList}\NormalTok{ (respons }\SpecialCharTok{\textasciitilde{}}\NormalTok{ time, trenal\_grouped1 , }\AttributeTok{na.action =}\NormalTok{ na.pass)}
+
+
+\CommentTok{\#plot(intervals(modlist1))}
+\CommentTok{\#plot(trenal\_grouped)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Comment} In here, he have the model with a beta for each
+individual.
+
+Then, we can extract all the beta0 and beta1 obtained from the model.
+This will be used in the following steps
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#attributes(modlist1)}
+
+
+\NormalTok{beta0}\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(modlist1)[,}\DecValTok{1}\NormalTok{]}
+
+\NormalTok{beta1}\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(modlist1)[,}\DecValTok{2}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+As we can see, huge part of the beta's are missings since we did not
+remove the missigness of the data for this analysis.
+
+Moreover,
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coef}\NormalTok{(modlist1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      (Intercept)          time
+## 495     26.83333  3.000000e+00
+## 865     22.95439  1.073684e+00
+## 192     27.83333 -5.000000e+00
+## 422     32.80000 -7.200000e+00
+## 26      25.66667  6.000000e+00
+## 214     23.57500  2.150000e+00
+## 298     27.62551  2.070977e-01
+## 326     28.95410 -3.625293e-01
+## 421     31.20690 -6.206897e-01
+## 428     28.73706  1.816262e-01
+## 577     31.40000 -1.714286e-01
+## 660     30.66667  2.000000e+00
+## 762     31.52661 -6.610644e-01
+## 848     31.89825 -9.894737e-01
+## 871     30.83333  1.000000e+00
+## 1145    31.83333 -1.000000e+00
+## 48      18.16667  1.900000e+01
+## 132     27.20000  3.485714e+00
+## 412     33.37246 -3.318033e-01
+## 478     28.83301  3.874575e-01
+## 513     30.66667  4.000000e+00
+## 640     31.31740 -7.604640e-02
+## 726     28.35266  5.338936e-01
+## 782     31.70990  3.890785e-01
+## 796     27.20990  1.389078e+00
+## 847     34.33333 -5.000000e+00
+## 928     30.70690  3.793103e-01
+## 943     33.50000 -1.000000e+00
+## 1122    31.50000  3.000000e+00
+## 9       26.82045  6.514341e-01
+## 25      30.03306  4.793388e-01
+## 82      30.06167  4.366667e-01
+## 121     31.59699  3.033544e-01
+## 123     28.28772  1.073684e+00
+## 134     28.72403  4.200292e-01
+## 144     27.34590  9.053864e-01
+## 152     32.04050 -2.628099e-01
+## 182     31.66991  1.254254e-01
+## 291     30.56960  5.435100e-01
+## 296     34.08838 -1.596500e-01
+## 299     30.62120  6.028196e-02
+## 380     32.15934 -4.346135e-02
+## 458     30.19250  5.746568e-01
+## 475     31.95403 -8.915897e-02
+## 539     31.00000  4.000000e+00
+## 575     31.33333  2.000000e+00
+## 690     32.37544  5.473684e-01
+## 984     34.50000 -5.000000e+00
+## 1009    32.77586  1.724138e-01
+## 1049    32.20000  1.200000e+00
+## 1057    28.80000  3.657143e+00
+## 1091    32.80000 -6.285714e-01
+## 1119    32.83333  1.000000e+00
+## 1125    33.83333 -1.000000e+00
+## 4       33.95706 -1.084125e+00
+## 47      31.13742 -2.819640e-01
+## 107     32.79693  6.723549e-01
+## 154     29.81034  1.068966e+00
+## 160     30.07843  2.352941e-01
+## 212     25.44912  2.505263e+00
+## 216     25.50000  1.100000e+01
+## 227     30.14432 -9.433298e-02
+## 228     32.01724  4.482759e-01
+## 267     28.20705  5.228002e-01
+## 287     30.62167  3.300000e-01
+## 297     29.80000  1.085714e+00
+## 344     36.33333 -2.000000e+00
+## 345     31.65079 -1.458435e-02
+## 433     34.40000 -1.600000e+00
+## 452     34.66667 -1.789905e-14
+## 459     33.80000 -2.914286e+00
+## 464     33.50000  3.000000e+00
+## 565     32.23117  3.936667e-01
+## 569     34.76721 -4.711944e-01
+## 626     28.97888  7.455121e-01
+## 630     26.71077  7.997888e-01
+## 633     30.74340 -6.420275e-01
+## 694     31.02667  6.933333e-01
+## 792     33.17491 -1.375768e+00
+## 815     32.40000 -1.028571e+00
+## 975     29.60690  1.579310e+00
+## 1007    33.44828 -3.448276e-01
+## 1010    30.02586  1.672414e+00
+## 1055    32.80000  5.142857e-01
+## 1077    31.00000  2.857143e+00
+## 1085    35.20000 -8.000000e-01
+## 1114    36.00000 -8.571429e-01
+## 1152    32.50000  3.000000e+00
+## 1064    30.38000  3.594286e+00
+## 460     31.57363  1.696646e-01
+## 787     35.09010  1.092149e-02
+## 981     32.42759  1.117241e+00
+## 1148    33.60000  2.400000e+00
+## 875     35.17789 -1.873684e-01
+## 818     33.37782  1.003413e-01
+## 54      32.66387 -3.865546e-01
+## 63      32.88883 -1.020904e-01
+## 155     33.33384 -2.505591e-01
+## 162     33.02220 -4.083617e-02
+## 246     32.00000  6.000000e+00
+## 247     30.09718  4.708799e-01
+## 249     35.54254 -6.037919e-01
+## 258     25.80000  6.228571e+00
+## 318     34.93115 -5.346621e-01
+## 392     33.20500 -1.700000e-01
+## 415     33.87085 -9.820126e-02
+## 480     30.44693  6.961595e-01
+## 592     33.80817  2.717353e-01
+## 602     33.98211 -5.326316e-01
+## 649     33.41816 -3.611404e-01
+## 684     36.74603 -6.031746e-01
+## 698     37.49138 -4.224138e+00
+## 702     33.95667 -1.266667e-01
+## 738     33.56116 -1.157796e-01
+## 754     33.93744  2.558357e-01
+## 855     35.75439 -5.263158e-01
+## 883     31.87368  3.578947e-01
+## 918     34.47414 -6.724138e-01
+## 936     33.98276 -4.482759e-01
+## 971     35.34483 -1.034483e+00
+## 973     35.35345  1.896552e-01
+## 1000    35.39655  3.103448e-01
+## 1013    32.39655  3.103448e-01
+## 1048    35.70000  7.142857e-01
+## 1089    29.60000  3.314286e+00
+## 1103    30.94000  2.897143e+00
+## 1118    35.90000 -4.200000e+00
+## 837     36.91997 -1.703072e-01
+## 248     31.93700  5.217307e-01
+## 712     36.98500 -1.566667e-01
+## 966     35.58000 -2.148571e+00
+## 1054    32.88000  2.708571e+00
+## 55      31.39183  5.639281e-01
+## 56      33.76730  1.944579e-01
+## 59      34.36072 -2.401556e-01
+## 64      32.40950 -5.250365e-02
+## 66      30.10906  1.205639e-01
+## 90      34.08913  4.491979e-01
+## 103     36.00000  1.914152e-15
+## 140     33.52828  4.443364e-01
+## 142     26.68421  1.894737e+00
+## 163     34.07487 -5.026738e-01
+## 164     31.86553  2.561011e-01
+## 172     30.16379  1.258621e+00
+## 180     26.38737  9.863481e-01
+## 259     31.01086  5.201750e-01
+## 302     33.69535  2.100146e-01
+## 341     34.99575 -2.430725e-02
+## 350     35.58606 -3.393291e-01
+## 354     35.74818  5.444823e-02
+## 368     31.83228  2.092367e-01
+## 388     30.42262  7.554691e-01
+## 389     36.15870 -7.167235e-02
+## 410     32.93103  2.206897e+00
+## 434     36.40000 -1.028571e+00
+## 453     30.08167  2.900000e-01
+## 506     31.34179  3.873602e-01
+## 511     33.33570  3.157428e-01
+## 545     33.83333  5.000000e+00
+## 547     26.60000  4.457143e+00
+## 566     32.85082  3.217799e-01
+## 582     32.73333  1.200000e+00
+## 600     35.88596  2.576557e-02
+## 603     35.77790 -4.596973e-01
+## 617     30.79021  6.054206e-01
+## 689     34.09430  5.695612e-01
+## 724     33.79925  7.469655e-02
+## 755     32.43791  2.091503e-01
+## 786     38.01195 -2.392491e+00
+## 800     35.44881 -4.607509e-01
+## 802     35.34130 -9.283276e-01
+## 814     37.83333 -5.000000e+00
+## 880     33.97544 -6.526316e-01
+## 909     34.10526 -6.315789e-01
+## 944     36.33333  2.000000e+00
+## 948     31.26897  1.393103e+00
+## 950     35.45690  8.793103e-01
+## 961     30.95345  2.589655e+00
+## 989     36.65517 -9.655172e-01
+## 1003    28.99138  2.775862e+00
+## 1038    37.22000 -1.371429e-01
+## 1065    31.80000  3.657143e+00
+## 1079    37.54000 -8.171429e-01
+## 1105    34.20000  2.057143e+00
+## 1126    32.33333  6.000000e+00
+## 1144    38.16667 -1.100000e+01
+## 1154    36.50000  1.000000e+00
+## 717     36.31018 -1.774042e-02
+## 1123    29.65000  1.010000e+01
+## 549     31.37869  4.622951e-01
+## 911     39.01228 -2.073684e+00
+## 322     31.84729  1.699562e-01
+## 568     35.70016 -3.956440e-01
+## 1020    33.98276  1.751724e+00
+## 651     36.02433 -6.006667e-01
+## 679     34.18267  3.493333e-01
+## 6       30.53265  7.136607e-01
+## 21      33.54778 -5.699659e-01
+## 53      32.05737  4.200292e-01
+## 161     31.32620  5.240642e-01
+## 177     33.51195  6.075085e-01
+## 219     34.71233  1.540734e-01
+## 232     35.02295  3.241218e-01
+## 233     34.26462  1.409820e-01
+## 239     33.26668  3.062713e-02
+## 311     32.62807 -1.684211e-01
+## 313     34.08702  4.676714e-01
+## 321     31.72090  5.089937e-01
+## 327     33.81139  8.608777e-01
+## 346     34.08151  5.444823e-02
+## 369     34.25928  3.403014e-02
+## 377     33.48582  2.012640e-01
+## 379     29.85318  5.182304e-01
+## 382     36.33333 -4.699962e-16
+## 406     33.40000  3.257143e+00
+## 438     36.73000 -6.866667e-01
+## 441     32.97585  3.655809e-01
+## 449     34.32954  3.325231e-02
+## 462     31.52311  6.742829e-01
+## 483     32.44942  6.127370e-01
+## 487     34.05526  4.385027e-01
+## 522     34.81283  2.566845e-01
+## 537     32.39180  6.964871e-01
+## 573     30.33333  8.000000e+00
+## 621     32.90004  3.287575e-01
+## 625     36.34386 -8.631579e-01
+## 627     33.74073 -2.759592e-02
+## 639     38.83333 -3.000000e+00
+## 648     35.83208 -7.112628e-01
+## 673     36.27000  2.000000e-02
+## 775     31.71242  7.581699e-01
+## 810     37.93157 -8.658703e-01
+## 846     38.22807 -1.368421e+00
+## 851     35.40105  9.136842e-01
+## 858     30.81404  1.915789e+00
+## 870     36.18246 -2.947368e-01
+## 887     35.31333 -1.600000e-01
+## 890     33.30140 -4.484211e-01
+## 987     30.56897  2.793103e+00
+## 1004    37.00000  5.714286e-01
+## 1025    34.80000  2.514286e+00
+## 1030    30.60000  5.028571e+00
+## 1050    35.00000  2.571429e+00
+## 1066    34.80000 -5.714286e-02
+## 1071    37.60000 -1.142857e-01
+## 1112    37.40000 -1.028571e+00
+## 1124    28.83333  9.000000e+00
+## 1137    34.16667  5.000000e+00
+## 1138    39.66667 -6.000000e+00
+## 1142    38.75000 -7.000000e-01
+## 468     34.60230  3.490520e-01
+## 761     32.65033  1.167320e+00
+## 953     33.14914  2.577586e+00
+## 564     31.78350 -1.233333e-02
+## 13      26.99222  1.298979e+00
+## 14      33.65500 -1.366667e-01
+## 19      33.71787  7.817210e-01
+## 22      30.00373  1.044239e+00
+## 91      32.73440  2.139037e-02
+## 99      35.85324 -3.208191e-01
+## 118     32.37822  8.371415e-01
+## 124     35.31034 -1.931034e+00
+## 128     31.96093  1.079197e+00
+## 135     34.16723  7.194944e-02
+## 193     33.78334  5.153136e-01
+## 225     30.54831  2.994652e-01
+## 254     34.95657 -8.070005e-02
+## 256     30.54778 -5.699659e-01
+## 274     34.33707  2.931839e-01
+## 316     37.88138 -1.905688e-01
+## 319     36.41274  7.292173e-02
+## 335     37.25117 -1.966667e-02
+## 337     37.18451 -7.953330e-02
+## 338     35.16563  2.398639e-01
+## 343     37.09415 -5.639281e-02
+## 349     37.16438 -7.025695e-01
+## 356     35.98973 -9.729225e-01
+## 411     36.82068 -1.197861e-01
+## 424     35.16501  2.760331e-01
+## 440     32.30935  6.718522e-01
+## 444     33.32831  5.055907e-01
+## 446     34.33641  5.585434e-01
+## 447     35.00000  2.000000e+00
+## 461     33.04375  6.932426e-01
+## 497     33.78000 -3.866667e-01
+## 502     37.30175 -1.410526e+00
+## 525     34.28246 -2.946604e-01
+## 535     33.73443  3.718970e-01
+## 540     37.01311  6.276347e-02
+## 544     36.19027  4.624573e-01
+## 555     36.60751 -5.324232e-01
+## 563     37.33115 -5.807963e-02
+## 574     36.57541 -1.391101e-01
+## 590     32.39212  3.583245e-01
+## 598     36.26445  1.549454e-01
+## 616     34.52418 -1.830066e-02
+## 637     32.76945  6.385076e-01
+## 658     39.75133 -6.653333e-01
+## 665     39.07500 -5.500000e-01
+## 680     37.80000 -1.200000e+00
+## 685     35.54608  9.146758e-01
+## 686     37.64667 -5.200000e-01
+## 691     37.04350 -3.190000e-01
+## 697     38.83333 -5.000000e+00
+## 721     31.10271  1.329225e+00
+## 756     32.08497  1.503268e+00
+## 770     32.28422  1.577965e+00
+## 773     30.85154  8.459384e-01
+## 789     31.20307  1.327645e+00
+## 797     31.70137  1.812287e+00
+## 824     37.11579  5.052632e-01
+## 860     32.92632  2.042105e+00
+## 868     33.33825  7.305263e-01
+## 876     32.03509  1.389474e+00
+## 881     37.88596 -9.157895e-01
+## 886     33.53088  1.734737e+00
+## 888     36.01404 -4.842105e-01
+## 889     39.61053 -6.315789e-02
+## 894     35.96842  5.894737e-01
+## 897     29.85614  2.463158e+00
+## 903     33.80000  3.657143e+00
+## 904     34.56000  2.331429e+00
+## 916     38.03860  5.684211e-01
+## 935     28.66667  1.000000e+01
+## 979     37.08362  7.413791e-02
+## 992     38.87931 -3.137931e+00
+## 995     33.97414  2.327586e+00
+## 1008    37.63793 -1.413793e+00
+## 1039    30.00000  6.000000e+00
+## 1068    39.80000 -2.342857e+00
+## 1095    39.16667  1.000000e+00
+## 1104    38.80000 -2.057143e+00
+## 1107    34.20000  2.914286e+00
+## 1116    35.38000 -1.771429e-01
+## 1120    39.33333 -4.000000e+00
+## 1141    37.83333  1.000000e+00
+## 1149    32.33333  6.000000e+00
+## 255     28.42617  1.062810e+00
+## 371     36.02497  3.964025e-01
+## 656     37.52700 -1.313333e-01
+## 642     36.36670  1.954241e-01
+## 972     32.20431  2.412069e+00
+## 1032    35.66000  2.874286e+00
+## 854     35.45614  6.315789e-02
+## 968     36.84224  9.982758e-01
+## 16      35.22233  2.041808e-01
+## 28      34.95576  3.879436e-01
+## 30      32.31680  7.603306e-01
+## 34      35.16091  1.273700e-01
+## 41      34.82123  5.154073e-01
+## 72      35.26365  3.033544e-01
+## 78      35.94409  3.364123e-01
+## 83      37.23367 -3.568303e-01
+## 137     36.39869 -1.869281e+00
+## 147     30.87719  2.736842e+00
+## 166     33.74426  9.189696e-01
+## 171     36.44899  1.858046e-01
+## 183     33.88982  1.017740e+00
+## 197     35.20775  2.397666e-01
+## 198     29.70356  1.217391e+00
+## 203     29.35345  4.189655e+00
+## 221     36.96824 -2.916869e-02
+## 223     32.04894  4.939232e-01
+## 224     39.07616 -5.250365e-02
+## 226     33.92513  5.026738e-01
+## 235     34.30724  6.903257e-01
+## 261     35.74526  5.415654e-01
+## 275     31.32329  6.111813e-01
+## 284     36.23380  2.199813e-01
+## 288     33.02752  8.048614e-01
+## 323     33.50000  9.000000e+00
+## 329     35.75547 -1.633447e-01
+## 340     39.80181 -5.697618e-01
+## 352     38.69379 -3.301896e-01
+## 353     37.06100 -4.875475e-01
+## 358     37.16721 -4.140515e-01
+## 366     37.73764  1.468158e-01
+## 383     36.59261  3.403014e-02
+## 387     37.00000 -1.142857e+00
+## 407     38.26527 -6.339329e-01
+## 413     34.79815  5.085075e-01
+## 414     37.55971 -1.390374e-01
+## 436     36.33030 -1.272727e-01
+## 451     36.18966  9.310345e-01
+## 465     34.76441 -5.717064e-02
+## 505     34.36753  6.232377e-01
+## 526     37.90000 -9.428571e-01
+## 534     36.82459  1.962529e-01
+## 543     34.00197  1.094145e-01
+## 553     40.16770 -7.152693e-01
+## 567     39.50000 -5.000000e+00
+## 580     38.37049 -4.412178e-01
+## 596     36.62443  1.576910e-01
+## 601     35.07709 -2.111932e-02
+## 606     38.46251 -1.267159e-01
+## 613     33.42267  9.198170e-01
+## 624     35.24284  2.978529e-01
+## 666     36.92667  9.333333e-02
+## 675     36.03833  1.633333e-01
+## 687     38.30000  1.999999e-01
+## 688     33.56500  1.190000e+00
+## 699     35.25000  8.333333e-01
+## 706     35.52833  5.700000e-01
+## 709     33.55833  1.016667e+00
+## 718     36.43697  3.025210e-01
+## 725     35.71989  1.120448e-02
+## 731     35.20551  8.491130e-01
+## 736     37.55172 -1.655172e+00
+## 739     33.15910  6.896359e-01
+## 743     37.68422  3.779645e-01
+## 752     34.23343  6.573296e-01
+## 767     40.33754 -7.535014e-01
+## 813     35.57167  6.450512e-01
+## 825     33.42150  1.293515e+00
+## 840     36.26109 -3.501706e-01
+## 878     37.56316 -5.789474e-01
+## 899     33.01754  1.894737e+00
+## 930     34.68966  1.931034e+00
+## 932     36.17414  1.527586e+00
+## 937     36.31897 -7.068966e-01
+## 951     29.01724  4.448276e+00
+## 957     32.14655  2.810345e+00
+## 974     37.16121  2.913793e-01
+## 980     34.43966  2.431034e+00
+## 993     26.12069  5.137931e+00
+## 994     38.00000  4.000000e-01
+## 1022    33.50000  3.000000e+00
+## 1029    37.00000  2.285714e+00
+## 1034    38.40000  9.714286e-01
+## 1040    33.28000  4.594286e+00
+## 1078    33.20000  4.628571e+00
+## 1081    33.40000  4.685714e+00
+## 1097    31.20000  4.628571e+00
+## 1132    29.93333  1.000000e+01
+## 1135    35.66667  6.000000e+00
+## 1160    39.16667  1.000000e+00
+## 593     33.20039  8.163323e-01
+## 552     36.21344  4.714754e-01
+## 443     37.09717  1.763333e-01
+## 920     34.04281  8.231579e-01
+## 991     33.44138  3.075862e+00
+## 668     28.56567  1.007333e+00
+## 908     38.31053  1.368421e-01
+## 1070    33.10000  3.114286e+00
+## 31      29.76962  2.426621e+00
+## 79      37.00000  3.142857e+00
+## 84      34.20353  6.767137e-01
+## 86      38.29736  7.778318e-03
+## 94      37.02771  3.723870e-01
+## 96      31.52000  1.520000e+00
+## 101     36.97167 -9.033333e-01
+## 112     39.51078 -6.329606e-01
+## 120     36.92281  1.663158e+00
+## 130     30.00000  1.200000e+01
+## 138     34.89500  7.700000e-01
+## 150     32.34386  1.136842e+00
+## 157     39.66634 -6.125425e-01
+## 200     31.87344  8.021390e-01
+## 201     36.73878  2.907146e-01
+## 237     40.68725 -1.103549e+00
+## 264     35.42359  5.930967e-01
+## 278     31.53184  1.182304e+00
+## 293     31.65517  3.034483e+00
+## 305     30.43509  2.989474e+00
+## 306     39.59433 -7.194944e-01
+## 351     36.52006  1.163831e-01
+## 363     37.88673 -8.361692e-02
+## 370     37.86356  1.195916e-01
+## 373     37.38843  1.322314e-01
+## 385     36.92500 -7.833333e-01
+## 394     39.30773 -3.908605e-01
+## 397     41.28942 -9.995139e-01
+## 432     38.05591 -3.364123e-01
+## 445     40.25977 -1.369799e+00
+## 474     40.42241 -2.017241e+00
+## 499     33.22687  7.797764e-01
+## 500     36.20907 -4.880895e-02
+## 507     37.41387  2.168206e-01
+## 546     32.37377  7.887588e-01
+## 554     36.66230 -1.161593e-01
+## 558     30.95426  4.703981e-01
+## 561     35.97377  1.601874e-01
+## 579     37.17657 -5.006508e-01
+## 583     35.54262  7.039813e-01
+## 584     39.33115  2.276347e-01
+## 622     38.57145 -2.231609e-02
+## 635     38.44748 -3.061598e-01
+## 638     29.46389  1.694826e+00
+## 659     33.60504  1.495798e+00
+## 693     29.83333  1.300000e+01
+## 696     39.89333  2.666667e-02
+## 747     32.45472  5.284781e-01
+## 749     38.38282 -2.819795e-01
+## 760     36.13968  4.317460e-01
+## 804     37.58959  8.563140e-01
+## 806     38.33276  4.948805e-01
+## 832     36.95563  6.006826e-01
+## 857     37.83333  5.000000e+00
+## 874     38.32070 -5.642105e-01
+## 912     34.74035  1.957895e+00
+## 970     38.00000  5.714286e-01
+## 983     31.80000  3.371429e+00
+## 996     31.81207  2.113793e+00
+## 1059    33.40000  4.685714e+00
+## 1062    35.20000  1.771429e+00
+## 1084    37.60000  1.600000e+00
+## 1092    39.40000  6.857143e-01
+## 1093    35.80000  3.371429e+00
+## 1098    37.10000  1.800000e+00
+## 1099    39.20000 -2.285714e-01
+## 1127    40.00000  2.000000e+00
+## 1128    33.66667  2.000000e+00
+## 1153    39.83333 -9.000000e+00
+## 653     36.12000  7.866667e-01
+## 769     39.96760 -9.600373e-01
+## 803     37.94642  1.017747e+00
+## 1056    36.84000  2.525714e+00
+## 1156    42.40000 -2.000000e+00
+## 1109    35.20000  3.800000e+00
+## 748     35.51438  1.162091e+00
+## 1011    36.79483  2.465517e+00
+## 734     42.40822 -1.421662e+00
+## 408     36.28539  3.656459e-01
+## 10      34.39621  8.332523e-01
+## 11      38.96095  1.886242e-01
+## 40      32.09480  1.168692e+00
+## 65      33.60898  9.674283e-01
+## 92      29.58807  1.458435e+00
+## 109     32.48193  8.507535e-01
+## 116     32.00000 -2.000000e+00
+## 126     35.27645  4.987846e-01
+## 133     34.97606  4.449138e-01
+## 143     29.55403  6.427314e-01
+## 151     31.80687  9.859018e-01
+## 159     36.00551  4.132231e-01
+## 173     39.89094 -1.205639e-01
+## 186     30.28828  8.565873e-01
+## 190     31.24080  1.119105e+00
+## 195     34.47368 -8.421053e-01
+## 196     26.75783  2.148539e+00
+## 199     38.36321 -3.211951e-01
+## 208     34.32086  4.171123e-01
+## 211     38.96356 -8.804084e-01
+## 229     23.16667  1.900000e+01
+## 241     37.62778  4.948955e-01
+## 312     37.28500 -9.000000e-02
+## 314     37.85399  4.958678e-02
+## 325     36.53233  1.011181e-01
+## 339     42.15558 -8.919395e-01
+## 348     36.51029  4.482256e-01
+## 359     38.87548 -1.388430e-01
+## 378     37.64009  1.715119e-01
+## 427     39.57284 -1.310647e-01
+## 454     37.48888  3.897910e-01
+## 471     37.03704  1.361205e-02
+## 476     37.89440 -2.724393e-01
+## 486     37.60819  7.372011e-02
+## 503     37.65700  4.129693e-01
+## 510     33.77735  7.832766e-01
+## 515     36.80172 -2.155172e+00
+## 533     37.27213 -1.976581e-01
+## 548     35.20328 -2.716628e-02
+## 550     38.13789 -5.073684e-01
+## 562     38.44361 -3.841686e-01
+## 570     36.48190  1.029310e+00
+## 571     35.41148  6.477752e-01
+## 578     38.14754  2.060890e-01
+## 588     35.32705  6.615925e-01
+## 632     36.03992  4.109820e-01
+## 644     35.60788 -3.583245e-01
+## 670     33.04333  1.460000e+00
+## 674     40.43133 -8.520000e-01
+## 678     35.65167  7.766667e-01
+## 710     38.94667 -5.333333e-02
+## 714     42.34454 -4.537815e-01
+## 719     33.48459  1.540616e+00
+## 722     40.39683  3.174603e-01
+## 723     36.93651  3.492063e-01
+## 730     40.77778  2.222222e-01
+## 741     36.53501  4.985994e-01
+## 778     40.10187 -1.186741e+00
+## 788     35.59215  8.293515e-01
+## 793     41.27133 -2.058020e+00
+## 809     39.75597 -1.696246e+00
+## 819     38.72918  1.262798e-02
+## 822     37.24744  7.269625e-01
+## 826     35.84471  1.102389e+00
+## 831     41.40017 -9.484642e-01
+## 834     39.24915 -7.576792e-01
+## 873     39.11930  8.842105e-01
+## 892     34.52281  4.631579e-01
+## 929     40.73684 -4.210526e-01
+## 931     33.03621  3.941379e+00
+## 942     32.83966  3.831034e+00
+## 945     36.78448  1.396552e+00
+## 960     35.99138  2.775862e+00
+## 963     36.87069  1.637931e+00
+## 998     38.72586 -1.275862e-01
+## 1012    39.07759  1.017241e+00
+## 1014    35.93103  2.206897e+00
+## 1045    35.80000  3.942857e+00
+## 1047    33.20000  5.200000e+00
+## 1053    42.60000 -3.542857e+00
+## 1063    41.33333 -2.000000e+00
+## 1074    40.40000  4.000000e-01
+## 1075    41.50000 -2.571429e-01
+## 1094    35.80000  3.657143e+00
+## 1096    36.40000  3.828571e+00
+## 1113    32.80000  6.228571e+00
+## 1117    42.62000 -1.365714e+00
+## 1133    30.16667  1.300000e+01
+## 1136    36.16667  7.000000e+00
+## 1155    40.33333  2.000000e+00
+## 784     42.14778 -1.969966e+00
+## 850     37.62351  7.389474e-01
+## 926     39.98947 -7.368421e-01
+## 967     38.50259  1.567241e+00
+## 823     40.37662 -8.604096e-01
+## 902     38.02105  4.736842e-01
+## 816     41.53584 -7.774744e-01
+## 879     40.35158 -1.229474e+00
+## 257     34.84689  5.029508e-01
+## 23      37.93259  5.911522e-01
+## 27      37.90925  4.880895e-01
+## 38      32.81754  2.294737e+00
+## 39      32.59828  7.535246e-01
+## 42      33.61433  1.074380e+00
+## 43      33.05137  1.087992e+00
+## 58      31.18103  1.706897e+00
+## 67      34.73375  7.963053e-01
+## 102     33.48635  8.771331e-01
+## 108     30.89289  1.554691e+00
+## 114     35.84767  1.050073e-01
+## 117     37.10598  3.014098e-01
+## 141     31.15929  1.064657e+00
+## 148     37.91885 -1.806514e-01
+## 175     36.67736  2.139037e-01
+## 210     37.70070  3.169665e-01
+## 220     34.16448  8.653379e-01
+## 230     32.75326  1.410067e+00
+## 231     35.11311  5.773456e-01
+## 240     38.65263 -1.515789e+00
+## 260     33.47885  1.031599e+00
+## 277     37.59413  5.129801e-01
+## 281     35.16406  6.903257e-02
+## 286     34.81008  1.050073e+00
+## 292     33.69113  7.201365e-01
+## 308     39.57273 -7.454545e-01
+## 333     38.66581 -2.323773e-02
+## 361     39.88833 -7.366667e-01
+## 386     22.36860  3.317406e+00
+## 399     28.66731  1.225085e+00
+## 404     37.57803  4.696159e-01
+## 405     32.04797  6.562956e-01
+## 418     39.02123  1.215362e-01
+## 431     38.59543 -2.368498e-01
+## 439     38.64333 -1.030627e-01
+## 455     34.56085  4.861449e-03
+## 457     38.38031 -1.195916e-02
+## 469     39.03079  1.915411e-01
+## 477     39.54310 -8.793103e-01
+## 481     35.63831  4.025280e-01
+## 488     41.43647 -1.407251e+00
+## 492     37.50313  5.110355e-01
+## 496     37.94967 -1.231961e-01
+## 529     42.20705 -8.698361e-01
+## 557     34.09475  6.320375e-01
+## 597     31.87012  8.848997e-01
+## 609     28.16667  1.900000e+01
+## 611     39.39986  6.849701e-01
+## 636     37.86730  5.843013e-01
+## 645     39.99296  2.485040e-01
+## 647     37.94710  4.775079e-01
+## 650     40.93742 -9.307990e-01
+## 652     37.02667  6.933333e-01
+## 655     36.69050  1.069667e+00
+## 661     39.69033  4.866666e-02
+## 664     38.28823 -1.155973e+00
+## 683     39.10833  3.166667e-01
+## 707     40.20667  4.000000e-02
+## 716     41.49123 -9.473684e-01
+## 729     37.87628  9.716153e-01
+## 765     37.53221  7.787115e-01
+## 768     37.93091 -2.905696e-01
+## 771     40.50047 -4.668534e-02
+## 801     40.51195  6.075085e-01
+## 827     36.26041  1.443686e+00
+## 833     36.25768  1.819113e+00
+## 838     37.68089  2.279864e-01
+## 849     36.61053  1.936842e+00
+## 882     33.64211  1.347368e+00
+## 898     38.89368 -2.821053e-01
+## 934     34.20000  4.914286e+00
+## 938     37.61207  1.913793e+00
+## 954     37.90517  5.344828e-01
+## 969     37.59483  2.465517e+00
+## 982     41.20690 -6.206897e-01
+## 1002    33.38793  3.086207e+00
+## 1018    38.80172  1.844828e+00
+## 1033    34.60000  5.314286e+00
+## 1035    37.80000  1.085714e+00
+## 1036    36.20000  3.771429e+00
+## 1052    35.60000  3.314286e+00
+## 1069    37.80000 -2.914286e+00
+## 1087    40.60000 -4.000000e-01
+## 1088    32.20000  7.200000e+00
+## 1130    35.83333  9.000000e+00
+## 1147    31.50000  1.300000e+01
+## 1150    35.33333  1.000000e+01
+## 1157    33.66667  1.000000e+01
+## 742     41.38441 -6.407096e-01
+## 941     39.25776  1.401724e+00
+## 1139    41.55000  9.999990e-02
+## 1134    37.38333  6.900000e+00
+## 1       37.91167  8.700000e-01
+## 8       33.63442  1.052018e+00
+## 12      31.61870  1.343704e+00
+## 46      36.42484  1.516340e+00
+## 87      36.55469  3.665532e-01
+## 100     33.86096  1.219251e+00
+## 136     37.94035  1.557895e+00
+## 145     32.75093  1.261060e+00
+## 168     34.69049  1.021877e+00
+## 174     41.25296  8.945066e-02
+## 185     30.93966  5.431034e+00
+## 189     37.22460  4.919786e-01
+## 205     39.97751  5.239704e-01
+## 207     42.38098  4.375304e-02
+## 218     37.05218  6.193486e-01
+## 234     30.61433  3.529010e+00
+## 243     36.53115  1.133489e-01
+## 251     35.54853  7.282450e-01
+## 252     36.14164  7.747440e-01
+## 268     41.66845 -6.310160e-01
+## 279     35.30635  1.005834e+00
+## 310     39.40000  1.200000e+00
+## 317     42.91000 -6.666667e-03
+## 332     39.67213 -1.283372e+00
+## 355     37.50608  4.851726e-01
+## 360     35.63242  9.856389e-01
+## 362     35.07649  5.600389e-01
+## 376     37.59083  6.650462e-01
+## 390     39.22503 -4.534319e-01
+## 391     33.83333  1.100000e+01
+## 393     44.65592 -1.105785e+00
+## 398     35.54756  8.906174e-01
+## 425     40.19057  1.750122e-01
+## 429     33.57090  9.936801e-01
+## 437     36.38842  1.157796e+00
+## 442     39.33293 -7.656782e-01
+## 456     43.00616 -3.616918e-01
+## 466     39.89883 -1.366667e-02
+## 467     41.59650 -6.154594e-01
+## 482     39.29865  4.579485e-01
+## 491     40.53259 -2.088478e-01
+## 541     36.94426  8.046838e-01
+## 559     33.98361  1.358314e-01
+## 589     37.76065  4.491376e-01
+## 591     36.12953 -1.724745e-01
+## 594     35.57902  1.260542e+00
+## 608     37.55088  1.494737e+00
+## 615     36.14291  7.553678e-01
+## 628     37.37994  6.082365e-01
+## 676     34.95500  1.663333e+00
+## 681     40.00167  2.100000e-01
+## 711     38.45000  3.333333e-02
+## 751     41.12325  4.750700e-01
+## 753     37.68908  1.092437e+00
+## 763     40.96013  5.869281e-01
+## 780     38.28328  1.549488e+00
+## 829     41.61331 -1.980205e+00
+## 884     38.97895  1.726316e+00
+## 917     39.35789  6.526316e-01
+## 919     30.38596  3.684211e+00
+## 924     40.28772  1.073684e+00
+## 939     43.25000 -5.000000e-01
+## 955     31.66667  1.600000e+01
+## 997     38.60000  2.457143e+00
+## 1001    39.07759  1.017241e+00
+## 1028    37.40000  3.542857e+00
+## 1031    34.00000  6.857143e+00
+## 1037    38.80000  2.800000e+00
+## 1043    36.40000  3.828571e+00
+## 1100    44.20000 -3.085714e+00
+## 1102    41.00000  2.285714e+00
+## 1108    41.82000  7.485714e-01
+## 1115    39.06000  2.674286e+00
+## 1143    43.80000 -7.800000e+00
+## 536     34.75443 -1.252459e-01
+## 671     38.20140  9.515789e-01
+## 713     37.42913  6.868347e-01
+## 907     38.54842  8.294737e-01
+## 962     39.83966  8.310345e-01
+## 976     33.39828  3.355172e+00
+## 853     42.37965 -5.978947e-01
+## 2       34.88667  1.720000e+00
+## 5       35.92530  8.089451e-01
+## 52      39.42230  1.429266e-01
+## 70      34.53607  1.386885e+00
+## 76      35.04426  6.046838e-01
+## 77      38.91860 -2.400583e-01
+## 105     35.78885  9.285367e-01
+## 129     39.26009 -4.346135e-01
+## 153     40.43508 -4.922703e-01
+## 158     34.52730  1.245734e+00
+## 191     39.65694 -3.762761e-01
+## 209     38.42894  7.000486e-01
+## 262     36.81570  3.412969e-01
+## 266     40.02674  5.347594e-01
+## 269     32.80000  6.800000e+00
+## 304     43.49473 -9.538162e-01
+## 328     39.85623 -1.238697e-01
+## 331     39.32350 -1.906660e-01
+## 334     37.41468  1.232082e+00
+## 364     40.25410  1.803279e-01
+## 372     27.16667  1.500000e+01
+## 417     35.93139  7.247448e-01
+## 472     43.59857 -2.951872e-01
+## 473     33.68692  2.839086e-01
+## 484     40.88454  1.817209e-01
+## 494     37.71350  5.123967e-01
+## 509     39.63000  7.133333e-01
+## 512     39.13333  1.200000e+00
+## 517     38.45690 -1.120690e+00
+## 518     38.62111  3.071463e-01
+## 519     37.72951  5.269321e-01
+## 523     41.91877  1.232493e-01
+## 538     38.24262  4.468384e-01
+## 587     36.34262  1.103981e+00
+## 605     41.01763  5.074973e-01
+## 629     32.93371  2.629318e+00
+## 672     38.94000  1.106667e+00
+## 701     40.46333 -2.866667e-01
+## 744     37.47143  1.457143e+00
+## 757     39.71148  8.515406e-01
+## 758     41.98599 -5.994398e-01
+## 774     34.98263  1.736695e+00
+## 781     42.35154 -1.836177e+00
+## 783     36.84642 -3.822526e-01
+## 785     39.23208  8.873720e-02
+## 867     43.66421 -1.465263e+00
+## 869     39.77930 -2.035789e+00
+## 877     42.60000 -4.000000e-01
+## 893     31.16842  4.189474e+00
+## 925     39.42241  1.982759e+00
+## 999     36.35345  4.189655e+00
+## 1016    37.07672  3.494828e+00
+## 1021    41.22414  1.827586e+00
+## 1023    41.80172 -2.155172e+00
+## 1042    23.00000  1.328571e+01
+## 1073    35.60000  1.714286e-01
+## 1129    41.83333  1.000000e+00
+## 1140    44.66667 -2.000000e+00
+## 1158    46.00000 -1.000000e+01
+## 835     42.87116 -1.909556e+00
+## 759     39.54837  3.633987e-01
+## 843     32.61672  1.850512e+00
+## 1005    45.19914 -1.522414e+00
+## 514     41.17378  4.453087e-01
+## 956     39.87759  2.217241e+00
+## 856     41.64702  1.077895e+00
+## 964     38.33362  2.774138e+00
+## 24      39.00351  2.378947e+00
+## 37      32.92124  1.152163e+00
+## 44      36.15184  9.761789e-01
+## 45      39.51855  6.806028e-02
+## 57      39.22897  7.613029e-01
+## 62      40.72792 -2.294604e-01
+## 74      33.72452  1.338843e+00
+## 89      31.40723  1.659699e+00
+## 125     34.82330  1.637452e+00
+## 165     33.88333  1.484686e+00
+## 167     32.81034  5.068966e+00
+## 170     41.87151 -2.061629e-01
+## 202     38.96970  7.272727e-01
+## 222     39.59812  4.472533e-01
+## 236     33.60667  1.106667e+00
+## 276     40.17679  1.419543e-01
+## 290     39.18862  4.997569e-01
+## 300     43.57278 -2.535732e-01
+## 320     42.21909  7.875547e-02
+## 330     43.58725 -5.035489e-01
+## 336     42.16189 -3.500243e-02
+## 367     37.72743  8.517258e-01
+## 401     43.45735 -1.059796e-02
+## 493     37.48060  7.393291e-01
+## 508     39.32951  1.840749e-01
+## 528     38.28000  1.280000e+00
+## 542     42.35902 -1.747073e-01
+## 610     37.05966  1.043928e+00
+## 614     37.72401  8.126012e-01
+## 619     41.21457  5.055966e-01
+## 623     43.34122  1.750088e-01
+## 631     42.91130 -4.688490e-01
+## 634     35.74035  1.957895e+00
+## 654     40.84833  2.233333e-01
+## 657     41.60117 -7.196667e-01
+## 695     36.73333  1.066667e+00
+## 733     39.78945 -7.449113e-01
+## 735     37.62652  1.348273e+00
+## 790     39.49488  1.453925e+00
+## 798     44.15870 -7.167235e-02
+## 799     41.35683 -3.856656e-02
+## 836     39.60068  1.406143e+00
+## 863     42.10175  9.894737e-01
+## 866     32.79298  3.642105e+00
+## 891     38.94737  2.315789e+00
+## 910     36.61404  2.315789e+00
+## 913     39.42807  2.231579e+00
+## 914     40.59298  2.042105e+00
+## 946     29.02586  3.672414e+00
+## 965     43.51207 -8.620691e-02
+## 985     35.15517  4.034483e+00
+## 1017    38.50000  3.000000e+00
+## 1024    42.60000  1.028571e+00
+## 1044    41.60000  1.600000e+00
+## 1110    45.20000  1.200000e+00
+## 1159    45.66667 -1.381681e-14
+## 1046    37.48000  5.337143e+00
+## 1058    28.18000  1.068000e+01
+## 402     36.67948  6.260574e-01
+## 906     41.92351 -1.261053e+00
+## 852     41.49333 -5.200000e-01
+## 35      36.50008  1.153136e+00
+## 50      35.13823  1.249392e+00
+## 68      36.88948  1.122995e+00
+## 104     41.53784  5.143413e-01
+## 111     40.32393  2.362664e-01
+## 156     37.74833  9.566667e-01
+## 204     40.41614  5.046184e-01
+## 245     32.50000  1.500000e+01
+## 280     41.54383 -1.536218e-01
+## 347     40.05834  2.576568e-01
+## 400     43.61805  1.186193e-01
+## 403     35.31839  2.160598e+00
+## 409     40.94066  2.434613e-01
+## 420     41.23560  8.779776e-02
+## 435     38.60751 -5.324232e-01
+## 485     39.62745  1.254902e+00
+## 489     40.37385  5.678172e-01
+## 521     42.91518  9.761789e-02
+## 527     42.06885  4.009368e-01
+## 531     40.64000 -2.666667e-02
+## 556     36.40000 -4.571429e-01
+## 646     38.68567  1.957057e-01
+## 720     39.93595 -1.194771e+00
+## 740     39.69048 -4.476191e-01
+## 745     40.34809  3.914099e-01
+## 772     36.26331  1.669468e+00
+## 777     42.65546  5.378150e-02
+## 795     45.95546  3.491468e-01
+## 805     40.77645  1.488055e+00
+## 817     35.90785  2.170648e+00
+## 839     38.53072  2.276451e+00
+## 845     41.03072  1.276451e+00
+## 872     41.98947  8.631579e-01
+## 896     39.95439  1.073684e+00
+## 900     36.00000  4.000000e+00
+## 933     41.97414  2.327586e+00
+## 947     38.77586  2.172414e+00
+## 978     41.94310  1.520690e+00
+## 988     36.51724  3.448276e+00
+## 1067    40.80000  3.657143e+00
+## 1076    39.66000 -4.000000e-02
+## 1082    40.66667  8.000000e+00
+## 1086    39.20000  4.342857e+00
+## 1090    29.60000  9.314286e+00
+## 1146    30.83333  1.700000e+01
+## 811     38.63413  1.307167e+00
+## 641     45.27807 -1.590989e-02
+## 324     39.38493  7.167720e-01
+## 812     35.93686  2.531741e+00
+## 1106    44.68000  1.708571e+00
+## 17      41.29541  3.325231e-01
+## 51      40.58759  5.396208e-01
+## 73      39.83730  5.036461e-01
+## 179     35.18474  1.149246e+00
+## 181     37.23011  9.052018e-01
+## 188     34.34754  1.520375e+00
+## 206     37.98023  6.349052e-01
+## 217     37.00583  1.025766e+00
+## 244     34.81886  2.113912e+00
+## 273     37.37768  1.567758e+00
+## 307     40.35375  5.901799e-01
+## 315     42.99887 -1.438989e-01
+## 357     41.57791  2.552261e-01
+## 430     44.38054 -7.831794e-01
+## 470     36.40593  1.209528e+00
+## 599     41.84224 -2.910243e-01
+## 612     42.32070  3.093981e-01
+## 662     40.78983 -5.476667e-01
+## 669     41.73167  8.566667e-01
+## 677     40.16500  1.233333e-01
+## 682     40.65600 -1.440000e-01
+## 779     42.35481  5.191410e-01
+## 861     45.32702 -2.082105e+00
+## 977     33.93103  6.206897e+00
+## 1019    35.26724  3.948276e+00
+## 1027    40.86000  4.588571e+00
+## 1060    43.00000  2.857143e-01
+## 1061    37.00000  6.857143e+00
+## 1111    42.00000  3.714286e+00
+## 1131    39.33333  1.000000e+01
+## 1151    37.83333  1.300000e+01
+## 921     43.55053 -3.431579e-01
+## 764     43.34575 -9.751634e-01
+## 864     41.57509  5.094737e-01
+## 923     41.02456 -9.473684e-01
+## 520     37.04470  1.349457e+00
+## 905     43.29860 -1.551579e+00
+## 3       38.40804  1.191055e+00
+## 18      39.10000  8.571429e-02
+## 106     42.33982  2.508508e-01
+## 115     29.83621  6.741379e+00
+## 127     41.46667 -1.600000e+00
+## 131     33.22184  2.996587e+00
+## 169     42.80198 -2.634905e-01
+## 213     39.73602  1.084103e+00
+## 215     38.82288  1.245503e+00
+## 272     40.54545  9.090909e-01
+## 283     42.25847  5.026738e-01
+## 285     39.34549 -1.029655e+00
+## 365     43.53573  5.328148e-01
+## 395     38.49622  6.638794e-01
+## 416     44.90763 -5.746232e-01
+## 498     45.21569 -3.529412e-01
+## 551     43.44754 -1.081967e-01
+## 560     42.72557  2.238875e-02
+## 607     43.83210 -1.731785e-01
+## 830     37.90785  2.170648e+00
+## 859     44.50491 -3.269474e+00
+## 986     42.13793 -2.413793e+00
+## 1015    43.06034  2.568966e+00
+## 1101    46.80000  8.000000e-01
+## 1083    41.92000  2.862857e+00
+## 7       42.36818  8.032383e-01
+## 15      33.31826  1.516772e+00
+## 29      46.03225 -1.052018e+00
+## 32      40.22590  9.421488e-01
+## 71      46.16723  7.194944e-02
+## 88      41.97877 -1.215362e-01
+## 238     41.55664  4.180846e-02
+## 270     40.76689  1.234379e+00
+## 301     41.46184  8.731162e-01
+## 342     35.42868  1.010015e+00
+## 374     41.49825  1.810526e+00
+## 396     45.04863 -8.799222e-02
+## 419     49.94471 -1.603456e+00
+## 423     43.45696 -7.004851e-01
+## 448     44.89904 -8.070005e-01
+## 463     39.28153 -3.149246e-01
+## 490     46.82223  2.041808e-02
+## 504     44.35975 -7.778318e-02
+## 516     40.86181  1.818861e+00
+## 572     45.17049 -6.126464e-01
+## 576     38.62131  2.234192e-01
+## 585     39.26557  1.342389e+00
+## 618     43.98310  1.964097e-01
+## 667     39.92583 -1.278333e+00
+## 692     43.23167  5.233333e-01
+## 700     48.34950 -1.763000e+00
+## 715     40.83100  9.000934e-01
+## 732     43.12512 -5.116713e-01
+## 750     39.65079  9.206349e-01
+## 808     45.08191  7.372014e-01
+## 952     41.00862  3.224138e+00
+## 990     41.15517  2.034483e+00
+## 1072    43.80000  2.800000e+00
+## 1026    40.84000  5.440000e+00
+## 643     41.68962  1.016543e+00
+## 75      38.71565  9.858046e-01
+## 80      40.69665  6.601847e-01
+## 95      46.18522  6.806028e-02
+## 139     42.91784  7.204667e-01
+## 178     41.68968 -5.094798e-01
+## 253     47.66756 -3.155080e-01
+## 271     42.29344  6.543326e-01
+## 282     41.16783  4.051531e-01
+## 294     42.09244  7.563025e-01
+## 309     46.75855 -3.441906e-01
+## 450     39.18004  2.673797e-01
+## 501     44.77670 -4.418085e-01
+## 524     43.16885  7.723653e-01
+## 703     43.53167 -1.676667e+00
+## 844     48.69625 -1.733788e+00
+## 915     41.90175  1.389474e+00
+## 927     40.99298  1.242105e+00
+## 940     41.40517  1.534483e+00
+## 1041    44.00000  2.000000e+00
+## 1080    41.00000  2.428571e+00
+## 901     38.43621  5.341379e+00
+## 85      37.22105  3.873684e+00
+## 93      45.37498  7.117161e-01
+## 98      41.91087 -4.491979e-01
+## 122     46.62972  1.701507e-01
+## 146     44.84686  5.736509e-01
+## 265     44.61167  1.070000e+00
+## 289     48.15929 -9.353427e-01
+## 479     36.58953  2.148760e-01
+## 581     43.97049  1.215925e+00
+## 663     48.43867  6.053333e-01
+## 807     45.00341  1.030717e+00
+## 820     42.56034 -4.310345e-01
+## 862     44.83860 -1.431579e+00
+## 885     43.26316  4.210526e-01
+## 895     47.33684  3.789474e-01
+## 949     42.58621  1.241379e+00
+## 959     41.02586  3.672414e+00
+## 1121    36.83333  1.500000e+01
+## 705     40.59633 -1.953333e-01
+## 61      44.22120  6.028196e-02
+## 81      47.13871 -1.831794e+00
+## 113     34.58621  1.936315e+00
+## 149     46.07109 -3.879436e-02
+## 194     43.61803  4.220141e-01
+## 303     44.56895 -6.815751e-01
+## 375     46.12865 -8.512397e-01
+## 381     48.44547 -6.028196e-02
+## 384     47.68259 -1.856655e+00
+## 586     44.84426  1.004684e+00
+## 708     43.28667  7.866667e-01
+## 746     49.28478 -4.780579e-01
+## 828     47.99829 -5.153584e-01
+## 922     37.64211  4.347368e+00
+## 958     43.56897  2.793103e+00
+## 1006    42.11897  2.093103e+00
+## 794     48.81667 -1.190000e+01
+## 20      32.43855  2.460050e+00
+## 33      41.36140  1.031579e+00
+## 60      40.96552  3.103448e+00
+## 176     42.73770  1.316159e+00
+## 184     44.27030  8.604764e-01
+## 250     48.06255  2.207098e-01
+## 263     41.31750 -7.227030e-01
+## 426     44.67253 -9.129801e-01
+## 841     49.93003 -1.129693e+00
+## 842     41.39420  1.047782e+00
+## 1051    46.80000 -1.200000e+00
+## 532     45.32180  9.222014e-01
+## 36      41.98023  6.349052e-01
+## 110     45.25474 -5.415654e-01
+## 242     41.88852 -1.049180e-01
+## 295     46.21429  1.857143e+00
+## 737     44.01251  7.488329e-01
+## 97      42.13320 -2.450170e-01
+## 187     49.45228 -1.196889e+00
+## 776     49.35387 -1.387488e+00
+## 727     45.72456 -2.455649e+00
+## 821     47.23720 -2.365188e+00
+## 119     48.90974 -5.930967e-01
+## 530     38.26557  1.342389e+00
+## 604     42.50171  7.153584e-01
+## 620     46.88398 -1.184653e+00
+## 49      50.59358 -1.283422e-01
+## 728     47.18627 -8.274510e-01
+## 595     47.00018 -7.562126e-01
+## 766     53.57782  1.003413e-01
+## 704     50.18100 -1.127333e+00
+## 69      37.51823 -5.444823e-01
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bbdd}\OtherTok{\textless{}{-}}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{id=}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{attributes}\NormalTok{(modlist1)}\SpecialCharTok{$}\NormalTok{names),}
+                 \AttributeTok{beta0=}\FunctionTok{coef}\NormalTok{(modlist1)[,}\DecValTok{1}\NormalTok{],}\AttributeTok{beta1=}\FunctionTok{coef}\NormalTok{(modlist1)[,}\DecValTok{2}\NormalTok{])}
+\NormalTok{bbdd }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(trenal.long, bbdd[,}\FunctionTok{c}\NormalTok{(}\StringTok{"id"}\NormalTok{,}\StringTok{"beta0"}\NormalTok{, }\StringTok{"beta1"}\NormalTok{)], }\AttributeTok{by.x =} \StringTok{"id"}\NormalTok{, }\AttributeTok{all.x =}\NormalTok{ T)}
+
+\NormalTok{bbdd }\OtherTok{\textless{}{-}}\NormalTok{ bbdd[}\FunctionTok{order}\NormalTok{(bbdd[,}\DecValTok{1}\NormalTok{]),]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Boxplot}
+\NormalTok{meanbeta0bymale}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta0,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{male),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+\NormalTok{meanbeta1bymale}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta1,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{male),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+
+\NormalTok{meanbeta0byreject}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta0,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{reject),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+\NormalTok{meanbeta1byreject}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta1,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{reject),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+
+\NormalTok{meanbeta0bycardio}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta0,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{cardio),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+\NormalTok{meanbeta1bycardio}\OtherTok{\textless{}{-}}\FunctionTok{tapply}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{beta1,}\FunctionTok{as.factor}\NormalTok{(bbdd}\SpecialCharTok{$}\NormalTok{cardio),mean,}\AttributeTok{na.rm=}\NormalTok{T)}
+
+
+\CommentTok{\#Let\textquotesingle{}s check if they are quite related ?inverse correlation?}
+
+\FunctionTok{with}\NormalTok{(bbdd,}\FunctionTok{cor}\NormalTok{(beta0,beta1))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{ggplot}\NormalTok{(bbdd, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{beta0, }\AttributeTok{y=}\NormalTok{beta1)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 12 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(bbdd, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{beta0, }\AttributeTok{y=}\NormalTok{beta1, }\AttributeTok{color=}\NormalTok{male)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 12 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-28-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(bbdd, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{beta0, }\AttributeTok{y=}\NormalTok{beta1, }\AttributeTok{color=}\NormalTok{reject)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 12 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-28-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(bbdd, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{beta0, }\AttributeTok{y=}\NormalTok{beta1, }\AttributeTok{color=}\NormalTok{cardio)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Removed 12 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-28-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#install.packages(\textquotesingle{}dplyr\textquotesingle{}, repos = \textquotesingle{}https://cloud.r{-}project.org\textquotesingle{})}
+
+\FunctionTok{library}\NormalTok{(dplyr)}
+\NormalTok{bbdd }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(male) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{cor=}\FunctionTok{cor}\NormalTok{(beta0, beta1))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   male     cor
+##   <fct>  <dbl>
+## 1 0     -0.416
+## 2 1     NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bbdd }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(cardio) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{cor=}\FunctionTok{cor}\NormalTok{(beta0, beta1))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   cardio    cor
+##   <fct>   <dbl>
+## 1 0      NA    
+## 2 1      -0.448
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bbdd }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(reject) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarize}\NormalTok{(}\AttributeTok{cor=}\FunctionTok{cor}\NormalTok{(beta0, beta1))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   reject    cor
+##   <fct>   <dbl>
+## 1 0      -0.375
+## 2 1      NA
+\end{verbatim}
+
+2nd step:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Fit a model for the intercept}
+\NormalTok{modbeta0}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(beta0}\SpecialCharTok{\textasciitilde{}}\NormalTok{male}\SpecialCharTok{+}\NormalTok{cardio,bbdd)}
+\FunctionTok{summary}\NormalTok{(modbeta0)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = beta0 ~ male + cardio, data = bbdd)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17.7108  -3.1054  -0.0243   2.8390  15.5812 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 35.58738    0.06081 585.234  < 2e-16 ***
+## male1        2.11908    0.07712  27.478  < 2e-16 ***
+## cardio1      0.29012    0.09957   2.914  0.00358 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.497 on 13905 degrees of freedom
+##   (12 observations deleted due to missingness)
+## Multiple R-squared:  0.05227,    Adjusted R-squared:  0.05214 
+## F-statistic: 383.5 on 2 and 13905 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confint}\NormalTok{(modbeta0)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   2.5 %    97.5 %
+## (Intercept) 35.46818606 35.706573
+## male1        1.96791843  2.270242
+## cardio1      0.09495222  0.485292
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# Fit a model for the slope}
+\CommentTok{\# All the variables should be included}
+\NormalTok{modbeta1}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(beta1}\SpecialCharTok{\textasciitilde{}}\NormalTok{male}\SpecialCharTok{+}\NormalTok{cardio,bbdd)}
+\FunctionTok{summary}\NormalTok{(modbeta1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = beta1 ~ male + cardio, data = bbdd)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -12.7690  -1.0437  -0.3768   0.3724  18.1310 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.69343    0.03483  19.908  < 2e-16 ***
+## male1        0.17559    0.04417   3.975 7.07e-05 ***
+## cardio1      0.41228    0.05703   7.229 5.13e-13 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.576 on 13905 degrees of freedom
+##   (12 observations deleted due to missingness)
+## Multiple R-squared:  0.004951,   Adjusted R-squared:  0.004808 
+## F-statistic: 34.59 on 2 and 13905 DF,  p-value: 1.031e-15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confint}\NormalTok{(modbeta1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                  2.5 %    97.5 %
+## (Intercept) 0.62516106 0.7617089
+## male1       0.08900118 0.2621718
+## cardio1     0.30048466 0.5240708
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# }\RegionMarkerTok{END}\DocumentationTok{ OF  EXERCISE}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  Pay attention to the missing, especially the ones presented by the
+  outcome variable. Do your results still hold despite the missingness?
+\end{enumerate}
+
+Outcome analysis
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(trenal.long}\SpecialCharTok{$}\NormalTok{respons)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##   14.00   34.00   38.00   38.24   42.00   65.00    4362
+\end{verbatim}
+
+From the 13920 measurements, 4362 are NA's. That represents a 31\% of
+the response measurements are NAs.
+
+How are they distributed?
+
+Male
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal.long.na}\OtherTok{\textless{}{-}}\NormalTok{trenal.long }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(respons) }\SpecialCharTok{==}\NormalTok{ T)}
+
+\NormalTok{trenal\_na\_male }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{respons, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{male), }\AttributeTok{FUN=}\NormalTok{length)}
+\NormalTok{trenal\_na\_male}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Group.1    x
+## 1       0 1715
+## 2       1 2647
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p}\OtherTok{\textless{}{-}}\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{trenal\_na\_male, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Group}\FloatTok{.1}\NormalTok{, }\AttributeTok{y=}\NormalTok{x)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat=}\StringTok{"identity"}\NormalTok{)}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-32-1.pdf}
+
+Reject
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal\_na\_reject }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{respons, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{reject), }\AttributeTok{FUN=}\NormalTok{length)}
+\NormalTok{trenal\_na\_reject}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Group.1    x
+## 1       0 3202
+## 2       1 1160
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p}\OtherTok{\textless{}{-}}\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{trenal\_na\_reject, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Group}\FloatTok{.1}\NormalTok{, }\AttributeTok{y=}\NormalTok{x)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat=}\StringTok{"identity"}\NormalTok{)}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-34-1.pdf}
+
+Cardio
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trenal\_na\_cardio }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{respons, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(trenal.long.na}\SpecialCharTok{$}\NormalTok{cardio), }\AttributeTok{FUN=}\NormalTok{length)}
+\NormalTok{trenal\_na\_cardio}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Group.1    x
+## 1       0 3502
+## 2       1  860
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p}\OtherTok{\textless{}{-}}\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{trenal\_na\_cardio, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{Group}\FloatTok{.1}\NormalTok{, }\AttributeTok{y=}\NormalTok{x)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat=}\StringTok{"identity"}\NormalTok{)}
+\NormalTok{p}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{LDA_oscar_approach{[}785{]}_files/figure-latex/unnamed-chunk-36-1.pdf}
+
+\end{document}
