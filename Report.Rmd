@@ -317,6 +317,11 @@ if p value is 0.05, it is better to add cardio
 
 ## Two Stage Model Analysis
 
+```{r}
+#install.packages("pacman")
+library(pacman)
+p_load(readxl, magrittr, dplyr, lattice, ggplot2, nlme)
+```
 
 
 ## Linear Mixed effects Model Analysis
@@ -644,4 +649,27 @@ $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.3
  $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and $\epsilon_{ij} \sim N(0,20.5)$
  
 
+```{r}
+model.b.piecewise2.maleage <- lmer(Hc ~ time1 + time2 + male +age +(1|id),REML=T,data=trenal.long.piecewise)
+```
 
+# Considering just keep intercept as random effect
+```{r,echo=FALSE}
+summary(model.b.piecewise.maleage)
+cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
+cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
+cat("model.c: AIC = ",AIC(model.c),";BIC = ", BIC(model.c),"\n")
+cat("model.c1: AIC = ",AIC(model.c1),";BIC = ", BIC(model.c1),"\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
+cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
+cat("model.b.piecewise2.maleage: AIC = ",AIC(model.b.piecewise2.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
+```
+
+```{r}
+drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,model.b.piecewise2.maleage,test="Chisq")
+drop_in_dev
+```

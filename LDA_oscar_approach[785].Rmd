@@ -191,8 +191,8 @@ Analysis of increments: Difference between the response at the first available a
 We will use just the non NA values
 
 ```{r}
-trenal.long_no_na <- na.omit(trenal.long)
-trenal.long.incr<-trenal.long_no_na %>% 
+trenal.long.noNA <- na.omit(trenal.long)
+trenal.long.incr<-trenal.long.noNA %>% 
   filter(time == c(0, 10)) %>% 
   group_by(id) %>% 
   mutate(incr = max(respons) - min (respons), one = 1) %>% 
@@ -249,12 +249,12 @@ As a first step, we need to create a *groupedData* object in order to apply it t
 ```{r}
 
 
-trenal_grouped1<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped1<-groupedData(respons~time|id,trenal.long.noNA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
 
-trenal_grouped2<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ reject, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped2<-groupedData(respons~time|id,trenal.long.noNA, inner = ~ reject, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
-trenal_grouped3<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ cardio, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped3<-groupedData(respons~time|id,trenal.long.noNA, inner = ~ cardio, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
 #plot(trenal_grouped1, inner =  T, key = F)
 #plot(trenal_grouped2, inner = T, key = F)
