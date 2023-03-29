@@ -271,3 +271,71 @@ cat("model.b.agemale: AIC = ",AIC(model.b.agemale),";BIC = ", BIC(model.b.agemal
 cat("model.b.agemale1: AIC = ",AIC(model.b.agemale1),";BIC = ", BIC(model.b.agemale1), "\n")
 cat("model.b.agemalereject1: AIC = ",AIC(model.b.agemalereject1),";BIC = ", BIC(model.b.agemalereject1), "\n")
 ```
+
+
+# Piecewise linear time trend
+In the **piecewise linear model**, the complete time span of the study is divided into two segments, with a separate slope relating time to the response in each segment.
+
+In our case study, we can fit separate slope in time $0-0.5$ and $0.5-10$
+```{r}
+# Modeling piecewise linear time trend with two intervals
+time1 = trenal.long$time
+time1[time1>0.5] = 0
+time2 = trenal.long$time
+time2[time2<1] = 0
+  
+trenal.long.piecewise = trenal.long
+trenal.long.piecewise['time1'] <- time1
+trenal.long.piecewise['time2'] <- time2
+
+model.b.piecewise <- lmer(HC ~ time1 + time2 + (1|id),REML=T,data=trenal.long.piecewise)
+
+summary(model.b.piecewise)
+
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("AIC = ",AIC(model.c),";BIC = ", BIC(model.c))
+```
+
+
+```{r}
+model.b.piecewise1 <- lmer(HC ~ time1 + time2 + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise1)
+cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b), "\n")
+cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.piecewise), "\n")
+cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
+cat("AIC = ",AIC(model.c),";BIC = ", BIC(model.c))
+```
+
+## I guess an ideal model could be
+```{r}
+model.b.piecewise.age <- lmer(HC ~ time1 + time2 + age + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise.age)
+cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
+```
+
+
+```{r}
+model.b.piecewise.male <- lmer(HC ~ time1 + time2 + male + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise.male)
+cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
+```
+
+
+```{r}
+model.b.piecewise.maleage <- lmer(HC ~ time1 + time2 + male +age +(time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise.maleage)
+cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
+```
+
+## Comparing model using anova
+```{r}
+drop_in_dev <- anova(model.b.piecewise1,model.b.piecewise.male,test="Chisq")
+drop_in_dev
+```
+
+```{r}
+drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,test="Chisq")
+drop_in_dev
+```
+

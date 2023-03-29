@@ -431,6 +431,8 @@ summary(model.a)</code></pre>
 ## Fixed effects:
 ##             Estimate Std. Error t value
 ## (Intercept)  38.1630     0.1206   316.4</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.a),&quot;;BIC = &quot;, BIC(model.a))</code></pre>
+<pre><code>## AIC =  59112.68 ;BIC =  59134.18</code></pre>
 <p>From the output of <code>model.a</code>, we obtain estimates of three
 model parameters:</p>
 <ul>
@@ -499,6 +501,8 @@ summary(model.b)</code></pre>
 ## Correlation of Fixed Effects:
 ##      (Intr)
 ## time -0.394</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b))</code></pre>
+<pre><code>## AIC =  58702.37 ;BIC =  58745.36</code></pre>
 <p>From the <code>model.b</code>, we obtain estimates of our six model
 parameters:</p>
 <ul>
@@ -523,11 +527,55 @@ variability in HC level can be explained by a linear increase over time:
 \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond.
 growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} =
 0.0948\]</span></p>
+<div id="unconditional-growth-but-only-random-intercepts" class="section level3">
+<h3>Unconditional growth but only random intercepts</h3>
+<pre class="r"><code>model.b1 &lt;- lmer(HC ~ time + (1|id),REML=T,data= trenal.long)
+summary(model.b1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + (1 | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58849.2
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.5197 -0.4741  0.0847  0.5683  6.4131 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 13.69    3.700   
+##  Residual             22.36    4.729   
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  37.2953     0.1317  283.24
+## time          0.2913     0.0178   16.36
+## 
+## Correlation of Fixed Effects:
+##      (Intr)
+## time -0.402</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.b1),&quot;;BIC = &quot;, BIC(model.b1))</code></pre>
+<pre><code>## AIC =  58857.21 ;BIC =  58885.87</code></pre>
+</div>
 </div>
 <div id="modeling-other-trends-over-time" class="section level2">
 <h2>Modeling other trends over time</h2>
 <p>From the spaghetti plots we notice that our HC level usually
-increases first very quickly then stays stable. (piecewise linear? )</p>
+increases first very quickly then stays stable. (piecewise linear? ) To
+reduce the correlation between the linear and quadratic components of
+time effect, we need to center the time varibale first:</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>trenal.long.center &lt;- trenal.long%&gt;%
+  mutate(timec = time - 5,timec2 = timec^2)</code></pre>
 <ul>
 <li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times
 time_{ij} + c_i \times time_{ij}^2 \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p></li>
@@ -552,6 +600,685 @@ time_{ij}^2 +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begi
 \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span>
 and <span class="math inline">\(\epsilon_{ij} \sim
 N(0,\sigma^2)\)</span></p>
+<pre class="r"><code>model.c &lt;- lmer(HC ~ timec + timec2 + (timec + timec2|id),REML=T, data=trenal.long.center)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 0.0353379 (tol = 0.002, component 1)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, : Model is nearly unidentifiable: very large eigenvalue
+##  - Rescale variables?</code></pre>
+<pre class="r"><code>summary(model.c)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ timec + timec2 + (timec + timec2 | id)
+##    Data: trenal.long.center
+## 
+## REML criterion at convergence: 57865.5
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -4.7256 -0.4767  0.0361  0.5308  6.7119 
+## 
+## Random effects:
+##  Groups   Name        Variance  Std.Dev. Corr       
+##  id       (Intercept) 21.436916 4.63000             
+##           timec        0.197651 0.44458   0.27      
+##           timec2       0.007685 0.08767  -0.82 -0.44
+##  Residual             18.231536 4.26984             
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 40.201415   0.162783 246.963
+## timec        0.055012   0.024108   2.282
+## timec2      -0.161860   0.006341 -25.526
+## 
+## Correlation of Fixed Effects:
+##        (Intr) timec 
+## timec   0.244       
+## timec2 -0.590  0.198
+## optimizer (nloptwrap) convergence code: 0 (OK)
+## Model failed to converge with max|grad| = 0.0353379 (tol = 0.002, component 1)
+## Model is nearly unidentifiable: very large eigenvalue
+##  - Rescale variables?</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.c),&quot;;BIC = &quot;, BIC(model.c))</code></pre>
+<pre><code>## AIC =  57885.46 ;BIC =  57957.11</code></pre>
+<pre class="r"><code>model.c1 &lt;- lmer(HC ~ timec + timec2 + (1|id),REML=T, data=trenal.long.center)
+summary(model.c1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ timec + timec2 + (1 | id)
+##    Data: trenal.long.center
+## 
+## REML criterion at convergence: 58237
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.4559 -0.4917  0.0467  0.5568  6.4954 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 13.91    3.730   
+##  Residual             20.77    4.558   
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 40.179999   0.137545 292.122
+## timec        0.103646   0.018717   5.538
+## timec2      -0.149817   0.005903 -25.379
+## 
+## Correlation of Fixed Effects:
+##        (Intr) timec 
+## timec   0.071       
+## timec2 -0.409  0.396</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.c1),&quot;;BIC = &quot;, BIC(model.c1))</code></pre>
+<pre><code>## AIC =  58247.01 ;BIC =  58282.83</code></pre>
+<p>Then add more variables in Level Two Here we fix the linear model on
+time model.b ### Add age to uncontidional growth
+<code>model.b.age</code></p>
+<ul>
+<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times
+time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p></li>
+<li><p>Level Two:</p></li>
+</ul>
+<p><span class="math display">\[\begin{align}
+  a_i &amp;= \alpha_0 + \alpha_1 \times Age_i + u_i, \\
+  b_i &amp;= \beta_0 + \beta_1 \times Age_i +  v_i
+  \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix}
+u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0
+\end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp;
+\rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2
+\end{bmatrix}\right)\)</span></p>
+<p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} +
+\alpha_1\times Age_i + \beta_1 \times Age_i \times time_{ij}] + [ u_i +
+v_i \times time_{ij} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim
+N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2
+&amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp;
+\sigma_v^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre class="r"><code># model.b.age
+model.b.age &lt;- lmer(HC ~ time + age + time:age +  (time|id),REML=T,data= trenal.long)
+summary(model.b.age)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + age + time:age + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58618
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2229 -0.4573  0.0710  0.5475  6.3989 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 13.1560  3.6271        
+##           time         0.1872  0.4327   -0.18
+##  Residual             20.8713  4.5685        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 34.884012   0.468486  74.461
+## time         0.150336   0.085224   1.764
+## age          0.051075   0.009736   5.246
+## time:age     0.003840   0.001851   2.075
+## 
+## Correlation of Fixed Effects:
+##          (Intr) time   age   
+## time     -0.408              
+## age      -0.961  0.401       
+## time:age  0.383 -0.960 -0.408</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age))</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code># model.b.age1
+model.b.age1 &lt;- lmer(HC ~ time + age  +  (time|id),REML=T,data= trenal.long)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 0.00244692 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>summary(model.b.age1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + age + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58611.6
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.1919 -0.4563  0.0701  0.5470  6.3908 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 13.146   3.6257        
+##           time         0.186   0.4313   -0.18
+##  Residual             20.885   4.5700        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 34.511988   0.432715  79.757
+## time         0.319993   0.023745  13.476
+## age          0.059315   0.008888   6.674
+## 
+## Correlation of Fixed Effects:
+##      (Intr) time  
+## time -0.154       
+## age  -0.954  0.033
+## optimizer (nloptwrap) convergence code: 0 (OK)
+## Model failed to converge with max|grad| = 0.00244692 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1))</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<div id="add-male-to-unconditional-growth-model-model.b.male" class="section level3">
+<h3>Add male to unconditional growth model
+<code>model.b.male</code></h3>
+<ul>
+<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times
+time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p></li>
+<li><p>Level Two:</p></li>
+</ul>
+<p><span class="math display">\[\begin{align}
+  a_i &amp;= \alpha_0 + \alpha_1 \times Male_i + u_i, \\
+  b_i &amp;= \beta_0 + \beta_1 \times Male_i +  v_i
+  \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix}
+u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0
+\end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp;
+\rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2
+\end{bmatrix}\right)\)</span></p>
+<p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} +
+\alpha_1\times Male_i + \beta_1 \times Male_i \times time_{ij}] + [ u_i
++ v_i \times time_{ij} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim
+N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2
+&amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp;
+\sigma_v^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre class="r"><code># model.b.male
+model.b.male &lt;- lmer(HC ~ time + male + time:male +  (time|id),REML=T,data= trenal.long)
+summary(model.b.male)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + male + time:male + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58595.5
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2744 -0.4553  0.0717  0.5533  6.4396 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 12.3680  3.5168        
+##           time         0.1865  0.4319   -0.19
+##  Residual             20.8877  4.5703        
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept) 35.98052    0.19329 186.143
+## time         0.28806    0.03529   8.162
+## male1        2.24236    0.25570   8.770
+## time:male1   0.05400    0.04767   1.133
+## 
+## Correlation of Fixed Effects:
+##            (Intr) time   male1 
+## time       -0.419              
+## male1      -0.756  0.317       
+## time:male1  0.310 -0.740 -0.418</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male: AIC = &quot;,AIC(model.b.male),&quot;;BIC = &quot;, BIC(model.b.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male: AIC =  58611.52 ;BIC =  58668.85</code></pre>
+<pre class="r"><code># model.b.male
+model.b.male1 &lt;- lmer(HC ~ time + male  +  (time|id),REML=T,data= trenal.long)
+summary(model.b.male1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + male + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58592.6
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2859 -0.4546  0.0725  0.5557  6.4469 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 12.3601  3.5157        
+##           time         0.1855  0.4307   -0.18
+##  Residual             20.8920  4.5708        
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept)  35.9129     0.1838  195.42
+## time          0.3176     0.0237   13.40
+## male1         2.3633     0.2323   10.17
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time  
+## time  -0.295       
+## male1 -0.725  0.011</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male: AIC = &quot;,AIC(model.b.male),&quot;;BIC = &quot;, BIC(model.b.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male: AIC =  58611.52 ;BIC =  58668.85</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male1: AIC = &quot;,AIC(model.b.male1),&quot;;BIC = &quot;, BIC(model.b.male1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male1: AIC =  58606.56 ;BIC =  58656.71</code></pre>
+</div>
+<div id="add-age-and-male-to-unconditional-growth-model-model.b.agemale" class="section level3">
+<h3>Add age and male to unconditional growth model
+<code>model.b.agemale</code></h3>
+<ul>
+<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times
+time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p></li>
+<li><p>Level Two:</p></li>
+</ul>
+<p><span class="math display">\[\begin{align}
+  a_i &amp;= \alpha_0 + \alpha_1 \times Age_i + \alpha_2 \times Male_i +
+u_i, \\
+  b_i &amp;= \beta_0 + \beta_1 \times Age_i + \beta_2 \times Male_i
++  v_i
+  \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix}
+u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0
+\end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp;
+\rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2
+\end{bmatrix}\right)\)</span></p>
+<p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} +
+\alpha_1\times Age_i + \alpha_2\times Male_i + \beta_1 \times Age_i
+\times time_{ij}+\beta_2 \times Male_i \times time_{ij}] + [ u_i + v_i
+\times time_{ij} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim
+N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2
+&amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp;
+\sigma_v^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre class="r"><code># model.b.agemale
+model.b.agemale &lt;- lmer(HC ~ time + age + age:time + male + male:time +  (time|id),REML=T,data= trenal.long)
+summary(model.b.agemale)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + age + age:time + male + male:time + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58520.1
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2436 -0.4541  0.0741  0.5573  6.4309 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 11.9748  3.4605        
+##           time         0.1886  0.4343   -0.22
+##  Residual             20.8705  4.5684        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 33.667384   0.474739  70.918
+## time         0.112274   0.089350   1.257
+## age          0.049809   0.009436   5.279
+## male1        2.220852   0.253033   8.777
+## time:age     0.004041   0.001848   2.186
+## time:male1   0.057968   0.047693   1.215
+## 
+## Correlation of Fixed Effects:
+##            (Intr) time   age    male1  time:g
+## time       -0.434                            
+## age        -0.915  0.406                     
+## male1      -0.293  0.129 -0.012              
+## time:age    0.390 -0.919 -0.434  0.002       
+## time:male1  0.129 -0.304  0.002 -0.436  0.012</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male: AIC = &quot;,AIC(model.b.male),&quot;;BIC = &quot;, BIC(model.b.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male: AIC =  58611.52 ;BIC =  58668.85</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male1: AIC = &quot;,AIC(model.b.male1),&quot;;BIC = &quot;, BIC(model.b.male1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male1: AIC =  58606.56 ;BIC =  58656.71</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemale: AIC = &quot;,AIC(model.b.agemale),&quot;;BIC = &quot;, BIC(model.b.agemale), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemale: AIC =  58540.06 ;BIC =  58611.7</code></pre>
+<pre class="r"><code># model.b.agemale1
+model.b.agemale1 &lt;- lmer(HC ~ time + age + male +  (time|id),REML=T,data= trenal.long)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 0.00413355 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>summary(model.b.agemale1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + age + male + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58511.2
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2238 -0.4568  0.0729  0.5568  6.4306 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 11.9573  3.4579        
+##           time         0.1864  0.4317   -0.21
+##  Residual             20.8875  4.5703        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 33.195249   0.433448  76.584
+## time         0.322553   0.023698  13.611
+## age          0.058657   0.008504   6.897
+## male1        2.350432   0.227837  10.316
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time   age   
+## time  -0.162              
+## age   -0.909  0.037       
+## male1 -0.292  0.011 -0.011
+## optimizer (nloptwrap) convergence code: 0 (OK)
+## Model failed to converge with max|grad| = 0.00413355 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male: AIC = &quot;,AIC(model.b.male),&quot;;BIC = &quot;, BIC(model.b.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male: AIC =  58611.52 ;BIC =  58668.85</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male1: AIC = &quot;,AIC(model.b.male1),&quot;;BIC = &quot;, BIC(model.b.male1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male1: AIC =  58606.56 ;BIC =  58656.71</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemale: AIC = &quot;,AIC(model.b.agemale),&quot;;BIC = &quot;, BIC(model.b.agemale), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemale: AIC =  58540.06 ;BIC =  58611.7</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemale1: AIC = &quot;,AIC(model.b.agemale1),&quot;;BIC = &quot;, BIC(model.b.agemale1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemale1: AIC =  58527.24 ;BIC =  58584.55</code></pre>
+<pre class="r"><code># model.b.agemale1
+model.b.agemalereject1 &lt;- lmer(HC ~ time + age + male + reject+ (time|id),REML=T,data= trenal.long)
+summary(model.b.agemalereject1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time + age + male + reject + (time | id)
+##    Data: trenal.long
+## 
+## REML criterion at convergence: 58509.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2308 -0.4570  0.0725  0.5569  6.4264 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 11.9410  3.4556        
+##           time         0.1864  0.4318   -0.21
+##  Residual             20.8872  4.5703        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 33.436200   0.461895  72.389
+## time         0.323068   0.023701  13.631
+## age          0.056186   0.008657   6.490
+## male1        2.334201   0.227972  10.239
+## reject1     -0.370586   0.246414  -1.504
+## 
+## Correlation of Fixed Effects:
+##         (Intr) time   age    male1 
+## time    -0.147                     
+## age     -0.903  0.033              
+## male1   -0.290  0.011 -0.001       
+## reject1 -0.347 -0.014  0.190  0.047</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age: AIC = &quot;,AIC(model.b.age),&quot;;BIC = &quot;, BIC(model.b.age),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age: AIC =  58634.04 ;BIC =  58691.35</code></pre>
+<pre class="r"><code>cat(&quot;model.b.age1: AIC = &quot;,AIC(model.b.age1),&quot;;BIC = &quot;, BIC(model.b.age1),&quot;\n&quot;)</code></pre>
+<pre><code>## model.b.age1: AIC =  58625.59 ;BIC =  58675.74</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male: AIC = &quot;,AIC(model.b.male),&quot;;BIC = &quot;, BIC(model.b.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male: AIC =  58611.52 ;BIC =  58668.85</code></pre>
+<pre class="r"><code>cat(&quot;model.b.male1: AIC = &quot;,AIC(model.b.male1),&quot;;BIC = &quot;, BIC(model.b.male1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.male1: AIC =  58606.56 ;BIC =  58656.71</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemale: AIC = &quot;,AIC(model.b.agemale),&quot;;BIC = &quot;, BIC(model.b.agemale), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemale: AIC =  58540.06 ;BIC =  58611.7</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemale1: AIC = &quot;,AIC(model.b.agemale1),&quot;;BIC = &quot;, BIC(model.b.agemale1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemale1: AIC =  58527.24 ;BIC =  58584.55</code></pre>
+<pre class="r"><code>cat(&quot;model.b.agemalereject1: AIC = &quot;,AIC(model.b.agemalereject1),&quot;;BIC = &quot;, BIC(model.b.agemalereject1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.agemalereject1: AIC =  58527.94 ;BIC =  58592.42</code></pre>
+</div>
+</div>
+</div>
+<div id="piecewise-linear-time-trend" class="section level1">
+<h1>Piecewise linear time trend</h1>
+<p>In the <strong>piecewise linear model</strong>, the complete time
+span of the study is divided into two segments, with a separate slope
+relating time to the response in each segment.</p>
+<p>In our case study, we can fit separate slope in time <span class="math inline">\(0-0.5\)</span> and <span class="math inline">\(0.5-10\)</span></p>
+<pre class="r"><code># Modeling piecewise linear time trend with two intervals
+time1 = trenal.long$time
+time1[time1&gt;0.5] = 0
+time2 = trenal.long$time
+time2[time2&lt;1] = 0
+  
+trenal.long.piecewise = trenal.long
+trenal.long.piecewise[&#39;time1&#39;] &lt;- time1
+trenal.long.piecewise[&#39;time2&#39;] &lt;- time2
+
+model.b.piecewise &lt;- lmer(HC ~ time1 + time2 + (1|id),REML=T,data=trenal.long.piecewise)
+
+summary(model.b.piecewise)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time1 + time2 + (1 | id)
+##    Data: trenal.long.piecewise
+## 
+## REML criterion at convergence: 58716.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.4595 -0.4903  0.0741  0.5791  6.5397 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  id       (Intercept) 13.76    3.709   
+##  Residual             22.01    4.692   
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept) 36.81383    0.13799  266.78
+## time1        4.02855    0.32348   12.45
+## time2        0.36597    0.01881   19.46
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time1 
+## time1 -0.322       
+## time2 -0.461  0.393</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise: AIC = &quot;,AIC(model.b.piecewise),&quot;;BIC = &quot;, BIC(model.b.piecewise), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise: AIC =  58726.86 ;BIC =  58762.69</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.c),&quot;;BIC = &quot;, BIC(model.c))</code></pre>
+<pre><code>## AIC =  57885.46 ;BIC =  57957.11</code></pre>
+<pre class="r"><code>model.b.piecewise1 &lt;- lmer(HC ~ time1 + time2 + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise1)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time1 + time2 + (time2 | id)
+##    Data: trenal.long.piecewise
+## 
+## REML criterion at convergence: 58545.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.1940 -0.4729  0.0625  0.5607  6.5532 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 13.6532  3.6950        
+##           time2        0.1867  0.4321   -0.15
+##  Residual             20.4690  4.5243        
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept) 36.76665    0.13678  268.79
+## time1        4.12291    0.31360   13.15
+## time2        0.40031    0.02467   16.22
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time1 
+## time1 -0.324       
+## time2 -0.439  0.330</code></pre>
+<pre class="r"><code>cat(&quot;model.b: AIC = &quot;,AIC(model.b),&quot;;BIC = &quot;, BIC(model.b), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b: AIC =  58702.37 ;BIC =  58745.36</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise: AIC = &quot;,AIC(model.b.piecewise),&quot;;BIC = &quot;, BIC(model.b.piecewise), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise: AIC =  58726.86 ;BIC =  58762.69</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise1: AIC = &quot;,AIC(model.b.piecewise1),&quot;;BIC = &quot;, BIC(model.b.piecewise1), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise1: AIC =  58559.93 ;BIC =  58610.09</code></pre>
+<pre class="r"><code>cat(&quot;AIC = &quot;,AIC(model.c),&quot;;BIC = &quot;, BIC(model.c))</code></pre>
+<pre><code>## AIC =  57885.46 ;BIC =  57957.11</code></pre>
+<div id="i-guess-an-ideal-model-could-be" class="section level2">
+<h2>I guess an ideal model could be</h2>
+<pre class="r"><code>model.b.piecewise.age &lt;- lmer(HC ~ time1 + time2 + age + (time2|id),REML=T,data=trenal.long.piecewise)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 0.00365004 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>summary(model.b.piecewise.age)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time1 + time2 + age + (time2 | id)
+##    Data: trenal.long.piecewise
+## 
+## REML criterion at convergence: 58467.8
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.1368 -0.4701  0.0627  0.5628  6.5372 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 13.2327  3.6377        
+##           time2        0.1872  0.4327   -0.18
+##  Residual             20.4668  4.5240        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 34.009541   0.434914  78.198
+## time1        4.116852   0.313703  13.123
+## time2        0.404186   0.024665  16.387
+## age          0.059373   0.008894   6.676
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time1  time2 
+## time1 -0.104              
+## time2 -0.172  0.330       
+## age   -0.950  0.002  0.032
+## optimizer (nloptwrap) convergence code: 0 (OK)
+## Model failed to converge with max|grad| = 0.00365004 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise,age: AIC = &quot;,AIC(model.b.piecewise.age),&quot;;BIC = &quot;, BIC(model.b.piecewise.age), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise,age: AIC =  58483.85 ;BIC =  58541.16</code></pre>
+<pre class="r"><code>model.b.piecewise.male &lt;- lmer(HC ~ time1 + time2 + male + (time2|id),REML=T,data=trenal.long.piecewise)
+summary(model.b.piecewise.male)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time1 + time2 + male + (time2 | id)
+##    Data: trenal.long.piecewise
+## 
+## REML criterion at convergence: 58448.6
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.2294 -0.4679  0.0612  0.5625  6.5926 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 12.4340  3.5262        
+##           time2        0.1865  0.4319   -0.18
+##  Residual             20.4734  4.5248        
+## Number of obs: 9558, groups:  id, 1160
+## 
+## Fixed effects:
+##             Estimate Std. Error t value
+## (Intercept) 35.41528    0.18827  188.10
+## time1        4.11679    0.31361   13.13
+## time2        0.40188    0.02462   16.32
+## male1        2.35907    0.23253   10.14
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time1  time2 
+## time1 -0.234              
+## time2 -0.334  0.331       
+## male1 -0.708 -0.001  0.010</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise,male: AIC = &quot;,AIC(model.b.piecewise.male),&quot;;BIC = &quot;, BIC(model.b.piecewise.male), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise,male: AIC =  58464.65 ;BIC =  58521.97</code></pre>
+<pre class="r"><code>model.b.piecewise.maleage &lt;- lmer(HC ~ time1 + time2 + male +age +(time2|id),REML=T,data=trenal.long.piecewise)</code></pre>
+<pre><code>## Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :
+## Model failed to converge with max|grad| = 0.00794242 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>summary(model.b.piecewise.maleage)</code></pre>
+<pre><code>## Linear mixed model fit by REML [&#39;lmerMod&#39;]
+## Formula: HC ~ time1 + time2 + male + age + (time2 | id)
+##    Data: trenal.long.piecewise
+## 
+## REML criterion at convergence: 58368
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.1683 -0.4680  0.0637  0.5619  6.5758 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev. Corr 
+##  id       (Intercept) 12.0382  3.4696        
+##           time2        0.1874  0.4329   -0.21
+##  Residual             20.4704  4.5244        
+## Number of obs: 9551, groups:  id, 1159
+## 
+## Fixed effects:
+##              Estimate Std. Error t value
+## (Intercept) 32.694557   0.435712  75.037
+## time1        4.112153   0.313713  13.108
+## time2        0.406601   0.024616  16.518
+## male1        2.346642   0.228052  10.290
+## age          0.058747   0.008512   6.902
+## 
+## Correlation of Fixed Effects:
+##       (Intr) time1  time2  male1 
+## time1 -0.104                     
+## time2 -0.180  0.331              
+## male1 -0.290 -0.001  0.011       
+## age   -0.905  0.003  0.035 -0.011
+## optimizer (nloptwrap) convergence code: 0 (OK)
+## Model failed to converge with max|grad| = 0.00794242 (tol = 0.002, component 1)</code></pre>
+<pre class="r"><code>cat(&quot;model.b.piecewise,maleage: AIC = &quot;,AIC(model.b.piecewise.maleage),&quot;;BIC = &quot;, BIC(model.b.piecewise.maleage), &quot;\n&quot;)</code></pre>
+<pre><code>## model.b.piecewise,maleage: AIC =  58386 ;BIC =  58450.48</code></pre>
+</div>
+<div id="comparing-model-using-anova" class="section level2">
+<h2>Comparing model using anova</h2>
+<pre class="r"><code>drop_in_dev &lt;- anova(model.b.piecewise1,model.b.piecewise.male,test=&quot;Chisq&quot;)</code></pre>
+<pre><code>## refitting model(s) with ML (instead of REML)</code></pre>
+<pre class="r"><code>drop_in_dev</code></pre>
+<pre><code>## Data: trenal.long.piecewise
+## Models:
+## model.b.piecewise1: HC ~ time1 + time2 + (time2 | id)
+## model.b.piecewise.male: HC ~ time1 + time2 + male + (time2 | id)
+##                        npar   AIC   BIC logLik deviance  Chisq Df Pr(&gt;Chisq)
+## model.b.piecewise1        7 58551 58602 -29269    58537                     
+## model.b.piecewise.male    8 58455 58512 -29220    58439 98.453  1  &lt; 2.2e-16
+##                           
+## model.b.piecewise1        
+## model.b.piecewise.male ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>drop_in_dev &lt;- anova(model.b.piecewise.age,model.b.piecewise.maleage,test=&quot;Chisq&quot;)</code></pre>
+<pre><code>## refitting model(s) with ML (instead of REML)</code></pre>
+<pre class="r"><code>drop_in_dev</code></pre>
+<pre><code>## Data: trenal.long.piecewise
+## Models:
+## model.b.piecewise.age: HC ~ time1 + time2 + age + (time2 | id)
+## model.b.piecewise.maleage: HC ~ time1 + time2 + male + age + (time2 | id)
+##                           npar   AIC   BIC logLik deviance  Chisq Df Pr(&gt;Chisq)
+## model.b.piecewise.age        8 58468 58525 -29226    58452                     
+## model.b.piecewise.maleage    9 58368 58433 -29175    58350 101.15  1  &lt; 2.2e-16
+##                              
+## model.b.piecewise.age        
+## model.b.piecewise.maleage ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
 </div>
 
