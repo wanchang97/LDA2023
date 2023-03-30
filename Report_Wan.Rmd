@@ -196,7 +196,7 @@ HcCorr = trenal.wide[,c(1:12)]
 chart.Correlation(HcCorr,historgram=TRUE)
 ```
 
-### Find out a covariate increasing or decreasing the responses time trend#
+### Find out a covariate increasing or decreasing the responses time trend
 
 #### Spaghetti Plot
 
@@ -623,7 +623,7 @@ drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,model.b.pie
 drop_in_dev
 ```
 
-Finally, our optimal model would be the piecewise linear model with age gender as the levle two variables `model.b.piecewise.maleage`.
+Finally, our optimal model would be the piecewise linear model with age gender as the level two variables `model.b.piecewise.agemale`.
 
 
 $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}} + \epsilon_{ij} $$
@@ -631,12 +631,12 @@ $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.3
  
  
 ```{r}
-model.b.piecewise2.maleage <- lmer(Hc ~ time1 + time2 + male +age +(1|id),REML=T,data=trenal.long.piecewise)
+model.b.piecewise2.agemale <- lmer(Hc ~ time1 + time2 + male +age +(1|id),REML=T,data=trenal.long.piecewise)
 ```
 
 Considering just keep intercept as random effect
 ```{r,echo=FALSE}
-summary(model.b.piecewise.maleage)
+summary(model.b.piecewise.agemale)
 cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
 cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
 cat("model.b1: AIC = ",AIC(model.b1),";BIC = ", BIC(model.b1),"\n")
@@ -646,12 +646,12 @@ cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.pi
 cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
 cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
 cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
-cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
-cat("model.b.piecewise2.maleage: AIC = ",AIC(model.b.piecewise2.maleage),";BIC = ", BIC(model.b.piecewise2.maleage), "\n")
+cat("model.b.piecewise,agemale: AIC = ",AIC(model.b.piecewise.agemale),";BIC = ", BIC(model.b.piecewise.agemale), "\n")
+cat("model.b.piecewise2.agemale: AIC = ",AIC(model.b.piecewise2.agemale),";BIC = ", BIC(model.b.piecewise2.agemale), "\n")
 ```
 
 ```{r}
-drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,model.b.piecewise2.maleage,test="Chisq")
+drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.agemale,model.b.piecewise2.agemale,test="Chisq")
 drop_in_dev
 ```
 
@@ -762,8 +762,8 @@ cat("model.b.piecewise: AIC = ",AIC(model.b.piecewise),";BIC = ", BIC(model.b.pi
 cat("model.b.piecewise1: AIC = ",AIC(model.b.piecewise1),";BIC = ", BIC(model.b.piecewise1), "\n")
 cat("model.b.piecewise,age: AIC = ",AIC(model.b.piecewise.age),";BIC = ", BIC(model.b.piecewise.age), "\n")
 cat("model.b.piecewise,male: AIC = ",AIC(model.b.piecewise.male),";BIC = ", BIC(model.b.piecewise.male), "\n")
-cat("model.b.piecewise,maleage: AIC = ",AIC(model.b.piecewise.maleage),";BIC = ", BIC(model.b.piecewise.maleage), "\n")
-cat("model.b.piecewise2.maleage: AIC = ",AIC(model.b.piecewise2.maleage),";BIC = ", BIC(model.b.piecewise2.maleage), "\n")
+cat("model.b.piecewise,agemale: AIC = ",AIC(model.b.piecewise.agemale),";BIC = ", BIC(model.b.piecewise.agemale), "\n")
+cat("model.b.piecewise2.agemale: AIC = ",AIC(model.b.piecewise2.agemale),";BIC = ", BIC(model.b.piecewise2.agemale), "\n")
 cat("model.b.piecewise.equivalent: AIC = ",AIC(model.b.piecewise.equivalent),";BIC = ", BIC(model.b.piecewise.equivalent), "\n")
 ```
 
