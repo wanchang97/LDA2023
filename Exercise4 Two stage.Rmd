@@ -38,7 +38,7 @@ trenal$male = as.factor(trenal$male)
 trenal$cardio = as.factor(trenal$cardio)
 trenal$reject = as.factor(trenal$reject)
 # Change the name of respons
-colnames(trenal)[19] <- "HC"
+colnames(trenal)[19] <- "Hc"
 trenal.long = trenal[,13:20] # long table form
 
 # Remove j
@@ -57,13 +57,108 @@ selected <- sample(1:length(unique(trenal.long.noNA$id)),30,replace=T) # random 
 data.selected = trenal.long.noNA[(trenal.long.noNA$id %in% c(selected)), ] 
 ```
 
+
+
+
+```{r}
+trenal.grouped<-groupedData(Hc~time|id,trenal.long.noNA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="%"))
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
+a = coef(modlist1)[,1]
+b = coef(modlist1)[,2]
+plot.new()
+par(mfrow=c(1,2))
+hist(a,xlab="intercepts",ylab="Frequency",title="Histogram for intercepts")
+hist(b,xlab="slopes",ylab="Frequency",title="Histogram for time slopes")
+
+bbdd <- data.frame(id=as.numeric(attributes(modlist1)$names),
+                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","a", "b")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+ggplot(bbdd, aes(x=a, y=b)) + geom_point() + ggtitle("Beta comparison")
+(meanabymale<-tapply(bbdd$a,as.factor(bbdd$male),mean,na.rm=T))
+(meanbbymale<-tapply(bbdd$b,as.factor(bbdd$male),mean,na.rm=T))
+ggplot(bbdd, aes(x=a, y=b, color=male)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Gender")
+
+```
+Fit the model and confidence interval. We will use the structure found in the multivariate section. 
+
+```{r}
+### Fit a model for the intercept
+
+fita.agemalecardio<-lm(a ~ age + male + cardio ,bbdd)
+summary(fita.agemalecardio)
+confint(fita.agemalecardio)
+
+### Fit a model for the slope
+
+fitb.agemalecardio<-lm(b~age + male + cardio ,bbdd)
+summary(fitb.agemalecardio)
+confint(fitb.agemalecardio)
+
+```
+
+
+
+```{r}
+trenal.grouped<-groupedData(Hc~time|id,trenal.long.noNA, inner = ~ reject, labels=list(y="level of Haematocrit"),units=list(y="%"))
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
+bbdd <- data.frame(id=as.numeric(attributes(modlist1)$names),
+                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","a", "b")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+ggplot(bbdd, aes(x=a, y=b)) + geom_point() + ggtitle("Beta comparison")
+(meanabymale<-tapply(bbdd$a,as.factor(bbdd$reject),mean,na.rm=T))
+(meanbbymale<-tapply(bbdd$b,as.factor(bbdd$reject),mean,na.rm=T))
+ggplot(bbdd, aes(x=a, y=b, color=reject)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Reject")
+
+```
+
+```{r}
+trenal.grouped<-groupedData(Hc~time|id,trenal.long.noNA, inner = ~ cardio, labels=list(y="level of Haematocrit"),units=list(y="%"))
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
+bbdd <- data.frame(id=as.numeric(attributes(modlist1)$names),
+                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","a", "b")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+ggplot(bbdd, aes(x=a, y=b)) + geom_point() + ggtitle("Beta comparison")
+(meanabymale<-tapply(bbdd$a,as.factor(bbdd$cardio),mean,na.rm=T))
+(meanbbymale<-tapply(bbdd$b,as.factor(bbdd$cardio),mean,na.rm=T))
+ggplot(bbdd, aes(x=a, y=b, color=cardio)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Cardio")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 regressions <- data.selected %>%
   group_by(id) %>%
-  do(fit = lm(HC ~ time,data=.))
+  do(fit = lm(Hc ~ time,data=.))#,confintval = confint(fit))
+  
 sd_filter <- data.selected %>%
   group_by(id) %>%
-  summarise(sds = sd(HC))
+  summarise(sds = sd(Hc))
 
 regressions <- regressions %>% 
   right_join(sd_filter,by="id")%>%
@@ -87,22 +182,44 @@ lm_info1 <- regressions %>%
 ```
 
 
-## R Markdown
+```{r}
+trenal.grouped<-groupedData(Hc~time|id,trenal.long.noNA, inner = ~ male+cardio+reject, labels=list(y="level of Haematocrit"),units=list(y="%"))
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
+a = coef(modlist1)[,1]
+b = coef(modlist1)[,2]
+plot.new()
+par(mfrow=c(1,2))
+hist(a,xlab="intercepts",ylab="Frequency",title="Histogram for intercepts")
+hist(b,xlab="slopes",ylab="Frequency",title="Histogram for time slopes")
+bbdd <- data.frame(id=as.numeric(attributes(modlist1)$names),
+                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","a", "b")], by.x = "id", all.x = T)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+bbdd <- bbdd[order(bbdd[,1]),]
+ggplot(bbdd, aes(x=a, y=b)) + geom_point() + ggtitle("Beta comparison")
+(meanabymale<-tapply(bbdd$a,as.factor(bbdd$male),mean,na.rm=T))
+(meanbbymale<-tapply(bbdd$b,as.factor(bbdd$male),mean,na.rm=T))
+ggplot(bbdd, aes(x=a, y=b, color=male)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Gender")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+## Step two
+Fit the model and confidence interval. We will use the structure found in the multivariate section. 
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+### Fit a model for the intercept
+fita<-lm(a~ age +male + cardio ,bbdd)
+summary(fita)
+confint(fita)
+
+### Fit a model for the slope
+
+fitb<-lm(b~age + male + cardio ,bbdd)
+summary(fitb)
+confint(fitb)
+
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
