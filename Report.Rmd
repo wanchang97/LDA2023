@@ -648,7 +648,7 @@ $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.3
 model.b.piecewise2.maleage <- lmer(Hc ~ time1 + time2 + male +age +(1|id),REML=T,data=trenal.long.piecewise)
 ```
 
-# Considering just keep intercept as random effect
+Considering just keep intercept as random effect
 ```{r,echo=FALSE}
 summary(model.b.piecewise.maleage)
 cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
@@ -803,12 +803,13 @@ ggtitle("Beta comparison by Cardio Level")
 
 It seems that for gender classification, the intercept and the slope is higher for patient who did show symptoms of graft rejection during the first three months after the transplantation 
 
-#### 2nd step
+
+### second step
 
 
 Fit the model and confidence interval. We will use the structure found in the multivariate section. 
 
-##### Beta0
+#### Beta0
 
 ```{r}
 
@@ -826,7 +827,7 @@ $$\textsf{Respons}_i = 33.75 + 2.1089 * Male- 0.11 * Cardio + 0.04 * Age + \epsi
 - If a subject experienced a cardio-vascular problem during the years preceding the transplantation. , the $\beta_{0}$ decreases in 0.11 units.
 - If a subject increases the age, the $\beta_{0}$ increases in 0.04 units.
 
-##### Beta1
+#### Beta1
 
 ```{r}
 
