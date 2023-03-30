@@ -7,6 +7,9 @@ output: html_document
 
 ```{r}
 library(readxl, knitr)
+library(nlme)
+library(lme4)
+library(ggplot2)
 trenal <- read_excel("Trenal.XLS") # summary(trenal)
 trenal= trenal[,-18] #remove a noninformative column const
 # Continuous or discrete variables
@@ -37,9 +40,9 @@ We need to create a *groupedData* object in order to apply it to the following p
 
 ```{r}
 
-trenal.long_no_na <- na.omit(trenal.long)
+trenal.long.NA <- na.omit(trenal.long)
 
-trenal_grouped<-groupedData(Hc~time|id,trenal.long_no_na, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal_grouped<-groupedData(Hc~time|id,trenal.long.NA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
 ```
 
@@ -48,7 +51,7 @@ A model for each individual estimating the intercept and time was adjusted.
 
 ```{r}
 
-modlist1 <- lmList (Hc ~ time, trenal_grouped , na.action = na.pass)
+modlist1 <- lmList (Hc ~ time|id, trenal_grouped , na.action = na.pass)
 
 
 ```

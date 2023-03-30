@@ -41,6 +41,7 @@ library(ggplot2)
 library(dplyr)
 library(lme4)
 library(GGally)
+library(nlme)
 library("PerformanceAnalytics")
 ```
 ## Data preprocess
@@ -314,14 +315,6 @@ Conclustions:
 Variables must keep are: intercept, time, age, male
 if p value is 0.01, it is better to add reject
 if p value is 0.05, it is better to add cardio 
-
-## Two Stage Model Analysis
-
-```{r}
-#install.packages("pacman")
-library(pacman)
-p_load(readxl, magrittr, dplyr, lattice, ggplot2, nlme)
-```
 
 
 ## Linear Mixed effects Model Analysis
@@ -648,6 +641,8 @@ The simplified linear mixed effect model is:
 $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}} + \epsilon_{ij} $$
  $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and $\epsilon_{ij} \sim N(0,20.5)$
  
+ 
+## Two Stage Model Analysis
 
 ```{r}
 model.b.piecewise2.maleage <- lmer(Hc ~ time1 + time2 + male +age +(1|id),REML=T,data=trenal.long.piecewise)
@@ -673,3 +668,180 @@ cat("model.b.piecewise2.maleage: AIC = ",AIC(model.b.piecewise2.maleage),";BIC =
 drop_in_dev <- anova(model.b.piecewise.age,model.b.piecewise.maleage,model.b.piecewise2.maleage,test="Chisq")
 drop_in_dev
 ```
+```{r}
+library(readxl, knitr)
+library(nlme)
+library(lme4)
+library(ggplot2)
+trenal <- read_excel("Trenal.XLS") # summary(trenal)
+trenal= trenal[,-18] #remove a noninformative column const
+# Continuous or discrete variables
+trenal$id = as.factor(trenal$id)
+trenal$j = as.factor(trenal$j)
+#trenal$time = as.factor(trenal$time)
+trenal$male = as.factor(trenal$male)
+trenal$cardio = as.factor(trenal$cardio)
+trenal$reject = as.factor(trenal$reject)
+# Change the name of respons
+colnames(trenal)[19] <- "Hc"
+trenal.long = trenal[,13:20] # long table form
+
+# Remove j
+trenal.long = trenal.long[,-6]
+trenal.long.unique <- trenal.long[match( unique(trenal.long$id), trenal.long$id),]
+trenal.long.noNA <- na.omit(trenal.long)
+
+# Wide table form
+trenal.wide = as.data.frame(subset(trenal,trenal$j=="1"))[,1:18] # 1160 x 18
+```
+
+
+### First Step
+
+
+We need to create a *groupedData* object in order to apply it to the following process. 
+
+```{r}
+
+trenal.long.NA <- na.omit(trenal.long)
+
+trenal_grouped<-groupedData(Hc~time|id,trenal.long.NA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+```
+
+
+A model for each individual estimating the intercept and time was adjusted.
+
+```{r}
+
+modlist1 <- lmList (Hc ~ time|id, trenal_grouped , na.action = na.pass)
+
+
+```
+
+
+Here, he have the model with a beta for each individual. 
+
+Then, we can extract all the beta0 and beta1 obtained from the model. This will be used in the following steps and create a data frame in which we store all the betas obtained. This will be useful for trying to split up the analysis by groups. 
+
+```{r}
+
+beta0<- coef(modlist1)[,1]
+
+beta1<- coef(modlist1)[,2]
+
+bbdd<-data.frame(id=as.numeric(attributes(modlist1)$names),
+                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","beta0", "beta1")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+
+
+```
+
+
+
+#### BETAS ANALYSIS
+
+A descriptive analysis from the beta's obtaines will be performed in the following section.
+
+```{r}
+
+ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point() + ggtitle("Beta comparison")
+
+```
+
+The betas seem to have a small negative trend between them. 
+
+It is interesting to calculate the mean beta by groups, to check if we have significant differences. 
+
+```{r}
+
+(meanbeta0bymale<-tapply(bbdd$beta0,as.factor(bbdd$male),mean,na.rm=T))
+(meanbeta1bymale<-tapply(bbdd$beta1,as.factor(bbdd$male),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=male)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Gender")
+
+```
+
+It seems that for gender classification, the intercept is higher for male and also the slope.
+
+```{r}
+(meanbeta0byreject<-tapply(bbdd$beta0,as.factor(bbdd$reject),mean,na.rm=T))
+(meanbeta1byreject<-tapply(bbdd$beta1,as.factor(bbdd$reject),mean,na.rm=T))
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=reject)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Rejection Level")
+
+``` 
+
+It seems that for rejection level classification, the intercept is higher for people without experiencing a cardio-vascular problem during the years preceding the transplantation. However, in this case the slope is higher to its opposite group. 
+
+
+```{r}
+
+(meanbeta0bycardio<-tapply(bbdd$beta0,as.factor(bbdd$cardio),mean,na.rm=T))
+(meanbeta1bycardio<-tapply(bbdd$beta1,as.factor(bbdd$cardio),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=cardio)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Cardio Level")
+
+```
+
+It seems that for gender classification, the intercept and the slope is higher for patient who did show symptoms of graft rejection during the first three months after the transplantation 
+
+#### 2nd step
+
+
+Fit the model and confidence interval. We will use the structure found in the multivariate section. 
+
+##### Beta0
+
+```{r}
+
+modbeta0<-lm(beta0~male + cardio + age,bbdd)
+summary(modbeta0)
+confint(modbeta0)
+
+```
+
+From the previous table, we have the following model:
+
+$$\textsf{Respons}_i = 33.75 + 2.1089 * Male- 0.11 * Cardio + 0.04 * Age + \epsilon_i$$
+- The intercept is 33.75.
+- If a subject is a male, the $\beta_{0}$ increases in 2.11 units.
+- If a subject experienced a cardio-vascular problem during the years preceding the transplantation. , the $\beta_{0}$ decreases in 0.11 units.
+- If a subject increases the age, the $\beta_{0}$ increases in 0.04 units.
+
+##### Beta1
+
+```{r}
+
+### Fit a model for the slope
+
+modbeta1<-lm(beta1~male + cardio + age,bbdd)
+summary(modbeta1)
+confint(modbeta1)
+
+```
+
+From the previous table, we have the following model:
+
+$$\textsf{Respons}_i = 0.075 + 0.1721 * Male + 0.274 * Cardio + 0.01 * Age + \epsilon_i$$
+- The intercept is 0.075.
+- If a subject is a male, the $\beta_{0}$ increases in 0.0274 units.
+- If a subject experienced a cardio-vascular problem during the years preceding the transplantation. , the $\beta_{0}$ increases in 0.274 units.
+- If a subject increases the age, the $\beta_{0}$ increases in 0.01 units.
