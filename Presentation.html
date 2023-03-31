@@ -400,7 +400,7 @@ Group2: Hugo Blain; Oscar Cabanelas;Wanchang Zhang
 </div>
 </div>
 
-  <p class="date">3/30/23</p>
+  <p class="date">3/31/23</p>
 </section>
 
 <section>
@@ -445,7 +445,7 @@ Group2: Hugo Blain; Oscar Cabanelas;Wanchang Zhang
 </tr>
 <tr class="even">
 <td style="text-align: left;">Hc</td>
-<td style="text-align: left;">Haematocrit level</td>
+<td style="text-align: left;">Haematocrit level (the percentage of red blood cells in the body)</td>
 <td style="text-align: left;">Continuous units in <span class="math inline">\(\%\)</span></td>
 </tr>
 <tr class="odd">
@@ -479,10 +479,7 @@ Group2: Hugo Blain; Oscar Cabanelas;Wanchang Zhang
 <section id="observations" class="slide level2">
 <h2>Observations</h2>
 <p>Our given data set is Longitudinal data with two levels: time-level and subject-level</p>
-<ul>
-<li><em>Time-level</em> (also called <em>first level</em>) variables: changed with time, indexed by <span class="math inline">\(j\)</span> e.g.&nbsp;time and response Hc</li>
-<li><em>Subject-level</em> (also called <em>second level</em>) variables: changed with subjects indexed by <span class="math inline">\(i\)</span> e.g.&nbsp;age, male, reject, cardio</li>
-</ul>
+<p>+Time-level (also called Level One) variables: changed with time, indexed by <span class="math inline">\(j\)</span> e.g.&nbsp;time and response Hc +Subject-level* (also called Level Two) variables: changed with subjects indexed by <span class="math inline">\(i\)</span> e.g.&nbsp;age, male, reject, cardio</p>
 </section>
 <section id="missing-data-distribution" class="slide level2">
 <h2>Missing data distribution</h2>
@@ -714,32 +711,29 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="two-stage-model-analysis" class="slide level2">
 <h2>Two stage model analysis</h2>
 </section>
-<section id="linear-mixed-effects-model-analysis" class="slide level2">
-<h2>Linear Mixed Effects Model Analysis</h2>
-<pre><code>Conduct the analysis level by level </code></pre>
+<section id="linear-mixed-effects-model-analysis-using-lmer" class="slide level2">
+<h2>Linear Mixed Effects Model Analysis using <code>lmer</code></h2>
+<h3 id="conduct-the-analysis-level-by-level">Conduct the analysis level by level</h3>
 <div class="footer">
 <p>inspired by Chapter 8 and 9 of <a href="https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html" class="uri">https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html</a></p>
 </div>
-<ul>
-<li>Level One is : time and the response variable e.g.&nbsp;Hc level</li>
-<li>Level Two is : covariates related to each subject, e.g.&nbsp;age, male, reject, cardio</li>
-</ul>
+<pre><code>Level One : time and the response variable e.g. Hc level 
+Level Two : covariates related to each subject, e.g. age, male, reject, cardio</code></pre>
 <p>The trials related to Level One (only time as covariate)</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>model.a <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long)</span>
 <span id="cb4-2"><a href="#cb4-2"></a>model.b <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time <span class="sc">+</span> (time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span> trenal.long)</span>
 <span id="cb4-3"><a href="#cb4-3"></a>model.c <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> timec <span class="sc">+</span> <span class="fu">I</span>(timec<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> (timec <span class="sc">+</span> <span class="fu">I</span>(timec<span class="sc">^</span><span class="dv">2</span>)<span class="sc">|</span>id),<span class="at">REML=</span>T, <span class="at">data=</span>trenal.long.center)</span>
-<span id="cb4-4"><a href="#cb4-4"></a>model.b.piecewise <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-4"><a href="#cb4-4"></a>model.b.piecewise <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The trials related to level Two (Add subject related variable)</p>
 </section>
-<section id="unconditional-means-model-to-discover-variance-distribution" class="slide level2 smaller">
-<h2>Unconditional Means Model to discover variance distribution</h2>
+<section id="unconditional-means-model" class="slide level2 smaller">
+<h2>Unconditional Means Model</h2>
+<h3 id="to-discover-variance-distribution">— to discover variance distribution</h3>
 <p>We can first try the unconditional Means Model to explore the variance( within subject and between-subject), Define <span class="math inline">\(Y_{ij}\)</span> as the Hc level from subject <span class="math inline">\(i\)</span> and measured time <span class="math inline">\(j\)</span></p>
-<ul>
-<li>Level One: <span class="math display">\[Y_{ij} = a_i + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></li>
-<li>Level Two: <span class="math display">\[a_i = \alpha_0 + u_i,\]</span> where <span class="math inline">\(u_i \sim N(0,\sigma_{u}^2)\)</span></li>
-</ul>
+<pre><code>Level One: </code></pre>
+<p><span class="math display">\[Y_{ij} = a_i + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span> Level Two: <span class="math display">\[a_i = \alpha_0 + u_i,\]</span> where <span class="math inline">\(u_i \sim N(0,\sigma_{u}^2)\)</span></p>
 <p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = \alpha_0 + u_i + \epsilon_{ij},\]</span> where <span class="math inline">\(u_i \sim N(0,\sigma_u^2)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -770,15 +764,18 @@ Fixed effects:
 <li><span class="math inline">\(\hat{\sigma}^2 = 23.07\)</span>: the variance in within-subjects deviation, between years of measurements <span class="math inline">\(Hc_j\)</span> and the mean <span class="math inline">\(\mu_{Hc}\)</span> across all subjects and all years</li>
 <li><span class="math inline">\(\hat{\sigma_u}^2 = 13.60\)</span>: the variance in between-subjects deviation, between subject mean <span class="math inline">\(\mu_{Hc_i}\)</span> and the overall mean <span class="math inline">\(\mu_{Hc}\)</span> across all subjects and all years.</li>
 </ul>
-<p>The intraclass correlation coefficient: <span class="math display">\[\hat{\rho}= \frac{\hat{\sigma_u}^2}{\hat{\sigma_u}^2+\hat{\sigma}^2} = \frac{13.60}{13.60+ 23.07}=0.371\]</span> ## Unconditional Growth Model, introducing time in Level One</p>
-<ul>
-<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p></li>
-<li><p>Level Two:</p></li>
-</ul>
+<p>The intraclass correlation coefficient: <span class="math display">\[\hat{\rho}= \frac{\hat{\sigma_u}^2}{\hat{\sigma_u}^2+\hat{\sigma}^2} = \frac{13.60}{13.60+ 23.07}=0.371\]</span></p>
+</section>
+<section id="unconditional-growth-model" class="slide level2 smaller">
+<h2>Unconditional Growth Model</h2>
+<h3 id="introducing-time-in-level-one">— introducing time in Level One</h3>
+<pre><code>Level One: </code></pre>
+<p><span class="math display">\[Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre><code>Level Two: </code></pre>
 <p><span class="math display">\[\begin{align}
-  a_i &amp;= \alpha_0 + u_i, \\
-  b_i &amp;= \beta_0 + v_i
-  \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2 \end{bmatrix}\right)\)</span></p>
+     a_i &amp;= \alpha_0 + u_i, \\
+     b_i &amp;= \beta_0 + v_i
+     \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2 \end{bmatrix}\right)\)</span></p>
 <p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -820,19 +817,16 @@ time -0.394</code></pre>
 </ul>
 <p>The estimated within-subject variance <span class="math inline">\(\hat{\sigma}^2\)</span> decreased by about <span class="math inline">\(9\%\)</span> from the unconditional means model implying that <span class="math inline">\(9\%\)</span> of within-subject variability in Hc level can be explained by a linear increase over time: <span class="math display">\[Pseudo R^2_{L1} = \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond. growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} = 0.0948\]</span></p>
 </section>
-<section id="modeling-other-trends-over-time-quadratic" class="slide level2">
-<h2>Modeling other trends over time quadratic</h2>
-<ul>
-<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
-<ul>
-<li>Level Two:</li>
-</ul>
+<section id="quadratic-time-trend-modeling" class="slide level2 smaller">
+<h2>Quadratic time trend modeling</h2>
+<pre><code>Level One: </code></pre>
+<p><span class="math display">\[Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre><code>Level Two: </code></pre>
 <p><span class="math display">\[\begin{align}
-a_i &amp;= \alpha_0 + u_i, \\
-b_i &amp;= \beta_0 + v_i, \\
-c_i &amp;= \gamma_0 + w_i,
-\end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span></p></li>
-</ul>
+     a_i &amp;= \alpha_0 + u_i, \\
+     b_i &amp;= \beta_0 + v_i, \\
+     c_i &amp;= \gamma_0 + w_i,
+     \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span></p>
 <p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \gamma_0 \times time_{ij}^2] + [ u_i + v_i \times time_{ij} + w_i \times time_{ij}^2 +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -871,55 +865,62 @@ Model is nearly unidentifiable: very large eigenvalue
 </div>
 </div>
 </section>
-<section id="piecewise-linear-time-trend" class="slide level2">
+<section id="piecewise-linear-time-trend" class="slide level2 smaller">
 <h2>Piecewise linear time trend</h2>
 <p>In the <strong>piecewise linear model</strong>, the complete time span of the study is divided into two segments, with a separate slope relating time to the response in each segment.</p>
-<ul>
-<li><p>Level One: <span class="math display">\[Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre><code>Level One: </code></pre>
+<p><span class="math display">\[Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
 <ul>
 <li>Level Two:</li>
 </ul>
 <p><span class="math display">\[\begin{align}
-a_i &amp;= \alpha_0 + u_i, \\
-b_i &amp;= \beta_0 + v_i, \\
-c_i &amp;= \gamma_0 + w_i,
-\end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span></p></li>
-</ul>
+  a_i &amp;= \alpha_0 + u_i, \\
+  b_i &amp;= \beta_0 + v_i, \\
+  c_i &amp;= \gamma_0 + w_i,
+  \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span></p>
 <p>Written in linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v &amp; \rho_{uw} \sigma_u \sigma_w \\ &amp; \sigma_v^2 &amp; \rho_{vw} \sigma_v\sigma_w \\ &amp; &amp; \sigma_w^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
 <p>In our case study, we can fit separate slope in time <span class="math inline">\(0-0.5\)</span> and <span class="math inline">\(0.5-10\)</span></p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: Hc ~ time1 + time2 + (1 | id)
+Formula: Hc ~ time1 + time2 + (time2 | id)
    Data: trenal.long.piecewise
 
-REML criterion at convergence: 58716.9
+REML criterion at convergence: 58545.9
 
 Scaled residuals: 
     Min      1Q  Median      3Q     Max 
--5.4595 -0.4903  0.0741  0.5791  6.5397 
+-5.1940 -0.4729  0.0625  0.5607  6.5532 
 
 Random effects:
- Groups   Name        Variance Std.Dev.
- id       (Intercept) 13.76    3.709   
- Residual             22.01    4.692   
+ Groups   Name        Variance Std.Dev. Corr 
+ id       (Intercept) 13.6532  3.6950        
+          time2        0.1867  0.4321   -0.15
+ Residual             20.4690  4.5243        
 Number of obs: 9558, groups:  id, 1160
 
 Fixed effects:
             Estimate Std. Error t value
-(Intercept) 36.81383    0.13799  266.78
-time1        4.02855    0.32348   12.45
-time2        0.36597    0.01881   19.46
+(Intercept) 36.76665    0.13678  268.79
+time1        4.12291    0.31360   13.15
+time2        0.40031    0.02467   16.22
 
 Correlation of Fixed Effects:
       (Intr) time1 
-time1 -0.322       
-time2 -0.461  0.393</code></pre>
+time1 -0.324       
+time2 -0.439  0.330</code></pre>
 </div>
 </div>
 </section>
 <section id="comparing-the-level-one-models" class="slide level2">
 <h2>Comparing the level one models</h2>
+<p>Comparing the AIC/ BIC value</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>model.a <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>model.b <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time <span class="sc">+</span> (time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span> trenal.long)</span>
+<span id="cb15-3"><a href="#cb15-3"></a>model.c <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> timec <span class="sc">+</span> <span class="fu">I</span>(timec<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> (timec <span class="sc">+</span> <span class="fu">I</span>(timec<span class="sc">^</span><span class="dv">2</span>)<span class="sc">|</span>id),<span class="at">REML=</span>T, <span class="at">data=</span>trenal.long.center)</span>
+<span id="cb15-4"><a href="#cb15-4"></a>model.b.piecewise <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>model.a: AIC =  59112.68 ;BIC =  59134.18 </code></pre>
@@ -931,52 +932,361 @@ time2 -0.461  0.393</code></pre>
 <pre><code>model.c: AIC =  57885.46 ;BIC =  57957.11 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise: AIC =  58726.86 ;BIC =  58762.69 </code></pre>
+<pre><code>model.b.piecewise: AIC =  58559.93 ;BIC =  58610.09 </code></pre>
+</div>
+</div>
+<p><code>model.c</code> has the lowest AIC BIC value. But we keep the linear time trend with piecewise time intervals, considering that in real case the Hc level (the percentage of red blood cells in the body) will be affected more by health status than the age of a person.</p>
+<p>Besides, the quadratic model seems not really identifiable</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: Hc ~ timec + I(timec^2) + (timec + I(timec^2) | id)
+   Data: trenal.long.center
+
+REML criterion at convergence: 57865.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.7256 -0.4767  0.0361  0.5308  6.7119 
+
+Random effects:
+ Groups   Name        Variance  Std.Dev. Corr       
+ id       (Intercept) 21.436916 4.63000             
+          timec        0.197651 0.44458   0.27      
+          I(timec^2)   0.007685 0.08767  -0.82 -0.44
+ Residual             18.231536 4.26984             
+Number of obs: 9558, groups:  id, 1160
+
+Fixed effects:
+             Estimate Std. Error t value
+(Intercept) 40.201415   0.162783 246.963
+timec        0.055012   0.024108   2.282
+I(timec^2)  -0.161860   0.006341 -25.526
+
+Correlation of Fixed Effects:
+           (Intr) timec 
+timec       0.244       
+I(timec^2) -0.590  0.198
+optimizer (nloptwrap) convergence code: 0 (OK)
+Model failed to converge with max|grad| = 0.0353379 (tol = 0.002, component 1)
+Model is nearly unidentifiable: very large eigenvalue
+ - Rescale variables?</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: Hc ~ time1 + time2 + (time2 | id)
+   Data: trenal.long.piecewise
+
+REML criterion at convergence: 58545.9
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-5.1940 -0.4729  0.0625  0.5607  6.5532 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr 
+ id       (Intercept) 13.6532  3.6950        
+          time2        0.1867  0.4321   -0.15
+ Residual             20.4690  4.5243        
+Number of obs: 9558, groups:  id, 1160
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept) 36.76665    0.13678  268.79
+time1        4.12291    0.31360   13.15
+time2        0.40031    0.02467   16.22
+
+Correlation of Fixed Effects:
+      (Intr) time1 
+time1 -0.324       
+time2 -0.439  0.330</code></pre>
+</div>
+</div>
 </div>
 </div>
 </section>
 <section id="adding-subject-related-variable-in-level-two" class="slide level2">
 <h2>Adding subject related variable in level two</h2>
+<h3 id="based-on-the-model.b">Based on the <code>model.b</code></h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>model.b.piecewise.age <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> age <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
-<span id="cb13-2"><a href="#cb13-2"></a>model.b.piecewise.male <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> male <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
-<span id="cb13-3"><a href="#cb13-3"></a>model.b.piecewise.agemale <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2  <span class="sc">+</span>male <span class="sc">+</span> age <span class="sc">+</span>(time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
-<span id="cb13-4"><a href="#cb13-4"></a>model.b.piecewise.agemalereject <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2  <span class="sc">+</span>age <span class="sc">+</span> male<span class="sc">+</span> reject <span class="sc">+</span>(time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>model.b.age <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time  <span class="sc">+</span> age <span class="sc">+</span> (time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.scaled)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>model.b.male <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time <span class="sc">+</span> male <span class="sc">+</span> (time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.scaled)</span>
+<span id="cb22-3"><a href="#cb22-3"></a>model.b.agemale <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time  <span class="sc">+</span>male <span class="sc">+</span> age <span class="sc">+</span>(time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.scaled)</span>
+<span id="cb22-4"><a href="#cb22-4"></a>model.b.agemalereject <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time  <span class="sc">+</span>age <span class="sc">+</span> male<span class="sc">+</span> reject <span class="sc">+</span>(time<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>model.a: AIC =  59112.68 ;BIC =  59134.18 </code></pre>
-</div>
 <div class="cell-output cell-output-stdout">
 <pre><code>model.b: AIC =  58702.37 ;BIC =  58745.36 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>model.c: AIC =  57885.46 ;BIC =  57957.11 </code></pre>
+<pre><code>model.b.age: AIC =  58625.59 ;BIC =  58675.74 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise: AIC =  58726.86 ;BIC =  58762.69 </code></pre>
+<pre><code>model.b.male: AIC =  58606.56 ;BIC =  58656.71 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise,age: AIC =  58483.85 ;BIC =  58541.16 </code></pre>
+<pre><code>model.b.agemale: AIC =  58527.24 ;BIC =  58584.55 </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise,male: AIC =  58464.65 ;BIC =  58521.97 </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise,agemale: AIC =  58386 ;BIC =  58450.48 </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>model.b.piecewise,agemalereject: AIC =  58386.74 ;BIC =  58458.38 </code></pre>
+<pre><code>model.b.agemalereject: AIC =  58527.94 ;BIC =  58592.42 </code></pre>
 </div>
 </div>
 </section>
 <section id="final-chosen-model" class="slide level2">
 <h2>Final chosen model</h2>
-<p>Our chosen model would be the piecewise linear model with age gender as the level two variables <code>model.b.piecewise.agemale</code>.</p>
-<p><span class="math display">\[Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}} + \epsilon_{ij} \]</span> <span class="math display">\[Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 &amp; -0.3155271 \\ -0.3155271 &amp; 0.1874\end{bmatrix}\right)\)</span>,and <span class="math inline">\(\epsilon_{ij} \sim N(0,20.5)\)</span></p>
+<p>Our chosen model would be the linear model with age gender as the level two variables <code>model.b.agemale</code>.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: Hc ~ time + male + age + (time | id)
+   Data: trenal.long.scaled
+
+REML criterion at convergence: 58511.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-5.2238 -0.4568  0.0729  0.5568  6.4306 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr 
+ id       (Intercept) 11.9573  3.4579        
+          time         0.1864  0.4317   -0.21
+ Residual             20.8875  4.5703        
+Number of obs: 9551, groups:  id, 1159
+
+Fixed effects:
+             Estimate Std. Error t value
+(Intercept) 33.195249   0.433448  76.584
+time         0.322553   0.023698  13.611
+male1        2.350432   0.227837  10.316
+age          0.058657   0.008504   6.897
+
+Correlation of Fixed Effects:
+      (Intr) time   male1 
+time  -0.162              
+male1 -0.292  0.011       
+age   -0.909  0.037 -0.011
+optimizer (nloptwrap) convergence code: 0 (OK)
+Model failed to converge with max|grad| = 0.00413353 (tol = 0.002, component 1)</code></pre>
+</div>
+</div>
 </section>
-<section id="two-stage-model-analysis-comparison" class="slide level2">
-<h2>Two Stage Model Analysis comparison</h2>
+<section id="adding-subject-related-variable-in-level-two-1" class="slide level2">
+<h2>Adding subject related variable in level two</h2>
+<h3 id="based-on-the-model.b.piecewise">Based on the <code>model.b.piecewise</code></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>model.b.piecewise.age <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> age <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
+<span id="cb29-2"><a href="#cb29-2"></a>model.b.piecewise.male <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2 <span class="sc">+</span> male <span class="sc">+</span> (time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
+<span id="cb29-3"><a href="#cb29-3"></a>model.b.piecewise.agemale <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2  <span class="sc">+</span>male <span class="sc">+</span> age <span class="sc">+</span>(time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span>
+<span id="cb29-4"><a href="#cb29-4"></a>model.b.piecewise.agemalereject <span class="ot">&lt;-</span> <span class="fu">lmer</span>(Hc <span class="sc">~</span> time1 <span class="sc">+</span> time2  <span class="sc">+</span>age <span class="sc">+</span> male<span class="sc">+</span> reject <span class="sc">+</span>(time2<span class="sc">|</span>id),<span class="at">REML=</span>T,<span class="at">data=</span>trenal.long.piecewise)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>model.b.piecewise: AIC =  58559.93 ;BIC =  58610.09 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>model.b.piecewise.age: AIC =  58483.85 ;BIC =  58541.16 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>model.b.piecewise.male: AIC =  58464.65 ;BIC =  58521.97 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>model.b.piecewise.agemale: AIC =  58386 ;BIC =  58450.48 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>model.b.piecewise.agemalereject: AIC =  58386.74 ;BIC =  58458.38 </code></pre>
+</div>
+</div>
+</section>
+<section id="final-chosen-model-1" class="slide level2">
+<h2>Final chosen model</h2>
+<p>Our chosen model would be the piecewise linear model with age gender as the level two variables <code>model.b.piecewise.agemale</code>.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: Hc ~ time1 + time2 + male + age + (time2 | id)
+   Data: trenal.long.piecewise
+
+REML criterion at convergence: 58368
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-5.1683 -0.4680  0.0637  0.5619  6.5758 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr 
+ id       (Intercept) 12.0382  3.4696        
+          time2        0.1874  0.4329   -0.21
+ Residual             20.4704  4.5244        
+Number of obs: 9551, groups:  id, 1159
+
+Fixed effects:
+             Estimate Std. Error t value
+(Intercept) 32.694557   0.435712  75.037
+time1        4.112153   0.313713  13.108
+time2        0.406601   0.024616  16.518
+male1        2.346642   0.228052  10.290
+age          0.058747   0.008512   6.902
+
+Correlation of Fixed Effects:
+      (Intr) time1  time2  male1 
+time1 -0.104                     
+time2 -0.180  0.331              
+male1 -0.290 -0.001  0.011       
+age   -0.905  0.003  0.035 -0.011
+optimizer (nloptwrap) convergence code: 0 (OK)
+Model failed to converge with max|grad| = 0.00794242 (tol = 0.002, component 1)</code></pre>
+</div>
+</div>
+<p><span class="math display">\[Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}}+ \epsilon_{ij} \]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 &amp; -0.3155271 \\ -0.3155271 &amp; 0.1874\end{bmatrix}\right)\)</span>,and <span class="math inline">\(\epsilon_{ij} \sim N(0,20.47)\)</span></p>
+</section></section>
+<section>
+<section id="two-stage-model-analysis-comparison" class="title-slide slide level1 center">
+<h1>Two Stage Model Analysis comparison</h1>
+
+</section>
+<section id="two-stage-model" class="slide level2">
+<h2>Two stage Model</h2>
+<h3 id="stage-one">Stage one</h3>
+
+<img data-src="Presentation_files/figure-revealjs/unnamed-chunk-34-1.png" width="960" class="r-stretch"><h3 id="stage-two">Stage two</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  id age male cardio reject Hc time  a  b
+1  1  25    1      0      1 26  0.0 NA NA
+2  1  25    1      0      1 41  0.5 NA NA
+3  1  25    1      0      1 42  1.0 NA NA
+4  1  25    1      0      1 44  2.0 NA NA
+5  1  25    1      0      1 44  3.0 NA NA
+6  1  25    1      0      1 45  4.0 NA NA</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = a ~ age + male, data = ab)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-12.2780  -3.0676  -0.3379   2.7342  11.9830 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 32.89757    0.25989  126.58   &lt;2e-16 ***
+age          0.06970    0.00562   12.40   &lt;2e-16 ***
+male1        2.57660    0.13688   18.82   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.35 on 4065 degrees of freedom
+  (9852 observations deleted due to missingness)
+Multiple R-squared:  0.1042,    Adjusted R-squared:  0.1037 
+F-statistic: 236.4 on 2 and 4065 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                  2.5 %    97.5 %
+(Intercept) 32.38805063 33.407089
+age          0.05867982  0.080715
+male1        2.30824792  2.844960</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = b ~ age + male, data = ab)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.07184 -0.35816 -0.00676  0.39026  1.70238 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.3264235  0.0337790   9.663  &lt; 2e-16 ***
+age         -0.0005096  0.0007304  -0.698    0.485    
+male1       -0.0710852  0.0177909  -3.996 6.57e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.5654 on 4065 degrees of freedom
+  (9852 observations deleted due to missingness)
+Multiple R-squared:  0.003945,  Adjusted R-squared:  0.003455 
+F-statistic:  8.05 on 2 and 4065 DF,  p-value: 0.0003241</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   2.5 %       97.5 %
+(Intercept)  0.260198135  0.392648915
+age         -0.001941644  0.000922405
+male1       -0.105965108 -0.036205358</code></pre>
+</div>
+</div>
+</section>
+<section id="the-equivalent-lmm-model-should-be" class="slide level2">
+<h2>The equivalent LMM model should be</h2>
+<pre><code>Level One: </code></pre>
+<p><span class="math display">\[Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},\]</span> where <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<pre><code>Level Two: </code></pre>
+<p><span class="math display">\[\begin{align}
+     a_i &amp;= \alpha_0 + \alpha_1 \times age_i + \alpha_2 \times male_i +  u_i, \\
+     b_i &amp;= \beta_0 + \beta_1 \times age_i + \beta_2 \times male_i + v_i
+     \end{align}\]</span> where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2 \end{bmatrix}\right)\)</span></p>
+<p>The equivalent linear mixed effect model is: <span class="math display">\[Y_{ij} = [\alpha_0 + \alpha_1 \times age_i +  \alpha_2 \times male_i + \beta_0 \times time_{ij} +\beta_1 \times age_i \times time_{ij} +\beta_2 \times male_i \times time_{ij} ] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],\]</span></p>
+<p>where <span class="math inline">\(\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 &amp; \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v &amp; \sigma_v^2 \end{bmatrix}\right)\)</span> and <span class="math inline">\(\epsilon_{ij} \sim N(0,\sigma^2)\)</span></p>
+<div class="cell">
+
+</div>
+</section>
+<section id="result-comparison" class="slide level2">
+<h2>Result comparison</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">coefficients.name</th>
+<th style="text-align: left;">coeff.twostage</th>
+<th style="text-align: left;">coeff.LMM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">alpha_0</td>
+<td style="text-align: left;">32.8975699323574</td>
+<td style="text-align: left;">33.6673837336226</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alpha_1</td>
+<td style="text-align: left;">0.0696974136630805</td>
+<td style="text-align: left;">0.0498091192428494</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">alpha_2</td>
+<td style="text-align: left;">2.576603751364</td>
+<td style="text-align: left;">2.22085177214344</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta_0</td>
+<td style="text-align: left;">0.326423524902391</td>
+<td style="text-align: left;">0.112273787474164</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta_1</td>
+<td style="text-align: left;">-0.000509619578403424</td>
+<td style="text-align: left;">0.00404103830321673</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta_2</td>
+<td style="text-align: left;">-0.0710852331532519</td>
+<td style="text-align: left;">0.0579677566050636</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div class="footer footer-default">
 
 </div>
