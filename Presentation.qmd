@@ -98,7 +98,7 @@ trenal.long.piecewise['time2'] <- time2
 ## Data organisation {.smaller}
 
 | **Variables**                      | **Physical Meaning**                                                                                        | **Types of the variable**                                             |
-|:-----------------|:--------------------------|:--------------------------|
+|:-----------------------------------|:------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------|
 | id                                 | Identification Number of each subject                                                                       | Categorical, ordinal $1,2,3,\cdots,1160$                              |
 | Hc                                 | Haematocrit level                                                                                           | Continuous units in $\%$                                              |
 | Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10 | Haematocrit level meassured at the moment of time ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant | Continuous; units in $\%$                                             |
@@ -316,6 +316,11 @@ bbdd <- merge(trenal.long, bbdd[,c("id","beta0", "beta1")], by.x = "id", all.x =
 
 bbdd <- bbdd[order(bbdd[,1]),]
 
+bbdd <- bbdd %>%
+  mutate(groups_age = case_when(age < 25 ~ "Young",
+                           age >= 25 & age < 60 ~ "Adult",
+                           age >= 60 ~ "Old"))
+
 
 ```
 
@@ -380,6 +385,14 @@ It seems that for gender classification, the intercept and the slope is
 higher for patient who did show symptoms of graft rejection during the
 first three months after the transplantation
 
+```{r}
+
+ggplot(bbdd, aes(x=beta0, y=beta1, color=groups_age)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Age Group")
+
+```
+
 #### 2nd step
 
 Fit the model and confidence interval. We will use the structure found
@@ -417,12 +430,9 @@ confint(modbeta1)
 $$\textsf{$\beta$}_1 = 0.075 + 0.1721 * Male + 0.274 * Cardio + 0.01 * Age + \epsilon_i$$ -
 The intercept is 0.075.
 
-\- If a subject is a male, the $\beta_{0}$ increases in 0.0274 units.
+\- If a subject is a male, the $\beta_{1}$ increases in 0.0274 units.
 
-\- If a subject experienced a cardio-vascular problem during the years
-preceding the transplantation, the $\beta_{0}$ increases in 0.274 units.
-
-\- If a subject increases the age, the $\beta_{0}$ increases in 0.01
+\- If a subject increases the age, the $\beta_{1}$ increases in 0.01
 units.
 
 ## Linear Mixed Effects Model Analysis
