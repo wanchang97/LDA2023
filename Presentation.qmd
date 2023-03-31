@@ -98,7 +98,7 @@ trenal.long.piecewise['time2'] <- time2
 ## Data organisation {.smaller}
 
 | **Variables**                      | **Physical Meaning**                                                                                        | **Types of the variable**                                             |
-|:-----------------------------------|:------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------|
+|:-----------------|:--------------------------|:--------------------------|
 | id                                 | Identification Number of each subject                                                                       | Categorical, ordinal $1,2,3,\cdots,1160$                              |
 | Hc                                 | Haematocrit level                                                                                           | Continuous units in $\%$                                              |
 | Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10 | Haematocrit level meassured at the moment of time ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant | Continuous; units in $\%$                                             |
@@ -384,6 +384,12 @@ ggtitle("Beta comparison by Cardio Level")
 It seems that for gender classification, the intercept and the slope is
 higher for patient who did show symptoms of graft rejection during the
 first three months after the transplantation
+
+```{r}
+(meanbeta0byage<-tapply(bbdd$beta0,as.factor(bbdd$groups_age),mean,na.rm=T))
+(meanbeta1byage<-tapply(bbdd$beta1,as.factor(bbdd$groups_age),mean,na.rm=T))
+```
+
 
 ```{r}
 
