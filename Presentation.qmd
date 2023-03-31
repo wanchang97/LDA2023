@@ -104,10 +104,11 @@ trenal.long.piecewise['time2'] <- time2
 
 ## Data organisation {.smaller}
 
-| **Variables**                      | **Physical Meaning**                                                                                        | **Types of the variable**                                             |
-| id                                 | Identification Number of each subject                                                                       | Categorical, ordinal $1,2,3,\cdots,1160$                              |
+| **Variables**                      | **Physical Meaning**                                                                                        | **Types of the variable**  |
+|:-----------------|:--------------------------|:--------------------------|
+| id                                 | Identification Number of each subject                                                                       | Categorical, ordinal $1,2,3,\cdots,1160$ |
 | Hc                                 | Haematocrit level (the percentage of red blood cells in the body)                                           | Continuous units in $\%$                                              |
-| Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10 | Haematocrit level meassured at the moment of time ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant | Continuous; units in $\%$                                             |
+| Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10 | Haematocrit level meassured at ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant | Continuous; units in $\%$                                             |
 | age                                | Age of the patient when performing the kidney transplant                                                    | Continuous; from $15$ to $76$ years old, average is $46.43$ years old |
 | male                               | Gender                                                                                                      | Binary: 0 = female ; 1 = male                                         |
 | reject                             | Has the patient shown symptoms of graft rejection during the first three months after the transportation    | Binary: 0 = no 1 = yes                                                |
@@ -123,7 +124,6 @@ subject-level
 -   *Subject-level* (also called *second level*) variables: changed with
     subjects indexed by $i$ e.g. age, male, reject, cardio
 
->>>>>>> 60a6cf47364d2a008e1b4a19dadb594f05202b2b
 ## Missing data distribution
 
 ```{r,echo=FALSE,fig.axis=1,fig.align='center'}
@@ -303,11 +303,11 @@ Obtaining beta's for the intercept and the time variable
 
 ```{r}
 
-trenal.long.NA <- na.omit(trenal.long)
+trenal.long.noNA <- na.omit(trenal.long)
 
-trenal_grouped<-groupedData(Hc~time|id,trenal.long.NA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal.grouped<-groupedData(Hc~time|id,trenal.long.noNA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
 
-modlist1 <- lmList (Hc ~ time|id, trenal_grouped , na.action = na.pass)
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
 
 ```
 
@@ -447,6 +447,127 @@ The intercept is 0.075.
 
 \- If a subject increases the age, the $\beta_{1}$ increases in 0.01
 units.
+
+
+# Two Stage Model Analysis comparison
+
+## Theories of Multilevel data analysis
+      
+    Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+    Level Two: 
+  \begin{align}
+     a_i &= \alpha_0 + \alpha_1 \times age_i + \alpha_2 \times male_i +  u_i, \\
+     b_i &= \beta_0 + \beta_1 \times age_i + \beta_2 \times male_i + v_i
+     \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+The equivalent linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \alpha_1 \times age_i +  \alpha_2 \times male_i + \beta_0 \times time_{ij} +\beta_1 \times age_i \times time_{ij} +\beta_2 \times male_i \times time_{ij} ] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$
+
+ 
+ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+
+ 
+```{r,echo=TRUE}
+model.b.equivalent <- lmer(Hc ~ age + male + time+ age:time+male:time+(time|id),REML=T,data=trenal.long)
+t = fixef(model.b.equivalent)
+```
+
+## Stage one
+```{r,echo=TRUE}
+trenal.grouped<-groupedData(Hc~time|id,trenal.long, inner = ~ male+cardio+reject, labels=list(y="level of Haematocrit"),units=list(y="%"))
+modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
+a = coef(modlist1)[,1]
+```
+
+
+```{r}
+b = coef(modlist1)[,2]
+plot.new()
+par(mfrow=c(1,2))
+hist(a,xlab="intercepts",ylab="Frequency",title="Histogram for intercepts")
+hist(b,xlab="slopes for t",ylab="Frequency",title="Histogram for time slopes")
+```
+
+## Stage two
+
+```{r}
+# appendix the value of a, b, c to the original data frame
+ab <- data.frame(id=as.numeric(attributes(modlist1)$names),
+                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
+ab <- merge(trenal.long, ab[,c("id","a", "b")], by.x = "id", all.x = T)
+ab <- ab[order(ab[,1]),]
+```
+
+::: columns
+::: {.column width="50%"}
+```{r}
+### Fit a model for the intercept
+fita<-lm(a ~ age + male,ab)
+summary(fita)
+confint(fita)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+### Fit a model for the slope t
+fitb<-lm(b ~ age + male ,ab)
+summary(fitb)
+confint(fitb)
+```
+:::
+:::
+
+
+## Result comparison
+Equivalent Linear Mixed Effect Model
+```{r,echo=TRUE,eval=FALSE}
+model.b.equivalent <- lmer(Hc ~ age + male + time+ age:time+male:time+(time|id),REML=T,data=trenal.long)
+```
+
+```{r}
+coeff.twostage = c(extract_numeric(fita$coefficients), extract_numeric(fitb$coefficients))
+fixeff = fixed.effects(model.b.equivalent)
+coeff.LMM = extract_numeric(fixeff)
+coefficients.name = c('alpha_0','alpha_1','alpha_2','beta_0','beta_1','beta_2')
+
+coefficients.comparison= cbind(coefficients.name,coeff.twostage,coeff.LMM)
+knitr::kable(coefficients.comparison)
+```
+
+
+## Pros and cons of two stage model and linear Mixed effects model
+
+```{r}
+summary(model.b.equivalent)
+```
+
+
+## Simplified model 
+
+Set $\beta_1$ and $\beta_2$ to 0.
+Level One: 
+  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
+  
+    Level Two: 
+  \begin{align}
+     a_i &= \alpha_0 + \alpha_1 \times age_i + \alpha_2 \times male_i +  u_i, \\
+     b_i &= \beta_0  + v_i
+     \end{align}
+  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+
+
+The equivalent linear mixed effect model is:
+ $$Y_{ij} = [\alpha_0 + \alpha_1 \times age_i +  \alpha_2 \times male_i + \beta_0 \times time_{ij} ] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$
+ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+ 
+ 
+
 
 ## Linear Mixed Effects Model Analysis using `lmer`
 
@@ -684,76 +805,3 @@ summary(model.b.piecewise.agemale)
 $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}}+ \epsilon_{ij} $$
  where  $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and $\epsilon_{ij} \sim N(0,20.47)$
  
-# Two Stage Model Analysis comparison
-
-## Two stage Model 
-### Stage one
-```{r}
-trenal.grouped<-groupedData(Hc~time|id,trenal.long, inner = ~ male+cardio+reject, labels=list(y="level of Haematocrit"),units=list(y="%"))
-modlist1 <- lmList (Hc ~ time|id, trenal.grouped , na.action = na.pass)
-a = coef(modlist1)[,1]
-b = coef(modlist1)[,2]
-plot.new()
-par(mfrow=c(1,2))
-hist(a,xlab="intercepts",ylab="Frequency",title="Histogram for intercepts")
-hist(b,xlab="slopes for t",ylab="Frequency",title="Histogram for time slopes")
-```
-### Stage two
-
-```{r}
-# appendix the value of a, b, c to the original data frame
-ab <- data.frame(id=as.numeric(attributes(modlist1)$names),
-                 a=coef(modlist1)[,1],b=coef(modlist1)[,2])
-ab <- merge(trenal.long, ab[,c("id","a", "b")], by.x = "id", all.x = T)
-ab <- ab[order(ab[,1]),]
-head(ab)
-```
-```{r}
-### Fit a model for the intercept
-fita<-lm(a ~ age + male,ab)
-summary(fita)
-confint(fita)
-
-### Fit a model for the slope t
-
-fitb<-lm(b ~ age + male ,ab)
-summary(fitb)
-confint(fitb)
-
-```
-
-## The equivalent LMM model should be
-
-    Level One: 
-  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
-  
-    Level Two: 
-  \begin{align}
-     a_i &= \alpha_0 + \alpha_1 \times age_i + \alpha_2 \times male_i +  u_i, \\
-     b_i &= \beta_0 + \beta_1 \times age_i + \beta_2 \times male_i + v_i
-     \end{align}
-  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
-
-
-The equivalent linear mixed effect model is:
- $$Y_{ij} = [\alpha_0 + \alpha_1 \times age_i +  \alpha_2 \times male_i + \beta_0 \times time_{ij} +\beta_1 \times age_i \times time_{ij} +\beta_2 \times male_i \times time_{ij} ] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$
-
- 
- where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
-```{r}
-model.b.equivalent <- lmer(Hc ~ age + male + time+ age:time+male:time+(time|id),REML=T,data=trenal.long)
-t = fixef(model.b.equivalent)
-```
-
-## Result comparison
-
-
-```{r}
-coeff.twostage = c(extract_numeric(fita$coefficients), extract_numeric(fitb$coefficients))
-fixeff = fixed.effects(model.b.equivalent)
-coeff.LMM = extract_numeric(fixeff)
-coefficients.name = c('alpha_0','alpha_1','alpha_2','beta_0','beta_1','beta_2')
-
-coefficients.comparison= cbind(coefficients.name,coeff.twostage,coeff.LMM)
-knitr::kable(coefficients.comparison)
-```
