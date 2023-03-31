@@ -5,14 +5,26 @@ author: "Group2: Hugo Blain; Oscar Cabanelas;Wanchang Zhang"
 date: "`r Sys.Date()`"
 format:
   revealjs:
-    
+    incremental: false  
+    transition: slide
+    background-transition: fade
+    transition-speed: slow
     scrollable: true
+    menu:
+      side: left
+      width: half
+      numbers: true
+    slide-number: c/t
+    show-slide-number: all
+    progress: true
+    css: "css4CU.css"
+    theme: sky
+    embed-resources: true
 bibliography: "scholar.bib"
 editor_options: 
   markdown: 
     wrap: 72
 ---
-
 ## Outline {visibility="hidden"}
 
 ```{r packages, echo=FALSE}
