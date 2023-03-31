@@ -58,11 +58,8 @@ head(trenal)
 ```{r message=FALSE, warning=FALSE}
 dim(trenal)
 ```
-As we can see, the dataset is composed of 13920 rows and 20 columns. 
 
-```{r message=FALSE, warning=FALSE}
-head(trenal)
-```
+As we can see, the dataset is composed of 13920 rows and 20 columns. 
 
 ```{r message=FALSE, warning=FALSE}
 trenal= trenal[,-18]
@@ -75,7 +72,7 @@ From the 1st column to the 12th, the values appear to be the levels of Haematocr
 trenal.long = trenal[,13:20]
 summary(trenal.long)
 ```
-Now, it is interesting to rellocate the variables in order to have a clear format . Moreover, some of the variables are transformed to factor since they are not numerical ones. 
+Now, it is interesting to relocate the variables in order to have a clear format . Moreover, some of the variables are transformed to factor since they are not numerical ones. 
 
 ```{r message=FALSE, warning=FALSE}
 trenal.long$id = as.factor(trenal.long$id)
@@ -107,7 +104,7 @@ Plot1<-xyplot(respons ~ time, groups = id,
 
 **Comment**:
 
-As we can see, there is a lot of variability in the origin, since the values go from 20 until 50 approximatelly. Furthermore, in this plot we can not see a clear difference in the slopes. Since that, we are going to pick up a random sample for trying to understand that aspect. 
+As we can see, there is a lot of variability in the origin, since the values go from 20 until 50 approximately. Furthermore, in this plot we can not see a clear difference in the slopes. Since that, we are going to pick up a random sample for trying to understand that aspect. 
 
 To do that, we are going to use the ggplot function to make it beauty.
 
@@ -137,7 +134,18 @@ Now, it is interesting to check if we can find differences between genders:
 ```{r}
 ggplot(data.selected,aes(x=time,y=respons,group=id,color=male))+geom_point()+ geom_line()+theme_light()
 ```
+
 **Comment**
+
+It seems that the Haematocrit level is higher in males than in females. However, the variability seems similar. 
+
+```{r}
+ggplot(data.selected,aes(x=male,y=respons))+geom_boxplot()+theme_light()
+```
+
+**Comment**
+
+In the boxplot we can check that also the variability in males is higher than in females. 
 
 Furthermore, we can check it depending on the level of cardio
 
@@ -146,14 +154,31 @@ ggplot(data.selected,aes(x=time,y=respons,group=id,color=cardio))+geom_point()+ 
 ```
 **Comment**
 
+It seems that the variability of Haematocrit level is higher in people without experiencing a cardio-vascular problem during the years preceding the transplantation
+
+```{r}
+ggplot(data.selected,aes(x=cardio,y=respons))+geom_boxplot()+theme_light()
+```
+
+**Comment**
+
+It seems that after checking the boxplot, the variability is similar in both groups indeed, same case as in the mean approach. 
+
 ```{r}
 ggplot(data.selected,aes(x=time,y=respons,group=id,color=reject))+geom_point()+ geom_line()+theme_light()
 ```
 **Comment**
 
+It seems that the variability of Haematocrit level is higher in patient who did not show symptoms of graft rejection during the first three months after the transplantation. 
+
+```{r}
+ggplot(data.selected,aes(x=reject,y=respons))+geom_boxplot()+theme_light()
+```
+
+
 Add here things about the mean that Wanchang did by group.
 
-2. Summary statistics ...
+2. Summary statistics
 
 Analysis of endpoints: the response at the last mesure
 
@@ -164,10 +189,62 @@ last_measurement <- subset(trenal.long, trenal.long$time == 10)
 summary(last_measurement)
 #Check the mean and everything about last point response
 ```
+**Comment**
 
+The last point of the *respons* has 812 NAs from the 1154 measurements. 
 
+```{r}
+last_measurement$resp_na<-ifelse(is.na(last_measurement$respons) == T, 1, 0)
+
+last_measurement$resp_na<- as.factor(last_measurement$resp_na)
+summary(last_measurement$resp_na)
+
+```
+
+How it is composed for male/female?
+
+```{r}
+last_measurement_male <- last_measurement %>%                                    # Count NA by group
+  group_by(male) %>%
+  dplyr::summarize(count_na = sum(is.na(respons)))
+last_measurement_male 
+```
+
+How is it composed for rejection or nor?
+
+```{r}
+last_measurement_reject <- last_measurement %>%                                    # Count NA by group
+  group_by(reject) %>%
+  dplyr::summarize(count_na = sum(is.na(respons)))
+last_measurement_reject
+```
+
+How is it composed for cardio or not?
+
+```{r}
+last_measurement_cardio <- last_measurement %>%                                    # Count NA by group
+  group_by(cardio) %>%
+  dplyr::summarize(count_na = sum(is.na(respons)))
+last_measurement_cardio
+```
 
 Analysis of increments: Difference between the response at the first available and the last one.
+
+We will use just the non NA values
+
+```{r}
+trenal.long.incr<-trenal.long_no_na %>% 
+  filter(time == c(0, 10)) %>% 
+  group_by(id) %>% 
+  mutate(incr = max(respons) - min (respons), one = 1) %>% 
+  filter(!incr %in% 0)
+```
+```{r}
+
+boxplot(trenal.long.incr$incr)
+
+ggplot(trenal.long.incr,aes(x=one,y=respons))+geom_boxplot()+theme_light()
+```
 
 Increment
 
@@ -177,46 +254,36 @@ Increment per unit of time
 
 To do that, we are going to use the lm function. We will try to create different linear models using all the available variables in the data set. 
 
-```{r}
-trenal.lm<-lm(respons ~ time, data = trenal.long)
-summary(trenal.lm)
-```
-
-**Comment**
-
-```{r}
-trenal.lm2 <- lm(respons ~ time + male, data = trenal.long)
-summary(trenal.lm2)
-```
-**Comment**
-
-```{r}
-trenal.lm3 <- lm(respons ~ time + male + reject, data = trenal.long)
-summary(trenal.lm3)
-```
-
-```{r}
-trenal.lm4 <- lm(respons ~ time + male + reject + cardio, data = trenal.long)
-summary(trenal.lm4)
-```
-
-```{r}
-trenal.lm5 <- lm(respons ~ time + male + cardio, data = trenal.long)
-summary(trenal.lm5)
-```
-
 On top of that, we want to test if the level of rejection affection in the response variable can depend on the time. Since that, we also apply one interaction between the time and the rejection level. 
 
 ```{r}
-trenal.lm6 <- lm(respons ~ time + male + reject + reject:time, data = trenal.long)
-summary(trenal.lm6)
-```
+trenal.lm<-lm(respons ~ time, data = trenal.long)
+trenal.lm2 <- lm(respons ~ time + male, data = trenal.long)
+trenal.lm3 <- lm(respons ~ time + male + age, data = trenal.long)
+trenal.lm4 <- lm(respons ~ time + male + age + reject, data = trenal.long)
+trenal.lm5 <- lm(respons ~ time + male + age + cardio, data = trenal.long)
+trenal.lm6 <- lm(respons ~ time + male + age + reject + cardio, data = trenal.long)
+trenal.lm7 <- lm(respons ~ time + male + age + reject + reject:time, data = trenal.long)
 
-**Comment**
+anova(trenal.lm, trenal.lm2, trenal.lm3, trenal.lm4, trenal.lm5, trenal.lm6)
+```
 
 ```{r}
-anova(trenal.lm, trenal.lm2,  trenal.lm4, trenal.lm5, trenal.lm6)
+anova(trenal.lm3, trenal.lm5)
 ```
+
+CORR AND COVARIANCE STRUCTURE
+
+```{r}
+trenal.wide = trenal[,1:17]
+
+dataCorr<- trenal.wide[, c(1:12)]
+cor(dataCorr,use="complete.obs") #Also COV for covarianza
+cov(dataCorr,use="complete.obs")
+library("PerformanceAnalytics")
+chart.Correlation(dataCorr , histogram=T)
+```
+
 
 4. Use an explicit two-stage analysis to get an initial impression about trends and effects of covariates. 
 
@@ -225,30 +292,41 @@ As a first step, we need to create a *groupedData* object in order to apply it t
 
 
 ```{r}
-trenal_grouped<-groupedData(respons~time|id,trenal.long, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+trenal.long_no_na <- na.omit(trenal.long)
 
+trenal_grouped1<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+trenal_grouped2<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ reject, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+trenal_grouped3<-groupedData(respons~time|id,trenal.long_no_na, inner = ~ cardio, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+#plot(trenal_grouped1, inner =  T, key = F)
+#plot(trenal_grouped2, inner = T, key = F)
+#plot(trenal_grouped3, inner = T, key = F)
 #here, we do not declare any group, but I should group by male, reject or cardio
 #outer: time dependent
 #inner: not time dependent (male, )
 
 ```
 
-```{r}
-plot(trenal_grouped, inner = T)
-```
 
-
-first step: A model for each individual estimating the intercept and time was adjusted
+first step: A model for each individual estimating the intercept and time was adjusted. It is not significant which of the three previous models we will use, since the info is the same. 
 
 ```{r}
-modlist1 <- lmList (respons~ time , trenal_grouped , na.action = na.pass)
 
-modlist1
+#REMOVE MISSINGS HERE
+
+modlist1 <- lmList (respons ~ time, trenal_grouped1 , na.action = na.pass)
+
 
 #plot(intervals(modlist1))
 #plot(trenal_grouped)
 ```
+
+
 **Comment** In here, he have the model with a beta for each individual. 
+
+Then, we can extract all the beta0 and beta1 obtained from the model. This will be used in the following steps
 
 
 ```{r}
@@ -261,33 +339,106 @@ beta1<- coef(modlist1)[,2]
 
 ```
 
-```{r}
-trenal.wide = trenal[,1:17]
-```
+The coefficients can be extracted by using the following function
 
 ```{r}
 coef(modlist1)
-bbdd<-data.frame(Id=as.numeric(attributes(modlist1)$names),
-                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
-bbdd <- bbdd[order(bbdd[,1]),]
-bbdd <- cbind(bbdd,male=trenal.wide$male)
+
 ```
-2nd step: 
+
+Then, we create a data frame in which we store all the betas obtained. This will be useful for trying to split up the analysis by groups. 
+
 ```{r}
 
-#Boxplot
-meanbeta0bygroup<-tapply(bbdd$beta0,as.factor(bbdd$male),mean,na.rm=T)
-meanbeta1bygroup<-tapply(bbdd$beta1,as.factor(bbdd$male),mean,na.rm=T)
+bbdd<-data.frame(id=as.numeric(attributes(modlist1)$names),
+                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","beta0", "beta1")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+
+```
+
+BETAS ANALYSIS
+
+```{r}
+
+ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point()
+
+```
 
 
+
+Here, we calculate the mean beta by groups, to check if we have significant differences. 
+
+```{r}
+
+(meanbeta0bymale<-tapply(bbdd$beta0,as.factor(bbdd$male),mean,na.rm=T))
+(meanbeta1bymale<-tapply(bbdd$beta1,as.factor(bbdd$male),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=male)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)
+
+```
+
+
+**Comment**
+
+It seems that for gender classification, the intercept is higher for male and also the slope.
+
+```{r}
+(meanbeta0byreject<-tapply(bbdd$beta0,as.factor(bbdd$reject),mean,na.rm=T))
+(meanbeta1byreject<-tapply(bbdd$beta1,as.factor(bbdd$reject),mean,na.rm=T))
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=reject)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)
+
+``` 
+
+**Comment**
+
+It seems that for rejection level classification, the intercept is higher for people without experiencing a cardio-vascular problem during the years preceding the transplantation. However, in this case the slope is higher to its opposite group. 
+
+
+```{r}
+
+(meanbeta0bycardio<-tapply(bbdd$beta0,as.factor(bbdd$cardio),mean,na.rm=T))
+(meanbeta1bycardio<-tapply(bbdd$beta1,as.factor(bbdd$cardio),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=cardio)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)
+
+```
+
+**Comment**
+
+It seems that for gender classification, the intercept and the slope is higher for patient who did show symptoms of graft rejection during the first three months after the transplantation 
+
+
+```{r}
 #Let's check if they are quite related ?inverse correlation?
 
 with(bbdd,cor(beta0,beta1))
 
+```
 
-library(ggplot2)
-ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point()
-ggplot(bbdd, aes(x=beta0, y=beta1, color=male)) + geom_point()
+
+
+
+
+
+
+Correlations (maybe not needed)
+
+```{r}
 
 
 #install.packages('dplyr', repos = 'https://cloud.r-project.org')
@@ -297,21 +448,109 @@ bbdd %>%
   group_by(male) %>%
   summarize(cor=cor(beta0, beta1))
 
+bbdd %>%
+  group_by(cardio) %>%
+  summarize(cor=cor(beta0, beta1))
+
+bbdd %>%
+  group_by(reject) %>%
+  summarize(cor=cor(beta0, beta1))
+
+```
+
+2nd step: Fit the model and confidence interval
+
+```{r}
 
 # Fit a model for the intercept
-modbeta0<-lm(beta0~male,bbdd)
+modbeta0<-lm(beta0~male+cardio,bbdd)
 summary(modbeta0)
 confint(modbeta0)
 
 ### Fit a model for the slope
 # All the variables should be included
-modbeta1<-lm(beta1~male,bbdd)
+modbeta1<-lm(beta1~male+cardio,bbdd)
 summary(modbeta1)
 confint(modbeta1)
 
 
-#### END OF  EXERCISE
+```
 
+6. Pay attention to the missing, especially the ones presented by the outcome variable. Do your results still hold despite the missingness?
+
+
+Outcome analysis
+
+```{r}
+
+summary(trenal.long$respons)
 
 ```
+
+From the 13920 measurements, 4362 are NA's. That represents a 31% of the response measurements are NAs. 
+
+How are they distributed?
+
+Male
+
+```{r}
+trenal.long.na<-trenal.long %>% 
+  filter(is.na(respons) == T)
+
+trenal_na_male <- aggregate(trenal.long.na$respons, by=list(trenal.long.na$male), FUN=length)
+trenal_na_male
+```
+
+```{r}
+ggplot(data=trenal_na_male, aes(x=Group.1, y=x, color = Group.1)) +
+  geom_bar(stat="identity")+
+  ggtitle("Outcome distribution by gender")
+
+```
+
+**Comment**
+
+It seems that the most part of the NAs in gender are found in males. 
+
+Reject
+
+```{r}
+
+trenal_na_reject <- aggregate(trenal.long.na$respons, by=list(trenal.long.na$reject), FUN=length)
+trenal_na_reject
+
+```
+
+```{r}
+ggplot(data=trenal_na_reject, aes(x=Group.1, y=x, color = Group.1)) +
+  geom_bar(stat="identity")+
+  ggtitle("Outcome distribution by rejection level")
+
+```
+
+**Comment**
+
+It seems that the most part of the NAs in cardio are found in the ones without experiencing a cardio-vascular problem during the years preceding the transplantation.
+
+
+Cardio
+
+```{r}
+
+trenal_na_cardio <- aggregate(trenal.long.na$respons, by=list(trenal.long.na$cardio), FUN=length)
+trenal_na_cardio
+
+```
+
+```{r}
+ggplot(data=trenal_na_cardio, aes(x=Group.1, y=x, color = Group.1)) +
+  geom_bar(stat="identity")+
+  ggtitle("Outcome distribution by cardio level")
+
+```
+
+**Comment**
+
+It seems that the most part of the NAs in cardio are found in the patient who did not show symptoms of graft rejection during the first three months after the transplantation. 
+
 
