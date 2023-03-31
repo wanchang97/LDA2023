@@ -399,9 +399,6 @@ $$\textsf{$\beta$}_0 = 33.75 + 2.1089 * Male- 0.11 * Cardio + 0.04 * Age + \epsi
 
 -   The intercept is 33.75.
 -   If a subject is a male, the $\beta_{0}$ increases in 2.11 units.
--   If a subject experienced a cardio-vascular problem during the years
-    preceding the transplantation, the $\beta_{0}$ decreases in 0.11
-    units.
 -   If a subject increases the age, the $\beta_{0}$ increases in 0.04
     units.
 
