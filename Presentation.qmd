@@ -5,9 +5,12 @@ author: "Group2: Hugo Blain; Oscar Cabanelas;Wanchang Zhang"
 date: "`r Sys.Date()`"
 format:
   revealjs:
-    scrollable: true
     
+    scrollable: true
 bibliography: "scholar.bib"
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ## Outline {visibility="hidden"}
@@ -15,11 +18,13 @@ bibliography: "scholar.bib"
 ```{r packages, echo=FALSE}
 if (!require(mlbench)) install.packages("mlbench", dep=TRUE)
 ```
+
 1.  Data description
 
 2.  Data analysis
 
 # Data description
+
 ```{r,echo=FALSE}
 library(readxl)
 library(knitr)
@@ -69,34 +74,51 @@ trenal.long.piecewise = trenal.long
 trenal.long.piecewise['time1'] <- time1
 trenal.long.piecewise['time2'] <- time2
 ```
-## Background 
-- The dataset `Trenal.XLS` contains information on patients who received renal graft(kidney transplant). The patients have been followed for at most 10 years.
 
-- People with end-stage kidney disease who receive a kidney transplant generally live longer than people with ESRD who are on dialysis. 
+## Background
 
-- However, kidney transplant recipients must remain on immunosuppressants  (medications to suppress the immune system) for the rest of their life to prevent their body from rejecting the new kidney. The long-term immunosuppression puts them at risk for infections and cancer.
+-   The dataset `Trenal.XLS` contains information on patients who
+    received renal graft(kidney transplant). The patients have been
+    followed for at most 10 years.
 
-- Haematocrit level is meassured for each patient who has received renal graft to see if gender, the age to go through the operation, reject or not, cardio history or not will influence the healthy state of a patient after operation.
+-   People with end-stage kidney disease who receive a kidney transplant
+    generally live longer than people with ESRD who are on dialysis.
 
-## Data organisation{.smaller}
+-   However, kidney transplant recipients must remain on
+    immunosuppressants (medications to suppress the immune system) for
+    the rest of their life to prevent their body from rejecting the new
+    kidney. The long-term immunosuppression puts them at risk for
+    infections and cancer.
 
-| **Variables**            | **Physical Meaning**                                  | **Types of the variable**      |
+-   Haematocrit level is meassured for each patient who has received
+    renal graft to see if gender, the age to go through the operation,
+    reject or not, cardio history or not will influence the healthy
+    state of a patient after operation.
+
+## Data organisation {.smaller}
+
+| **Variables**                      | **Physical Meaning**                                                                                        | **Types of the variable**                                             |
 |:-----------------|:--------------------------|:--------------------------|
-| id     | Identification Number of each subject  | Categorical, ordinal $1,2,3,\cdots,1160$  |
-| Hc     | Haematocrit level   | Continuous units in $\%$ |
-| Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10   |  Haematocrit level meassured at the moment of time ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant    | Continuous; units in $\%$  |
-| age    |Age of the patient when performing the kidney transplant     | Continuous; from $15$ to $76$ years old, average is $46.43$ years old  |
-| male  | Gender  |Binary: 0 = female ; 1 = male  |
-| reject    | Has the patient shown symptoms of graft rejection during the first three months after the transportation  | Binary: 0 = no 1 = yes  |
-| cardio | Has the patient experienced a cardio-vascular problem during the years preceding the transplantation | Binary: 0 = no 1 = yes|
+| id                                 | Identification Number of each subject                                                                       | Categorical, ordinal $1,2,3,\cdots,1160$                              |
+| Hc                                 | Haematocrit level                                                                                           | Continuous units in $\%$                                              |
+| Hc0, Hc06, Hc1, Hc2,$\cdots$, Hc10 | Haematocrit level meassured at the moment of time ${0,0.5,1,2,\cdots,10}$ years after the kidney transplant | Continuous; units in $\%$                                             |
+| age                                | Age of the patient when performing the kidney transplant                                                    | Continuous; from $15$ to $76$ years old, average is $46.43$ years old |
+| male                               | Gender                                                                                                      | Binary: 0 = female ; 1 = male                                         |
+| reject                             | Has the patient shown symptoms of graft rejection during the first three months after the transportation    | Binary: 0 = no 1 = yes                                                |
+| cardio                             | Has the patient experienced a cardio-vascular problem during the years preceding the transplantation        | Binary: 0 = no 1 = yes                                                |
 
 ## Observations
- Our given data set is Longitudinal data with two levels: time-level and subject-level
-  
-- *Time-level* (also called *first level*) variables: changed with time, indexed by $j$ e.g. time and response Hc
-- *Subject-level* (also called *second level*) variables: changed with subjects indexed by $i$ e.g. age, male, reject, cardio
-  
+
+Our given data set is Longitudinal data with two levels: time-level and
+subject-level
+
+-   *Time-level* (also called *first level*) variables: changed with
+    time, indexed by $j$ e.g. time and response Hc
+-   *Subject-level* (also called *second level*) variables: changed with
+    subjects indexed by $i$ e.g. age, male, reject, cardio
+
 ## Missing data distribution
+
 ```{r,echo=FALSE,fig.axis=1,fig.align='center'}
 # Analyse the NA values descriptively
 ## First to collect how many NAs are in Hc0, Hc0.5, Hc1, ..., Hc 10
@@ -115,14 +137,18 @@ axis(side=1,at=c(1,2,3,4,5,6,7,8,9,10,11,12),labels=colnames(trenal.wide)[1:12])
 
 ```
 
-
-## Missing data distribution{.smaller}
+## Missing data distribution {.smaller}
 
 ::: columns
 ::: {.column width="40%"}
-- First we extract a data with the Hc level is missing (shown as NA) as a new data frame `trenal.long.NA.unique`
-- Then We plot the histogram of all the predictors: age, male, cardio and reject (the 4 columns corresponding to the right figure).on both the original data set `trenal.long.unique` and the missing data frame  `trenal.long.NA.unique`
-- We may conclude that missing data are random and has no specific preference on any type of the person.
+-   First we extract a data with the Hc level is missing (shown as NA)
+    as a new data frame `trenal.long.NA.unique`
+-   Then We plot the histogram of all the predictors: age, male, cardio
+    and reject (the 4 columns corresponding to the right figure).on both
+    the original data set `trenal.long.unique` and the missing data
+    frame `trenal.long.NA.unique`
+-   We may conclude that missing data are random and has no specific
+    preference on any type of the person.
 :::
 
 ::: {.column width="58%"}
@@ -131,9 +157,8 @@ knitr::include_graphics("images/MissingValueAnalysis.png")
 ```
 :::
 :::
+
 # Exploratory Data analysis
-
-
 
 ## Mean Structure
 
@@ -159,8 +184,11 @@ HcCorr = trenal.wide[,c(1:12)]
 #cor(HcCorr,use="complete.obs" ) # also COV for covariance
 chart.Correlation(HcCorr,historgram=TRUE)
 ```
-# Find out which covariate might influence the responses time trend 
+
+# Find out which covariate might influence the responses time trend
+
 ## Spaghetti plot
+
 ```{r,echo=FALSE}
 # since the data dimension is large 9551 x 8, we can select random 30 data to have a look 
 set.seed(1)
@@ -234,7 +262,6 @@ ggplot(trenal.long.noNA,aes(x=as.factor(time),y=Hc,fill=as.factor(reject)))+
 ggplot(data=trenal.long.noNA,aes(y=Hc,x=age))+geom_point()
 ```
 
-
 ```{r}
 data.groupbyage <- trenal.long.noNA %>%   group_by(age) %>% summarise(avgHc=mean(Hc))
 ggplot(data=data.groupbyage,aes(y=avgHc,x=age))+geom_point()
@@ -242,14 +269,18 @@ ggplot(data=data.groupbyage,aes(y=avgHc,x=age))+geom_point()
 
 ## Conclusions after exploring data analysis
 
-* The Hc time trend tends to increase first from 0 to 0.5 year then keep variated during the rest of the meassurements
-* The subject related variables age may increase the mean Hc level of a subject
-* Male has relative higher Hc level than female
-* Cardio or reject play no big difference in the Hc level measurements.
+-   The Hc time trend tends to increase first from 0 to 0.5 year then
+    keep variated during the rest of the meassurements
+-   The subject related variables age may increase the mean Hc level of
+    a subject
+-   Male has relative higher Hc level than female
+-   Cardio or reject play no big difference in the Hc level
+    measurements.
 
 # Data analysis
 
 ## Multivariate Data Analysis using `lm`
+
 ```{r,echo=TRUE}
 lm0 <- lm(Hc ~ time, trenal.long)
 lm1 <- lm(Hc ~ time + age, trenal.long)
@@ -258,19 +289,160 @@ lm3 <- lm(Hc ~ time + age + male + reject,trenal.long)
 lm4 <- lm(Hc ~ time + age + male + reject + cardio,trenal.long)
 anova(lm1,lm2,lm3,lm4)
 ```
-## Two stage model analysis
+
+## Two stage analysis
+
+Obtaining beta's for the intercept and the time variable
+
+```{r}
+
+trenal.long.NA <- na.omit(trenal.long)
+
+trenal_grouped<-groupedData(Hc~time|id,trenal.long.NA, inner = ~ male, labels=list(y="level of Haematocrit"),units=list(y="level of Haematocrit "))
+
+modlist1 <- lmList (Hc ~ time|id, trenal_grouped , na.action = na.pass)
+
+```
+
+```{r}
+
+beta0<- coef(modlist1)[,1]
+
+beta1<- coef(modlist1)[,2]
+
+bbdd<-data.frame(id=as.numeric(attributes(modlist1)$names),
+                 beta0=coef(modlist1)[,1],beta1=coef(modlist1)[,2])
+bbdd <- merge(trenal.long, bbdd[,c("id","beta0", "beta1")], by.x = "id", all.x = T)
+
+bbdd <- bbdd[order(bbdd[,1]),]
+
+
+```
+
+#### BETAS ANALYSIS
+
+```{r}
+
+ggplot(bbdd, aes(x=beta0, y=beta1)) + geom_point() + ggtitle("Beta comparison")
+
+```
+
+```{r}
+
+(meanbeta0bymale<-tapply(bbdd$beta0,as.factor(bbdd$male),mean,na.rm=T))
+(meanbeta1bymale<-tapply(bbdd$beta1,as.factor(bbdd$male),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=male)) +
+geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Gender")
+
+```
+
+It seems that for gender classification, the intercept is higher for
+male and also the slope.
+
+```{r}
+(meanbeta0byreject<-tapply(bbdd$beta0,as.factor(bbdd$reject),mean,na.rm=T))
+(meanbeta1byreject<-tapply(bbdd$beta1,as.factor(bbdd$reject),mean,na.rm=T))
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=reject)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Rejection Level")
+
+```
+
+It seems that for rejection level classification, the intercept is
+higher for people without experiencing a cardio-vascular problem during
+the years preceding the transplantation. However, in this case the slope
+is higher to its opposite group.
+
+```{r}
+
+(meanbeta0bycardio<-tapply(bbdd$beta0,as.factor(bbdd$cardio),mean,na.rm=T))
+(meanbeta1bycardio<-tapply(bbdd$beta1,as.factor(bbdd$cardio),mean,na.rm=T))
+
+```
+
+```{r}
+ggplot(bbdd, aes(x=beta0, y=beta1, color=cardio)) + geom_point()+
+  geom_smooth(method='lm', formula= y~x)+
+ggtitle("Beta comparison by Cardio Level")
+
+```
+
+It seems that for gender classification, the intercept and the slope is
+higher for patient who did show symptoms of graft rejection during the
+first three months after the transplantation
+
+#### 2nd step
+
+Fit the model and confidence interval. We will use the structure found
+in the multivariate section.
+
+##### Beta0
+
+```{r}
+
+modbeta0<-lm(beta0~male + cardio + age,bbdd)
+summary(modbeta0)
+confint(modbeta0)
+
+```
+
+$$\textsf{$\beta$}_0 = 33.75 + 2.1089 * Male- 0.11 * Cardio + 0.04 * Age + \epsilon_i$$
+
+-   The intercept is 33.75.
+-   If a subject is a male, the $\beta_{0}$ increases in 2.11 units.
+-   If a subject experienced a cardio-vascular problem during the years
+    preceding the transplantation, the $\beta_{0}$ decreases in 0.11
+    units.
+-   If a subject increases the age, the $\beta_{0}$ increases in 0.04
+    units.
+
+##### Beta1
+
+```{r}
+
+### Fit a model for the slope
+
+modbeta1<-lm(beta1~male + cardio + age,bbdd)
+summary(modbeta1)
+confint(modbeta1)
+
+```
+
+$$\textsf{$\beta$}_1 = 0.075 + 0.1721 * Male + 0.274 * Cardio + 0.01 * Age + \epsilon_i$$ -
+The intercept is 0.075.
+
+\- If a subject is a male, the $\beta_{0}$ increases in 0.0274 units.
+
+\- If a subject experienced a cardio-vascular problem during the years
+preceding the transplantation, the $\beta_{0}$ increases in 0.274 units.
+
+\- If a subject increases the age, the $\beta_{0}$ increases in 0.01
+units.
 
 ## Linear Mixed Effects Model Analysis
 
     Conduct the analysis level by level 
 
 ::: footer
-inspired by Chapter 8 and 9 of <https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html>
+inspired by Chapter 8 and 9 of
+<https://bookdown.org/roback/bookdown-BeyondMLR/ch-lon.html>
 :::
-- Level One is : time and the response variable e.g. Hc level 
-- Level Two is : covariates related to each subject, e.g. age, male, reject, cardio
+
+-   Level One is : time and the response variable e.g. Hc level
+-   Level Two is : covariates related to each subject, e.g. age, male,
+    reject, cardio
 
 The trials related to Level One (only time as covariate)
+
 ```{r,echo=TRUE}
 model.a <- lmer(Hc ~ 1 + (1|id),REML=T,data=trenal.long)
 model.b <- lmer(Hc ~ time + (time|id),REML=T,data= trenal.long)
@@ -280,44 +452,57 @@ model.b.piecewise <- lmer(Hc ~ time1 + time2 + (1|id),REML=T,data=trenal.long.pi
 
 The trials related to level Two (Add subject related variable)
 
-## Unconditional Means Model to discover variance distribution{.smaller}
-We can first try the unconditional Means Model to explore the variance( within subject and between-subject), Define $Y_{ij}$ as the Hc level from subject $i$ and measured time $j$
+## Unconditional Means Model to discover variance distribution {.smaller}
 
-  * Level One: 
-  $$Y_{ij} = a_i + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
-  * Level Two: 
-  $$a_i = \alpha_0 + u_i,$$ where $u_i \sim N(0,\sigma_{u}^2)$
-  
+We can first try the unconditional Means Model to explore the variance(
+within subject and between-subject), Define $Y_{ij}$ as the Hc level
+from subject $i$ and measured time $j$
+
+-   Level One: $$Y_{ij} = a_i + \epsilon_{ij},$$ where
+    $\epsilon_{ij} \sim N(0,\sigma^2)$
+-   Level Two: $$a_i = \alpha_0 + u_i,$$ where
+    $u_i \sim N(0,\sigma_{u}^2)$
+
 Written in linear mixed effect model is:
- $$Y_{ij} = \alpha_0 + u_i + \epsilon_{ij},$$ where $u_i \sim N(0,\sigma_u^2)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+$$Y_{ij} = \alpha_0 + u_i + \epsilon_{ij},$$ where
+$u_i \sim N(0,\sigma_u^2)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+
 ```{r}
 summary(model.a)
 ```
 
-From the output of `model.a`, we obtain estimates of three model parameters:
+From the output of `model.a`, we obtain estimates of three model
+parameters:
 
-  * $\hat{\alpha}_0 = 38.16$: the mean of Hc level $\mu_{Hc}$ across all subjects and all years
-  * $\hat{\sigma}^2 = 23.07$: the variance in within-subjects deviation, between years of measurements $Hc_j$ and the mean $\mu_{Hc}$ across all subjects and all years
-  * $\hat{\sigma_u}^2 = 13.60$: the variance in between-subjects deviation, between subject mean $\mu_{Hc_i}$ and the overall mean $\mu_{Hc}$ across all subjects and all years.
-  
+-   $\hat{\alpha}_0 = 38.16$: the mean of Hc level $\mu_{Hc}$ across all
+    subjects and all years
+-   $\hat{\sigma}^2 = 23.07$: the variance in within-subjects deviation,
+    between years of measurements $Hc_j$ and the mean $\mu_{Hc}$ across
+    all subjects and all years
+-   $\hat{\sigma_u}^2 = 13.60$: the variance in between-subjects
+    deviation, between subject mean $\mu_{Hc_i}$ and the overall mean
+    $\mu_{Hc}$ across all subjects and all years.
+
 The intraclass correlation coefficient:
 $$\hat{\rho}= \frac{\hat{\sigma_u}^2}{\hat{\sigma_u}^2+\hat{\sigma}^2} = \frac{13.60}{13.60+ 23.07}=0.371$$
-## Unconditional Growth Model, introducing time in Level One
+\## Unconditional Growth Model, introducing time in Level One
 
-  * Level One: 
-  $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
-  
-  * Level Two: 
-  
-  \begin{align}
+-   Level One: $$Y_{ij} = a_i + b_i \times time_{ij} + \epsilon_{ij},$$
+    where $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+-   Level Two:
+
+\begin{align}
   a_i &= \alpha_0 + u_i, \\
   b_i &= \beta_0 + v_i
-  \end{align}
-  where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
-
+  \end{align} where
+$\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
 
 Written in linear mixed effect model is:
- $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$ where $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+$$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij}] + [ u_i + v_i \times time_{ij} +  \epsilon_{ij} ],$$
+where
+$\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v \\ \rho_{uv} \sigma_u\sigma_v & \sigma_v^2 \end{bmatrix}\right)$
+and $\epsilon_{ij} \sim N(0,\sigma^2)$
 
 ```{r}
 # model b
@@ -325,63 +510,85 @@ summary(model.b)
 ```
 
 From the `model.b`, we obtain estimates of our six model parameters:
- 
-* $\hat{\alpha}_0 = 37.2678$: the mean Hc level for the subjects at time 0, $Hc_0$
-* $\hat{\beta}_0 = 0.31583$: the mean change in successively measurements during totally $12$ measurements
-* $\hat{\sigma}^2 = 20.8883$: the variance in within-subject deviations
-* $\hat{\sigma}_u^2 = 13.5731$: the variance between subjects at time 0, $Hc_0$
-* $\hat{\sigma}_v^2 = 0.1856$: the variance between subjects in rate of changes in Hc level
-* $\rho_{uv} = -0.15$: the correlation in subject's $Hc_0$ and the rate of change in Hc level
 
-The estimated within-subject variance $\hat{\sigma}^2$ decreased by about $9\%$ from the unconditional means model implying that $9\%$ of within-subject variability in Hc level can be explained by a linear increase over time:
-$$Pseudo R^2_{L1} = \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond. growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} = 0.0948$$ 
+-   $\hat{\alpha}_0 = 37.2678$: the mean Hc level for the subjects at
+    time 0, $Hc_0$
+-   $\hat{\beta}_0 = 0.31583$: the mean change in successively
+    measurements during totally $12$ measurements
+-   $\hat{\sigma}^2 = 20.8883$: the variance in within-subject
+    deviations
+-   $\hat{\sigma}_u^2 = 13.5731$: the variance between subjects at time
+    0, $Hc_0$
+-   $\hat{\sigma}_v^2 = 0.1856$: the variance between subjects in rate
+    of changes in Hc level
+-   $\rho_{uv} = -0.15$: the correlation in subject's $Hc_0$ and the
+    rate of change in Hc level
+
+The estimated within-subject variance $\hat{\sigma}^2$ decreased by
+about $9\%$ from the unconditional means model implying that $9\%$ of
+within-subject variability in Hc level can be explained by a linear
+increase over time:
+$$Pseudo R^2_{L1} = \frac{\hat{\sigma}^2(uncond. means)-\hat{\sigma}^2(uncond. growth)}{\hat{\sigma}^2(uncond. growth)} = \frac{23.07-20.8883}{23.07} = 0.0948$$
 
 ## Modeling other trends over time quadratic
 
-* Level One: 
-  $$Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
-  
-  * Level Two: 
-  
-  \begin{align}
-  a_i &= \alpha_0 + u_i, \\
-  b_i &= \beta_0 + v_i, \\
-  c_i &= \gamma_0 + w_i,
-  \end{align}
-  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+-   Level One:
+    $$Y_{ij} = a_i + b_i \times time_{ij} + c_i \times time_{ij}^2 + \epsilon_{ij},$$
+    where $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+    -   Level Two:
+
+    \begin{align}
+    a_i &= \alpha_0 + u_i, \\
+    b_i &= \beta_0 + v_i, \\
+    c_i &= \gamma_0 + w_i,
+    \end{align} where
+    $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ & \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
 
 Written in linear mixed effect model is:
- $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \gamma_0 \times time_{ij}^2] + [ u_i + v_i \times time_{ij} + w_i \times time_{ij}^2 +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
+$$Y_{ij} = [\alpha_0 + \beta_0 \times time_{ij} + \gamma_0 \times time_{ij}^2] + [ u_i + v_i \times time_{ij} + w_i \times time_{ij}^2 +  \epsilon_{ij} ],$$
+where
+$\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ & \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+and $\epsilon_{ij} \sim N(0,\sigma^2)$
 
 ```{r}
 summary(model.c)
 ```
 
-
 ## Piecewise linear time trend
-In the **piecewise linear model**, the complete time span of the study is divided into two segments, with a separate slope relating time to the response in each segment.
 
-* Level One: 
-  $$Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},$$ where $\epsilon_{ij} \sim N(0,\sigma^2)$
-  
-  * Level Two: 
-  
-  \begin{align}
-  a_i &= \alpha_0 + u_i, \\
-  b_i &= \beta_0 + v_i, \\
-  c_i &= \gamma_0 + w_i,
-  \end{align}
-  where $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+In the **piecewise linear model**, the complete time span of the study
+is divided into two segments, with a separate slope relating time to the
+response in each segment.
+
+-   Level One:
+    $$Y_{ij} = a_i + b_i \times time_{1_{ij}} + c_i \times time_{2_{ij}} + \epsilon_{ij},$$
+    where $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+    -   Level Two:
+
+    \begin{align}
+    a_i &= \alpha_0 + u_i, \\
+    b_i &= \beta_0 + v_i, \\
+    c_i &= \gamma_0 + w_i,
+    \end{align} where
+    $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ & \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
 
 Written in linear mixed effect model is:
- $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ &  \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$ and $\epsilon_{ij} \sim N(0,\sigma^2)$
- 
-In our case study, we can fit separate slope in time $0-0.5$ and $0.5-10$
+$$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$
+where
+$\begin{bmatrix} u_i \\ v_i \\w_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \\0 \end{bmatrix}, \begin{bmatrix}\sigma_{u}^2 & \rho_{uv}\sigma_u\sigma_v & \rho_{uw} \sigma_u \sigma_w \\ & \sigma_v^2 & \rho_{vw} \sigma_v\sigma_w \\ & & \sigma_w^2 \end{bmatrix}\right)$
+and $\epsilon_{ij} \sim N(0,\sigma^2)$
+
+In our case study, we can fit separate slope in time $0-0.5$ and
+$0.5-10$
+
 ```{r}
 summary(model.b.piecewise)
 ```
 
 ## Comparing the level one models
+
 ```{r}
 cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
 cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
@@ -398,7 +605,6 @@ model.b.piecewise.agemale <- lmer(Hc ~ time1 + time2  +male + age +(time2|id),RE
 model.b.piecewise.agemalereject <- lmer(Hc ~ time1 + time2  +age + male+ reject +(time2|id),REML=T,data=trenal.long.piecewise)
 ```
 
-
 ```{r,echo=FALSE}
 cat("model.a: AIC = ",AIC(model.a),";BIC = ", BIC(model.a),"\n")
 cat("model.b: AIC = ",AIC(model.b),";BIC = ", BIC(model.b),"\n")
@@ -411,11 +617,14 @@ cat("model.b.piecewise,agemalereject: AIC = ",AIC(model.b.piecewise.agemalerejec
 ```
 
 ## Final chosen model
-Our chosen model would be the piecewise linear model with age gender as the level two variables `model.b.piecewise.agemale`.
 
+Our chosen model would be the piecewise linear model with age gender as
+the level two variables `model.b.piecewise.agemale`.
 
 $$Y_{ij} = [32.69 + 4.112\times time_{1_{ij}} +0.4066 \times time_{2_{ij}} + 2.347 \times male_i + 0.058747 \times age_i] + [u_i + v_i \times time_{2_{ij}} + \epsilon_{ij} $$
- $$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$ where  $\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim  N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and $\epsilon_{ij} \sim N(0,20.5)$
- 
+$$Y_{ij} = [\alpha_0 + \beta_0 \times time_{1_{ij}} + \gamma_0 \times time_{2_{ij}}] + [ u_i + v_i \times time_{1_{ij}} + w_i \times time_{2_{ij}} +  \epsilon_{ij} ],$$
+where
+$\begin{bmatrix} u_i \\ v_i \end{bmatrix} \sim N\left(\begin{bmatrix} 0 \\ 0 \end{bmatrix}, \begin{bmatrix}12.038 & -0.3155271 \\ -0.3155271 & 0.1874\end{bmatrix}\right)$,and
+$\epsilon_{ij} \sim N(0,20.5)$
+
 ## Two Stage Model Analysis comparison
- 
